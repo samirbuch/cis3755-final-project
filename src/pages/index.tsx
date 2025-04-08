@@ -61,13 +61,13 @@ export default function Home() {
             translateY: ["0%", "10%"],
             duration: 500,
             easing: "ease",
-          }, "<<")
+          }, "<+=100")
           .add(".choose", {
             opacity: [1, 0],
             // translateY: ["10%", "0%"],
             duration: 500,
             easing: "ease"
-          }, stagger(200, { start: "+=100" }));
+          }, stagger(200, { start: "+=50" }));
 
       });
 
