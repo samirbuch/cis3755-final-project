@@ -27,3 +27,7 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+div .choose {
+  opacity: 0;
+}

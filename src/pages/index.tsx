@@ -3,11 +3,11 @@
 import Head from "next/head";
 // import Image from "next/image";
 import styles from "@/styles/Home.module.css";
-import { Flex, Text, Title } from "@mantine/core";
+import { Button, Divider, Flex, Text, Title } from "@mantine/core";
 import CenteredOnPage from "@/components/CenteredOnPage";
 import { useEffect, useRef } from "react";
 
-import { createScope, animate, type Scope, createTimeline } from "animejs";
+import { createScope, animate, type Scope, createTimeline, stagger } from "animejs";
 
 export default function Home() {
   const root = useRef<HTMLDivElement>(null);
@@ -38,7 +38,13 @@ export default function Home() {
           translateY: ["10%", "0%"],
           duration: 500,
           easing: "ease",
-        })
+        }, "+=100")
+        .add(".choose", {
+          opacity: [0, 1],
+          // translateY: ["10%", "0%"],
+          duration: 1000,
+          easing: "ease"
+        }, stagger(200, { start: "+=100" }))
 
     })
   }, []);
@@ -53,16 +59,42 @@ export default function Home() {
       </Head>
       <div className={`${styles.page}`} ref={root}>
         <main>
-          <CenteredOnPage>
+          <div style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "100%"
+          }}>
+            <CenteredOnPage>
+              <Flex direction={"column"} gap="sm" align={"center"}>
+                <Title id="title" size={"8rem"} opacity={0}>
+                  Your time is limited.
+                </Title>
+                <Text id="subtitle" size="xl" opacity={0}>
+                  A perspective on time, and the way we spend it
+                </Text>
+              </Flex>
+            </CenteredOnPage>
+          </div>
+          <div style={{ paddingTop: "80vh", opacity: 0 }} className="choose">
             <Flex direction={"column"} gap="sm" align={"center"}>
-              <Title id="title" size={"8rem"} opacity={0}>
-                Your time is limited.
-              </Title>
-              <Text id="subtitle" size="xl" opacity={0}>
-                A perspective on time, and the way we spend it
-              </Text>
+              <Text className="choose">Choose your storyline:</Text>
+              <Flex gap="sm">
+                <Button className="choose" variant="transparent">
+                  Ari
+                </Button>
+                <Divider className="choose" orientation="vertical" />
+                <Button className="choose" variant="transparent">
+                  Jess
+                </Button>
+                <Divider className="choose" orientation="vertical" />
+                <Button className="choose" variant="transparent">
+                  Samir
+                </Button>
+              </Flex>
             </Flex>
-          </CenteredOnPage>
+          </div>
         </main>
       </div>
     </>
