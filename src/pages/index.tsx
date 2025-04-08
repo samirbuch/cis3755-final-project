@@ -44,10 +44,39 @@ export default function Home() {
           // translateY: ["10%", "0%"],
           duration: 1000,
           easing: "ease"
-        }, stagger(200, { start: "+=100" }))
+        }, stagger(200, { start: "+=100" }));
+
+      scope.add("transition", () => {
+        // timeline.reverse();
+        createTimeline()
+          .add("#title", {
+            opacity: [1, 0],
+            translateY: ["0%", "10%"],
+            duration: 500,
+            easing: "ease",
+            delay: 500,
+          }, "<<")
+          .add("#subtitle", {
+            opacity: [1, 0],
+            translateY: ["0%", "10%"],
+            duration: 500,
+            easing: "ease",
+          }, "<<")
+          .add(".choose", {
+            opacity: [1, 0],
+            // translateY: ["10%", "0%"],
+            duration: 500,
+            easing: "ease"
+          }, stagger(200, { start: "+=100" }));
+
+      });
 
     })
   }, []);
+
+  function goToStoryline(storyline: string) {
+    scope.current?.methods.transition();
+  }
 
   return (
     <>
@@ -81,15 +110,27 @@ export default function Home() {
             <Flex direction={"column"} gap="sm" align={"center"}>
               <Text className="choose">Choose your storyline:</Text>
               <Flex gap="sm">
-                <Button className="choose" variant="transparent">
+                <Button
+                  className="choose"
+                  variant="transparent"
+                  onClick={() => goToStoryline("ari")}
+                >
                   Ari
                 </Button>
                 <Divider className="choose" orientation="vertical" />
-                <Button className="choose" variant="transparent">
+                <Button
+                  className="choose"
+                  variant="transparent"
+                  onClick={() => goToStoryline("jess")}
+                >
                   Jess
                 </Button>
                 <Divider className="choose" orientation="vertical" />
-                <Button className="choose" variant="transparent">
+                <Button
+                  className="choose"
+                  variant="transparent"
+                  onClick={() => goToStoryline("samir")}
+                >
                   Samir
                 </Button>
               </Flex>
