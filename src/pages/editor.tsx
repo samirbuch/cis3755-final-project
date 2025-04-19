@@ -1,5 +1,6 @@
 import { Button, Flex, SegmentedControl, Text, Title } from "@mantine/core";
 import { useEffect, useRef, useState } from "react"
+import { animate, svg as animeSVG } from 'animejs';
 
 import type Node from "@/interfaces/Node";
 
@@ -25,13 +26,13 @@ function TheActualPage() {
 
   const svgContainerRef = useRef<SVGSVGElement>(null);
 
-  // const [nodes, setNodes] = useState<Node[]>([]);
-  // const [links, setLinks] = useState<Link[]>([]);
-
   const nodes = editorContext.nodes;
   const links = editorContext.links;
 
   const [tab, setTab] = useState<"nodes" | "links">("nodes");
+
+  // Store all animations so they can be cleaned up later
+  const animationsRef = useRef<any[]>([]);
 
   useEffect(() => {
     if (!svgContainerRef.current) return;
@@ -70,6 +71,19 @@ function TheActualPage() {
       .attr("stroke", "white")
       .attr("stroke-width", 2);
 
+    // Create a group for animated circles
+    const animationGroup = svg.append("g")
+      .attr("class", "animatedCircles");
+
+    // For each link, create a circle that will animate along the path
+    links.forEach((link, i) => {
+      // Add a circle to the animation group
+      animationGroup.append("circle")
+        .attr("r", 5)
+        .attr("fill", "#4CAF50")
+        .attr("id", `animated-circle-${i}`)
+        .style("opacity", 0.8);
+    });
 
     function tick() {
       if (nodes.length > 0) {
@@ -90,8 +104,33 @@ function TheActualPage() {
           .attr("x1", (d) => d.source.x)
           .attr("y1", (d) => d.source.y)
           .attr("x2", (d) => d.target.x)
-          .attr("y2", (d) => d.target.y);
+          .attr("y2", (d) => d.target.y)
+          .attr("id", (d) => `SOURCE${d.source.id}_TARGET${d.target.id}`);
+
+        // Setup AnimeJS animations after positions are set
+        setupAnimations();
       }
+    }
+
+    function setupAnimations() {
+      // Clean up old animations first
+      animationsRef.current.forEach(anim => anim.pause());
+      animationsRef.current = [];
+
+      // Create new animations for each link
+      links.forEach((link, i) => {
+        if (!link.source.x || !link.target.x) return;
+
+        // Setup animation
+        const animation = animate(`#animated-circle-${i}`, {
+          easing: 'linear',
+          duration: 2000,
+          loop: true,
+          ...animeSVG.createMotionPath(`#SOURCE${link.source.id}_TARGET${link.target.id}`),
+        });
+
+        animationsRef.current.push(animation);
+      });
     }
 
     if (nodes.length > 0) {
@@ -113,6 +152,8 @@ function TheActualPage() {
     // Cleanup
     return () => {
       d3.forceSimulation().stop();
+      animationsRef.current.forEach(anim => anim.pause());
+      animationsRef.current = [];
     }
   }, [nodes, links]);
 
