@@ -1,4 +1,4 @@
-import { Flex, SegmentedControl, Text, Title } from "@mantine/core";
+import { Button, Flex, SegmentedControl, Text, Title } from "@mantine/core";
 import { useEffect, useRef, useState } from "react"
 
 import type Node from "@/interfaces/Node";
@@ -8,14 +8,28 @@ import * as d3 from "d3";
 import styles from "@/styles/Editor.module.css";
 import Header from "@/components/Header";
 import NodesPanel from "@/components/editor/NodesPanel";
-import Link from "@/interfaces/Link";
+import type Link from "@/interfaces/Link";
 import LinksPanel from "@/components/editor/LinksPanel";
+import { EditorProvider, useEditorContext } from "@/contexts/EditorContext";
 
 export default function Editor() {
+  return (
+    <EditorProvider>
+      <TheActualPage />
+    </EditorProvider>
+  )
+}
+
+function TheActualPage() {
+  const editorContext = useEditorContext();
+
   const svgContainerRef = useRef<SVGSVGElement>(null);
 
-  const [nodes, setNodes] = useState<Node[]>([]);
-  const [links, setLinks] = useState<Link[]>([]);
+  // const [nodes, setNodes] = useState<Node[]>([]);
+  // const [links, setLinks] = useState<Link[]>([]);
+
+  const nodes = editorContext.nodes;
+  const links = editorContext.links;
 
   const [tab, setTab] = useState<"nodes" | "links">("nodes");
 
@@ -51,6 +65,8 @@ export default function Editor() {
         svgNodes
           .attr("cx", (d) => d.x)
           .attr("cy", (d) => d.y);
+
+        // console.log("Nodes", nodes.map((n) => n.name));
       }
 
       if (links.length > 0) {
@@ -86,7 +102,14 @@ export default function Editor() {
 
   return (
     <Flex direction={"column"}>
-      <Header title="Editor" />
+      <Header title="Editor">
+        <Button>
+          Import
+        </Button>
+        <Button>
+          Export
+        </Button>
+      </Header>
       <Flex direction="row">
         <Flex flex={3}>
           {/* Svg container. Should take up majority of page width */}
@@ -121,35 +144,11 @@ export default function Editor() {
           />
 
           {tab === "nodes" && (
-            <NodesPanel
-              nodes={nodes}
-              onNodeEdit={(node) => {
-                console.log("Editing node", node);
-                setNodes(nodes.map((n) => (n.id === node.id ? node : n)));
-              }}
-              onNodeDelete={(node) => {
-                setNodes(nodes.filter((n) => n.id !== node.id));
-              }}
-              onNodeCreate={(node) => {
-                setNodes((prev) => [...prev, node]);
-              }}
-            />
+            <NodesPanel />
           )}
 
           {tab === "links" && (
-            <LinksPanel 
-              nodes={nodes}
-              links={links}
-              onLinkEdit={(link) => {
-                console.log("Editing link", link);
-              }}
-              onLinkDelete={(link) => {
-                setLinks(links.filter((l) => l.id !== link.id));
-              }}
-              onLinkCreate={(link) => {
-                setLinks((prev) => [...prev, link]);
-              }}
-            />
+            <LinksPanel />
           )}
         </Flex>
       </Flex>
