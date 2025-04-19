@@ -27,7 +27,7 @@ export default function LinkCard(props: LinkCardProps) {
             <Select
               searchable
               data={editorContext.nodes
-                .filter((node) => node.id !== toSelected)
+                .filter((node) => node.id !== toSelected) // Cannot connect to themselves
                 .map((node) => ({
                   value: node.id.toString(),
                   label: node.name
@@ -56,7 +56,7 @@ export default function LinkCard(props: LinkCardProps) {
             <Select
               searchable
               data={editorContext.nodes
-                .filter((node) => node.id !== fromSelected)
+                .filter((node) => node.id !== fromSelected) // Cannot connect to themselves
                 .map((node) => ({
                   value: node.id.toString(),
                   label: node.name
@@ -70,7 +70,7 @@ export default function LinkCard(props: LinkCardProps) {
                   setToSelected(parseInt(option.value));
                   props.onLinkEdit({
                     ...props.link,
-                    source: editorContext.nodes.find((node) => node.id === parseInt(option.value))!
+                    target: editorContext.nodes.find((node) => node.id === parseInt(option.value))!
                   });
                 }
               }}
