@@ -1,6 +1,6 @@
 import Link from "@/interfaces/Link";
 import Node from "@/interfaces/Node";
-import { Button } from "@mantine/core";
+import { Button, Flex, Text } from "@mantine/core";
 
 export interface LinksPanelProps {
   nodes: Node[];
@@ -28,8 +28,8 @@ export default function LinksPanel(props: LinksPanelProps) {
   return (
     <>
       {props.links.map((link) => (
-        <div key={link.id}>
-          <span>{`Link ${link.id}: ${link.source.name} -> ${link.target.name}`}</span>
+        <Flex direction="row" key={link.id} align="center" justify="space-between">
+          <Text>{`Link ${link.id}: ${link.source.name} -> ${link.target.name}`}</Text>
           <Button
             variant="outline"
             color="red"
@@ -40,7 +40,7 @@ export default function LinksPanel(props: LinksPanelProps) {
           >
             Delete
           </Button>
-        </div>
+        </Flex>
       ))}
 
       <Button onClick={createLink}>

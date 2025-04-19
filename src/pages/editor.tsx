@@ -1,4 +1,4 @@
-import { Button, Flex, SegmentedControl, Text, Title } from "@mantine/core";
+import { Flex, SegmentedControl, Text, Title } from "@mantine/core";
 import { useEffect, useRef, useState } from "react"
 
 import type Node from "@/interfaces/Node";
@@ -125,6 +125,7 @@ export default function Editor() {
               nodes={nodes}
               onNodeEdit={(node) => {
                 console.log("Editing node", node);
+                setNodes(nodes.map((n) => (n.id === node.id ? node : n)));
               }}
               onNodeDelete={(node) => {
                 setNodes(nodes.filter((n) => n.id !== node.id));

@@ -2,6 +2,7 @@ import type Node from "@/interfaces/Node";
 import { Button, Flex, Title } from "@mantine/core";
 
 import styles from "@/styles/Editor.module.css";
+import NodeCard from "./NodeCard";
 
 export interface NodesPanelProps {
   nodes: Node[];
@@ -30,24 +31,12 @@ export default function NodesPanel(props: NodesPanelProps) {
   return (
     <>
       {props.nodes.map((node) => (
-        <Flex
+        <NodeCard 
           key={node.id}
-          justify={"space-between"}
-          align={"center"}
-          className={styles.node}
-        >
-          <Title order={3}>{node.name}</Title>
-          <Button
-            variant="outline"
-            color="red"
-            onClick={() => {
-              // setNodes(nodes.filter((n) => n.id !== node.id));
-              props.onNodeDelete(node);
-            }}
-          >
-            Delete
-          </Button>
-        </Flex>
+          node={node}
+          onNodeEdit={props.onNodeEdit}
+          onNodeDelete={props.onNodeDelete}
+        />
       ))
       }
 
