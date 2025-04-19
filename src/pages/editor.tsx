@@ -42,26 +42,6 @@ function TheActualPage() {
 
     const svg = d3.select(svgContainerRef.current);
 
-    // Create node groups containing both circle and text
-    const nodeGroups = svg.append("g")
-      .attr("class", "nodes")
-      .selectAll("g")
-      .data(nodes)
-      .enter()
-      .append("g");
-
-    // Add circles to each group
-    const svgNodes = nodeGroups.append("circle")
-      .attr("r", 10)
-      .attr("fill", "white");
-
-    // Add text to each group
-    const svgTexts = nodeGroups.append("text")
-      .attr("x", 15)
-      .attr("y", 5)
-      .attr("fill", "white")
-      .text(d => d.name);
-
     const svgLinks = svg.append("g")
       .attr("class", "links")
       .selectAll("line")
@@ -74,6 +54,26 @@ function TheActualPage() {
     // Create a group for animated circles
     const animationGroup = svg.append("g")
       .attr("class", "animatedCircles");
+
+    // Create node groups containing both circle and text
+    const nodeGroups = svg.append("g")
+      .attr("class", "nodes")
+      .selectAll("g")
+      .data(nodes)
+      .enter()
+      .append("g");
+
+    // Add text to each group
+    const svgTexts = nodeGroups.append("text")
+      .attr("x", 15)
+      .attr("y", 5)
+      .attr("fill", "white")
+      .text(d => d.name);
+
+    // Add circles to each group
+    const svgNodes = nodeGroups.append("circle")
+      .attr("r", 10)
+      .attr("fill", "white");
 
     // For each link, create a circle that will animate along the path
     links.forEach((link, i) => {
@@ -124,7 +124,7 @@ function TheActualPage() {
         // Setup animation
         const animation = animate(`#animated-circle-${i}`, {
           easing: 'linear',
-          duration: 2000,
+          duration: 1000,
           loop: true,
           ...animeSVG.createMotionPath(`#SOURCE${link.source.id}_TARGET${link.target.id}`),
         });
