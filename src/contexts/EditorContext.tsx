@@ -21,22 +21,20 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [links, setLinks] = useState<Link[]>([]);
 
   const updateNode = (id: Node["id"], newNode: Partial<Node>) => {
-    setNodes(prev =>
-      prev.map(node => (node.id === id ? { ...node, ...newNode } : node))
-    );
+    // Find the existing node
+    const nodeToUpdate = nodes.find(node => node.id === id);
 
-    // Update any links that reference this node
-    setLinks(prev =>
-      prev.map(link => {
-        if (link.source.id === id) {
-          return { ...link, source: { ...link.source, ...newNode } };
-        }
-        if (link.target.id === id) {
-          return { ...link, target: { ...link.target, ...newNode } };
-        }
-        return link;
-      })
-    );
+    if (nodeToUpdate) {
+      // Update the existing node object directly
+      Object.assign(nodeToUpdate, newNode);
+
+      // Force a state update by creating a new array reference
+      setNodes([...nodes]);
+
+      // Links already reference the same objects, 
+      // so we don't need to update references, just re-render
+      setLinks([...links]);
+    }
   };
 
   const updateLink = (id: Link["id"], newLink: Partial<Link>) => {
