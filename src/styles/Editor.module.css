@@ -1,0 +1,10 @@
+.editorPanel {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+
+  padding: 1rem;
+
+  /* Left border color */
+  border-left: 1px solid #ccc;
+}
