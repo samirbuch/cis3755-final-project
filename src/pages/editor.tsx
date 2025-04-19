@@ -41,25 +41,25 @@ function TheActualPage() {
 
     const svg = d3.select(svgContainerRef.current);
 
-    const svgNodes = svg.append("g")
+    // Create node groups containing both circle and text
+    const nodeGroups = svg.append("g")
       .attr("class", "nodes")
-      .selectAll("circle")
+      .selectAll("g")
       .data(nodes)
       .enter()
-      .append("circle")
+      .append("g");
+
+    // Add circles to each group
+    const svgNodes = nodeGroups.append("circle")
       .attr("r", 10)
       .attr("fill", "white");
 
-    const svgTexts = svg.append("g")
-      .attr("class", "texts")
-      .selectAll("text")
-      .data(nodes)
-      .enter()
-      .append("text")
-      .attr("x", (d) => d.x + 15)
-      .attr("y", (d) => d.y + 5)
+    // Add text to each group
+    const svgTexts = nodeGroups.append("text")
+      .attr("x", 15)
+      .attr("y", 5)
       .attr("fill", "white")
-      .text((d) => d.name);
+      .text(d => d.name);
 
     const svgLinks = svg.append("g")
       .attr("class", "links")
