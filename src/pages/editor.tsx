@@ -50,6 +50,17 @@ function TheActualPage() {
       .attr("r", 10)
       .attr("fill", "white");
 
+    const svgTexts = svg.append("g")
+      .attr("class", "texts")
+      .selectAll("text")
+      .data(nodes)
+      .enter()
+      .append("text")
+      .attr("x", (d) => d.x + 15)
+      .attr("y", (d) => d.y + 5)
+      .attr("fill", "white")
+      .text((d) => d.name);
+
     const svgLinks = svg.append("g")
       .attr("class", "links")
       .selectAll("line")
@@ -65,6 +76,11 @@ function TheActualPage() {
         svgNodes
           .attr("cx", (d) => d.x)
           .attr("cy", (d) => d.y);
+
+        svgTexts
+          .attr("x", (d) => d.x + 15)
+          .attr("y", (d) => d.y + 5)
+          .text((d) => d.name);
 
         // console.log("Nodes", nodes.map((n) => n.name));
       }

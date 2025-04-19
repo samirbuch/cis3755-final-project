@@ -3,17 +3,12 @@ import Node from "@/interfaces/Node";
 import { Button, Flex, Text } from "@mantine/core";
 import LinkCard from "./LinkCard";
 import { useEditorContext } from "@/contexts/EditorContext";
-import { useEffect } from "react";
 
 export default function LinksPanel() {
 
   const editorContext = useEditorContext();
   const nodes = editorContext.nodes;
   const links = editorContext.links;
-
-  useEffect(() => {
-    console.log("Links updated!", links);
-  }, [links]);
 
   function createLink() {
     console.log("Creating link");
