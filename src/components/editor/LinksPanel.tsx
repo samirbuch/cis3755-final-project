@@ -36,7 +36,7 @@ export default function LinksPanel() {
 
   return (
     <>
-      <Button onClick={createLink}>
+      <Button onClick={createLink} fullWidth>
         Create Connection
       </Button>
 

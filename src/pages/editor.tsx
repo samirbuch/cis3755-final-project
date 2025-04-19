@@ -159,13 +159,11 @@ function TheActualPage() {
             value={tab}
           />
 
-          {tab === "nodes" && (
-            <NodesPanel />
-          )}
-
-          {tab === "links" && (
-            <LinksPanel />
-          )}
+          {/* Add a scrollable container for the panels */}
+          <div className={styles.panelContent}>
+            {tab === "nodes" && <NodesPanel />}
+            {tab === "links" && <LinksPanel />}
+          </div>
         </Flex>
       </Flex>
     </Flex>

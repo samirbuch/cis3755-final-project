@@ -37,7 +37,7 @@ export default function NodesPanel() {
 
   return (
     <>
-      <Button onClick={createNode}>
+      <Button onClick={createNode} fullWidth>
         Create Node
       </Button>
 

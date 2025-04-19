@@ -1,10 +1,19 @@
 .editorPanel {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 5rem); /* 5 rem */
-
+  height: calc(100vh - 5rem); /* 5 rem for header */
   padding: 1rem;
-
-  /* Left border color */
   border-left: 2px solid #ccc;
+  overflow: hidden; /* Prevent outer panel from scrolling */
+}
+
+.panelContent {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding-right: 5px; /* Add space for scrollbar */
+}
+
+.panelContent > * {
+  margin-bottom: 10px;
 }
