@@ -3,6 +3,6 @@
   padding: 1rem;
   /* text-align: center; */
 
-  /* Bottom shadow */
-  box-shadow: 0 4px 2px -2px gray;
+  /* Bottom border */
+  border-bottom: 2px solid #ccc;
 }
