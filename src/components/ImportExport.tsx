@@ -1,5 +1,14 @@
 import { useEditorContext } from "@/contexts/EditorContext";
+import { ZodLinkNoPos } from "@/interfaces/Link";
+import { ZodNodeNoPos } from "@/interfaces/Node";
 import { Button, Group } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
+import { z } from "zod";
+
+const Data = z.object({
+  nodes: z.array(ZodNodeNoPos),
+  links: z.array(ZodLinkNoPos),
+});
 
 export default function ImportExport() {
   const editorContext = useEditorContext();
@@ -17,10 +26,10 @@ export default function ImportExport() {
       }
 
       // Convert the source and target properties of the links to their IDs
-      if(key === "source") {
+      if (key === "source") {
         return value.id;
       }
-      if(key === "target") {
+      if (key === "target") {
         return value.id;
       }
 
@@ -49,6 +58,21 @@ export default function ImportExport() {
         const dataStr = e.target?.result as string;
         const data = JSON.parse(dataStr);
 
+        const result = Data.safeParse(data);
+        if (!result.success) {
+          console.error("Invalid data format", result.error.format());
+          notifications.show({
+            title: "Invalid data format",
+            message: "Please ensure you are importing something previously exported from this editor.",
+            color: "red",
+            position: "top-center"
+          })
+          return;
+        }
+
+        // We're not using the result object here because the saved data
+        // doesn't include the d3 properties. The editor context requires
+        // them, but only in TypeScript. d3 adds them back when rendering.
         editorContext.setNodes(data.nodes);
         editorContext.setLinks(data.links);
       };

@@ -9,15 +9,16 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@mantine/charts": "^7.17.3",
-    "@mantine/core": "^7.17.3",
-    "@mantine/dates": "^7.17.3",
-    "@mantine/form": "^7.17.3",
-    "@mantine/hooks": "^7.17.3",
-    "@mantine/modals": "^7.17.3",
+    "@mantine/charts": "^7.17.4",
+    "@mantine/core": "^7.17.4",
+    "@mantine/dates": "^7.17.4",
+    "@mantine/form": "^7.17.4",
+    "@mantine/hooks": "^7.17.4",
+    "@mantine/modals": "^7.17.4",
+    "@mantine/notifications": "^7.17.4",
     "@tabler/icons-react": "^3.31.0",
     "@types/d3": "^7.4.3",
-    "animejs": "^4.0.0",
+    "animejs": "^4.0.1",
     "d3": "^7.9.0",
     "dayjs": "^1.11.13",
     "next": "15.2.4",
@@ -25,7 +26,8 @@
     "react-dom": "^19.0.0",
     "react-spinners": "^0.15.0",
     "recharts": "2",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "zod": "^3.24.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

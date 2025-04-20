@@ -1,4 +1,4 @@
-import { Button, Flex, SegmentedControl, Text, Title } from "@mantine/core";
+import { Flex, SegmentedControl, Text, Title } from "@mantine/core";
 import { animate, svg as animeSVG, JSAnimation } from 'animejs';
 import * as d3 from "d3";
 import { useCallback, useEffect, useRef, useState } from "react";
