@@ -242,58 +242,34 @@ function TheActualPage() {
     // Add SVG filter definitions for glow effects
     const defs = d3SvgRef.current.append("defs");
 
-    // Create a standard glow filter
-    const standardFilter = defs.append("filter")
-      .attr("id", "standard-glow")
-      .attr("x", "-50%")
-      .attr("y", "-50%")
-      .attr("width", "200%")
-      .attr("height", "200%");
-
-    standardFilter.append("feGaussianBlur")
-      .attr("stdDeviation", "3")
-      .attr("result", "blur");
-
-    standardFilter.append("feColorMatrix")
-      .attr("in", "blur")
-      .attr("type", "matrix")
-      .attr("values", "0 0 0 0 1   0 0 0 0 0.2   0 0 0 0 0.2   0 0 0 1 0")
-      .attr("result", "glow");
-
-    standardFilter.append("feMerge")
-      .selectAll("feMergeNode")
-      .data(["glow", "SourceGraphic"])
-      .enter().append("feMergeNode")
-      .attr("in", d => d);
-
-    // Create a super-intense bloom filter
+    // Create a super-bloom filter with less intense outer glow
     const bloomFilter = defs.append("filter")
       .attr("id", "super-bloom")
-      .attr("x", "-100%")
-      .attr("y", "-100%")
-      .attr("width", "300%")
-      .attr("height", "300%");
+      .attr("x", "-50%") // Reduced from -100%
+      .attr("y", "-50%") // Reduced from -100%
+      .attr("width", "200%") // Reduced from 300%
+      .attr("height", "200%"); // Reduced from 300%
 
-    // First blur pass - wide glow
+    // First blur pass - use a smaller blur for less spread
     bloomFilter.append("feGaussianBlur")
       .attr("in", "SourceGraphic")
-      .attr("stdDeviation", "15") // Even wider blur
+      .attr("stdDeviation", "6") // Reduced from 15 to 6 for less spread
       .attr("result", "blur1");
 
-    // Color matrix to intensify the glow and shift color
+    // Color matrix to intensify the glow but with less alpha
     bloomFilter.append("feColorMatrix")
       .attr("in", "blur1")
       .attr("type", "matrix")
-      .attr("values", "0 0 0 0 1   0 0 0 0 0.3   0 0 0 0 0.3   0 0 0 4 0") // Higher alpha multiplier
+      .attr("values", "0 0 0 0 1   0 0 0 0 0.3   0 0 0 0 0.3   0 0 0 2.5 0") // Reduced alpha from 4 to 2.5
       .attr("result", "coloredBlur1");
 
-    // Second blur pass - core glow
+    // Second blur pass - core glow (keep this the same for nice core glow)
     bloomFilter.append("feGaussianBlur")
       .attr("in", "SourceGraphic")
       .attr("stdDeviation", "3")
       .attr("result", "blur2");
 
-    // Intensify the core
+    // Intensify the core (keep this the same)
     bloomFilter.append("feColorMatrix")
       .attr("in", "blur2")
       .attr("type", "matrix")
@@ -306,7 +282,7 @@ function TheActualPage() {
       .attr("in2", "coloredBlur2")
       .attr("operator", "arithmetic")
       .attr("k1", "0")
-      .attr("k2", "1")
+      .attr("k2", "0.7") // Reduced from 1.0 to 0.7 for less intensity
       .attr("k3", "1")
       .attr("k4", "0")
       .attr("result", "bloom");
@@ -360,7 +336,7 @@ function TheActualPage() {
         .on("tick", tick);
 
       if (links.length > 0) {
-        simulation.force("link", d3.forceLink(links).distance(100))
+        simulation.force("link", d3.forceLink(links).distance(200))
       }
 
       setupAnimations();
