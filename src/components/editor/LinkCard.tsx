@@ -23,6 +23,8 @@ export default function LinkCard(props: LinkCardProps) {
   const [toMPPM, setToMPPM] = useState(props.link.targetToSourcePPM.mppm);
 
   const save = () => {
+    setIsEditing(false);
+
     props.onLinkEdit({
       ...props.link,
       sourceToTargetPPM: {
@@ -34,8 +36,6 @@ export default function LinkCard(props: LinkCardProps) {
         mppm: toMPPM
       }
     });
-
-    setIsEditing(false);
   }
 
   return (
