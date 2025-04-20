@@ -43,13 +43,14 @@ function TheActualPage() {
   const animationFrameId = useRef<number | null>(null);
   const arcAnimations = useRef<ArcAnimation[]>([]);
 
+  const fpsCounterRef = useRef<HTMLDivElement>(null);
+  const frameTimesRef = useRef<number[]>([]);
+  const lastFrameTimeRef = useRef<number>(0);
+
   const nodes = editorContext.nodes;
   const links = editorContext.links;
 
   const [tab, setTab] = useState<"nodes" | "links">("nodes");
-
-  // Store all animations so they can be cleaned up later
-  const animationsRef = useRef<JSAnimation[]>([]);
 
   const d3SvgRef = useRef<d3.Selection<SVGSVGElement, unknown, null, undefined>>(null);
   const svgLinksRef = useRef<d3.Selection<SVGLineElement, Link, SVGGElement, unknown>>(null);
@@ -79,8 +80,47 @@ function TheActualPage() {
 
     const currentTime = performance.now();
 
+    // Calculate FPS
+    const elapsed = currentTime - lastFrameTimeRef.current;
+    lastFrameTimeRef.current = currentTime;
+
+    // Keep only the last 60 frame times (1 second at 60fps)
+    frameTimesRef.current.push(elapsed);
+    if (frameTimesRef.current.length > 60) {
+      frameTimesRef.current.shift();
+    }
+
+    // Calculate average FPS from the frame times
+    const averageFrameTime = frameTimesRef.current.reduce((a, b) => a + b, 0) /
+      frameTimesRef.current.length;
+    const fps = Math.round(1000 / averageFrameTime);
+
+    // Update FPS counter display
+    if (fpsCounterRef.current) {
+      fpsCounterRef.current.textContent = `${fps} FPS`;
+
+      // Add color coding based on performance
+      if (fps >= 50) {
+        fpsCounterRef.current.style.color = '#4CAF50'; // Green
+      } else if (fps >= 30) {
+        fpsCounterRef.current.style.color = '#FF9800'; // Orange
+      } else {
+        fpsCounterRef.current.style.color = '#F44336'; // Red
+      }
+    }
+
+    // // Match canvas size to display size
+    // const rect = canvas.getBoundingClientRect();
+    // if (canvas.width !== rect.width || canvas.height !== rect.height) {
+    //   canvas.width = rect.width;
+    //   canvas.height = rect.height;
+    // }
+
+    // // Clear canvas
+    // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     // Draw all arcs
-    arcAnimations.current.forEach((anim, index) => {
+    arcAnimations.current.forEach((anim) => {
       // Calculate animation progress
       const elapsed = currentTime - anim.startTime;
       anim.progress = (elapsed / anim.duration) % 1;
@@ -377,6 +417,14 @@ function TheActualPage() {
       </Header>
       <Flex direction="row">
         <Flex flex={3}>
+          {/* FPS Counter */}
+          <div
+            ref={fpsCounterRef}
+            className={styles.fps}
+          >
+            0 FPS
+          </div>
+
           {/* Svg container. Should take up majority of page width */}
           <svg
             ref={svgContainerRef}
