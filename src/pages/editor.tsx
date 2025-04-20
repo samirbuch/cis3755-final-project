@@ -59,6 +59,7 @@ function TheActualPage() {
   const svgNodesRef = useRef<d3.Selection<SVGCircleElement, Node, SVGGElement, unknown>>(null);
 
   // Canvas draw function - called every frame
+  // Canvas draw function - called every frame
   const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -100,12 +101,36 @@ function TheActualPage() {
 
       if (!position) return;
 
+      // Calculate angle of motion by looking ahead/behind
+      const lookIndex = anim.reverse ?
+        Math.max(0, pathIndex - 5) :
+        Math.min(anim.pathPoints.length - 1, pathIndex + 5);
+
+      const lookPosition = anim.pathPoints[anim.reverse ?
+        anim.pathPoints.length - 1 - lookIndex : lookIndex];
+
+      if (!lookPosition) return;
+
+      // Calculate angle of motion
+      let angle = Math.atan2(
+        lookPosition.y - position.y,
+        lookPosition.x - position.x
+      );
+
+      // Adjust angle based on direction
+      if (anim.reverse) {
+        angle += Math.PI; // Flip 180 degrees if traveling in reverse
+      }
+
       // Draw the arc
       ctx.save();
       ctx.globalAlpha = anim.opacity;
 
       // Position at the current point on the path
       ctx.translate(position.x, position.y);
+
+      // Rotate to align with direction of travel
+      ctx.rotate(angle);
 
       // Set up glow effect
       if (anim.glow === 'bloom') {
@@ -119,8 +144,9 @@ function TheActualPage() {
       // Draw the arc shape
       ctx.beginPath();
       const radius = 8 * anim.scale;
-      const startAngle = anim.reverse ? Math.PI : 0;
-      const endAngle = anim.reverse ? 2 * Math.PI : Math.PI;
+      // Use consistent angle references now that we've rotated the context
+      const startAngle = 0;
+      const endAngle = Math.PI;
 
       // Draw outer arc
       ctx.arc(0, 0, radius, startAngle, endAngle);
