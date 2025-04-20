@@ -1,17 +1,16 @@
 import { Button, Flex, SegmentedControl, Text, Title } from "@mantine/core";
-import { useCallback, useEffect, useRef, useState } from "react"
 import { animate, svg as animeSVG, JSAnimation } from 'animejs';
-
-import type Node from "@/interfaces/Node";
-
 import * as d3 from "d3";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import styles from "@/styles/Editor.module.css";
 import Header from "@/components/Header";
-import NodesPanel from "@/components/editor/NodesPanel";
-import type Link from "@/interfaces/Link";
 import LinksPanel from "@/components/editor/LinksPanel";
+import NodesPanel from "@/components/editor/NodesPanel";
 import { EditorProvider, useEditorContext } from "@/contexts/EditorContext";
+import type Link from "@/interfaces/Link";
+import type Node from "@/interfaces/Node";
+import styles from "@/styles/Editor.module.css";
+import ImportExport from "@/components/ImportExport";
 
 export default function Editor() {
   return (
@@ -374,12 +373,7 @@ function TheActualPage() {
   return (
     <Flex direction={"column"}>
       <Header title="Editor">
-        <Button>
-          Import
-        </Button>
-        <Button>
-          Export
-        </Button>
+        <ImportExport />
       </Header>
       <Flex direction="row">
         <Flex flex={3}>
