@@ -130,7 +130,7 @@ function TheActualPage() {
       ctx.translate(position.x, position.y);
 
       // Rotate to align with direction of travel
-      ctx.rotate(angle);
+      ctx.rotate(angle - Math.PI / 2); // Rotate 90 degrees to align with arc
 
       // Set up glow effect
       if (anim.glow === 'bloom') {
