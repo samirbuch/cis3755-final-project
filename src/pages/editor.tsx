@@ -77,11 +77,17 @@ function TheActualPage() {
 
     // For each link, create a circle that will animate along the path
     links.forEach((link, i) => {
+
       // Add a circle to the animation group
-      animationGroup.append("circle")
-        .attr("r", 5)
+      animationGroup.append("path")
+        .attr("d", d3.arc()({
+          innerRadius: 8,
+          outerRadius: 10,
+          startAngle: 0,
+          endAngle: Math.PI 
+        }))
         .attr("fill", "#4CAF50")
-        .attr("id", `animated-circle-${i}`)
+        .attr("id", `animated-arc-${i}`)
         .style("opacity", 0.8);
     });
 
@@ -122,7 +128,7 @@ function TheActualPage() {
         if (!link.source.x || !link.target.x) return;
 
         // Setup animation
-        const animation = animate(`#animated-circle-${i}`, {
+        const animation = animate(`#animated-arc-${i}`, {
           easing: 'linear',
           duration: 1000,
           loop: true,
