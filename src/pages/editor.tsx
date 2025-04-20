@@ -134,14 +134,15 @@ function TheActualPage() {
 
       const animationGroup = d3.select(".animatedArcs");
       const sourceToTargetId = `SOURCE${link.source.id}_TARGET${link.target.id}`;
-      const targetToSourceId = `SOURCE${link.target.id}_TARGET${link.source.id}`;
+      // const targetToSourceId = `SOURCE${link.target.id}_TARGET${link.source.id}`;
+      // ^ not necessary, we can just reverse the arcs
 
       // Calculate timing based on pings per minute
       // Convert ppm (pings per minute) to delay in ms between pings
-      const toDelay = Math.floor(60000 / Math.max(link.toPPM.ppm, 1)); // ms between regular pings
-      const toBloomDelay = Math.floor(60000 / Math.max(link.toPPM.mppm, 1)); // ms between bloom pings
-      const fromDelay = Math.floor(60000 / Math.max(link.fromPPM.ppm, 1));
-      const fromBloomDelay = Math.floor(60000 / Math.max(link.fromPPM.mppm, 1));
+      const toDelay = link.sourceToTargetPPM.ppm > 0 ? Math.floor(60000 / link.sourceToTargetPPM.ppm) : 0;
+      const toBloomDelay = link.sourceToTargetPPM.mppm > 0 ? Math.floor(60000 / link.sourceToTargetPPM.mppm) : 0;
+      const fromDelay = link.targetToSourcePPM.ppm > 0 ? Math.floor(60000 / link.targetToSourcePPM.ppm) : 0;
+      const fromBloomDelay = link.targetToSourcePPM.mppm > 0 ? Math.floor(60000 / link.targetToSourcePPM.mppm) : 0;
 
       // Create regular arcs from source to target
       createPeriodicArcs({

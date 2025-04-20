@@ -6,11 +6,11 @@ export default interface Link {
   target: Node;
   // distance: number;
 
-  toPPM: {
+  sourceToTargetPPM: {
     ppm: number;
     mppm: number;
   };
-  fromPPM: {
+  targetToSourcePPM: {
     ppm: number;
     mppm: number;
   }

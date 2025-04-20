@@ -1,6 +1,6 @@
 import { useEditorContext } from "@/contexts/EditorContext";
 import Link from "@/interfaces/Link";
-import { Flex, Text, Button, Card, ActionIcon, Title, Group, Select } from "@mantine/core";
+import { Flex, Text, Button, Card, ActionIcon, Title, Group, Select, Fieldset, Slider } from "@mantine/core";
 import { IconArrowRight, IconPencil, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 
@@ -16,6 +16,27 @@ export default function LinkCard(props: LinkCardProps) {
 
   const [fromSelected, setFromSelected] = useState(props.link.source.id);
   const [toSelected, setToSelected] = useState(props.link.target.id);
+
+  const [fromPPM, setFromPPM] = useState(props.link.sourceToTargetPPM.ppm);
+  const [fromMPPM, setFromMPPM] = useState(props.link.sourceToTargetPPM.mppm);
+  const [toPPM, setToPPM] = useState(props.link.targetToSourcePPM.ppm);
+  const [toMPPM, setToMPPM] = useState(props.link.targetToSourcePPM.mppm);
+
+  const save = () => {
+    props.onLinkEdit({
+      ...props.link,
+      sourceToTargetPPM: {
+        ppm: fromPPM,
+        mppm: fromMPPM
+      },
+      targetToSourcePPM: {
+        ppm: toPPM,
+        mppm: toMPPM
+      }
+    });
+
+    setIsEditing(false);
+  }
 
   return (
     <Card>
@@ -88,9 +109,37 @@ export default function LinkCard(props: LinkCardProps) {
         </Group>}
       </Flex>
       {isEditing && (
-        <Button mt="sm" onClick={() => setIsEditing(false)}>
-          Done
-        </Button>
+        <Flex direction="column" mt="md" gap="lg">
+          <Fieldset legend="From -> To">
+            <Text>Pings per Minute</Text>
+            <Slider
+              value={fromPPM}
+              onChange={setFromPPM}
+            />
+            <Text mt="sm">Meaningful PPM</Text>
+            <Slider
+              value={fromMPPM}
+              onChange={setFromMPPM}
+            />
+          </Fieldset>
+
+          <Fieldset legend="To -> From">
+            <Text>Pings per Minute</Text>
+            <Slider
+              value={toPPM}
+              onChange={setToPPM}
+            />
+            <Text mt="sm">Meaningful PPM</Text>
+            <Slider
+              value={toMPPM}
+              onChange={setToMPPM}
+            />
+          </Fieldset>
+
+          <Button mt="sm" onClick={save}>
+            Done
+          </Button>
+        </Flex>
       )}
     </Card>
   )
