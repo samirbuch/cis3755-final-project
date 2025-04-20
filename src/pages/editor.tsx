@@ -41,24 +41,148 @@ function TheActualPage() {
   const svgTextsRef = useRef<d3.Selection<SVGTextElement, Node, SVGGElement, unknown>>(null);
   const svgNodesRef = useRef<d3.Selection<SVGCircleElement, Node, SVGGElement, unknown>>(null);
 
+  // Helper function to create arcs that appear at regular intervals
+  function createPeriodicArcs({
+    parentGroup,
+    pathId,
+    prefix,
+    count,
+    intervalMs,
+    color,
+    filter,
+    reverse = false,
+    scale = 1
+  }) {
+    // Don't create arcs if the interval is too small (avoids performance issues)
+    if (intervalMs < 100) return;
+
+    // Calculate staggered delays for the initial set of arcs
+    const staggerStep = intervalMs / count;
+
+    for (let i = 0; i < count; i++) {
+      const arcId = `${prefix}-${i}`;
+
+      // Create the arc element
+      const arc = parentGroup.append("path")
+        .attr("class", "arc-element")
+        .attr("d", d3.arc()({
+          innerRadius: 6 * scale,
+          outerRadius: 10 * scale,
+          startAngle: reverse ? Math.PI : 0, // Flip the arc if reverse is true
+          endAngle: reverse ? 0 : Math.PI
+        }))
+        .attr("fill", color)
+        .attr("id", arcId)
+        .style("opacity", 0) // Start invisible
+        .style("filter", filter);
+
+      // Create animation with staggered start
+      const delay = i * staggerStep;
+
+      const animation = animate(`#${arcId}`, {
+        easing: 'linear',
+        duration: 2000, // 2 seconds to travel the path
+        delay,
+        loop: true,
+        // direction: reverse ? 'reverse' : 'normal', // Travel direction
+        reversed: reverse,
+        ...animeSVG.createMotionPath(`#${pathId}`)
+        // ...animeSVG.createMotionPath({
+        //   path: `#${pathId}`,
+        //   align: 'self',
+        //   rotateWithPath: true,
+        //   offsetDistance: reverse ? '100%' : '0%', // Start position
+        //   direction: reverse ? 'reverse' : 'normal', // Travel direction
+        // })
+      });
+
+      // Animate opacity to fade in/out at start/end of path
+      const opacityAnimation = animate(`#${arcId}`, {
+        opacity: [0, 1, 1, 0],
+        easing: 'linear',
+        duration: 2000,
+        delay,
+        loop: true,
+        reversed: reverse,
+        offset: [0, 0.1, 0.9, 1] // Fade in at 0-10%, stay visible 10-90%, fade out 90-100%
+      });
+
+      animationsRef.current.push(animation, opacityAnimation);
+    }
+  }
+
   const setupAnimations = useCallback(() => {
     // Clean up old animations first
     animationsRef.current.forEach(anim => anim.pause());
     animationsRef.current = [];
 
-    // Create new animations for each link
-    links.forEach((link, i) => {
+    // Remove any previously created arc elements
+    d3.selectAll(".arc-element").remove();
+
+    // Create animated arcs for each link
+    links.forEach(link => {
       if (!link.source.x || !link.target.x) return;
 
-      // Setup animation
-      const animation = animate(`#animated-arc-${i}`, {
-        easing: 'linear',
-        duration: 1000,
-        loop: true,
-        ...animeSVG.createMotionPath(`#SOURCE${link.source.id}_TARGET${link.target.id}`),
+      const animationGroup = d3.select(".animatedArcs");
+      const sourceToTargetId = `SOURCE${link.source.id}_TARGET${link.target.id}`;
+      const targetToSourceId = `SOURCE${link.target.id}_TARGET${link.source.id}`;
+
+      // Calculate timing based on pings per minute
+      // Convert ppm (pings per minute) to delay in ms between pings
+      const toDelay = Math.floor(60000 / Math.max(link.toPPM.ppm, 1)); // ms between regular pings
+      const toBloomDelay = Math.floor(60000 / Math.max(link.toPPM.mppm, 1)); // ms between bloom pings
+      const fromDelay = Math.floor(60000 / Math.max(link.fromPPM.ppm, 1));
+      const fromBloomDelay = Math.floor(60000 / Math.max(link.fromPPM.mppm, 1));
+
+      // Create regular arcs from source to target
+      createPeriodicArcs({
+        parentGroup: animationGroup,
+        pathId: sourceToTargetId,
+        prefix: `to-regular-${link.id}`,
+        count: 5, // Keep 5 arcs in circulation
+        intervalMs: toDelay,
+        color: "#FF3030",
+        filter: "url(#standard-glow)",
+        reverse: false
       });
 
-      animationsRef.current.push(animation);
+      // Create bloom arcs from source to target
+      createPeriodicArcs({
+        parentGroup: animationGroup,
+        pathId: sourceToTargetId,
+        prefix: `to-bloom-${link.id}`,
+        count: 3, // Keep 3 bloom arcs in circulation
+        intervalMs: toBloomDelay,
+        color: "#FF0000", // Brighter red
+        filter: "url(#super-bloom)",
+        reverse: false,
+        scale: 1.2 // Slightly larger
+      });
+
+      // Create regular arcs from target to source
+      createPeriodicArcs({
+        parentGroup: animationGroup,
+        pathId: sourceToTargetId, // Same path, but we'll reverse the direction
+        prefix: `from-regular-${link.id}`,
+        count: 5,
+        intervalMs: fromDelay,
+        color: "#30A0FF", // Blue for opposite direction
+        filter: "url(#standard-glow)",
+        reverse: true
+      });
+
+      // Create bloom arcs from target to source
+      createPeriodicArcs({
+        parentGroup: animationGroup,
+        pathId: sourceToTargetId,
+        prefix: `from-bloom-${link.id}`,
+        count: 3,
+        intervalMs: fromBloomDelay,
+        color: "#00A0FF", // Brighter blue
+        filter: "url(#super-bloom)",
+        reverse: true,
+        scale: 1.2
+      });
     });
   }, [links]);
 
@@ -114,46 +238,70 @@ function TheActualPage() {
 
   const createAnimations = useCallback(() => {
     if (!d3SvgRef.current) return;
-  
-    // Add SVG filter definitions for glow effect
+
+    // Add SVG filter definitions for glow effects
     const defs = d3SvgRef.current.append("defs");
-  
+
+    // Create a standard glow filter
+    const standardFilter = defs.append("filter")
+      .attr("id", "standard-glow")
+      .attr("x", "-50%")
+      .attr("y", "-50%")
+      .attr("width", "200%")
+      .attr("height", "200%");
+
+    standardFilter.append("feGaussianBlur")
+      .attr("stdDeviation", "3")
+      .attr("result", "blur");
+
+    standardFilter.append("feColorMatrix")
+      .attr("in", "blur")
+      .attr("type", "matrix")
+      .attr("values", "0 0 0 0 1   0 0 0 0 0.2   0 0 0 0 0.2   0 0 0 1 0")
+      .attr("result", "glow");
+
+    standardFilter.append("feMerge")
+      .selectAll("feMergeNode")
+      .data(["glow", "SourceGraphic"])
+      .enter().append("feMergeNode")
+      .attr("in", d => d);
+
     // Create a super-intense bloom filter
-    const filter = defs.append("filter")
+    const bloomFilter = defs.append("filter")
       .attr("id", "super-bloom")
       .attr("x", "-100%")
       .attr("y", "-100%")
       .attr("width", "300%")
-      .attr("height", "300%"); // Bigger area to allow for more bloom spread
-  
+      .attr("height", "300%");
+
     // First blur pass - wide glow
-    filter.append("feGaussianBlur")
+    bloomFilter.append("feGaussianBlur")
       .attr("in", "SourceGraphic")
-      .attr("stdDeviation", "10") // Much wider blur
+      .attr("stdDeviation", "15") // Even wider blur
       .attr("result", "blur1");
-  
+
     // Color matrix to intensify the glow and shift color
-    filter.append("feColorMatrix")
+    bloomFilter.append("feColorMatrix")
       .attr("in", "blur1")
       .attr("type", "matrix")
-      .attr("values", "0 0 0 0 1   0 0 0 0 0.2   0 0 0 0 0.2   0 0 0 3 0") // Much higher alpha multiplier
+      .attr("values", "0 0 0 0 1   0 0 0 0 0.3   0 0 0 0 0.3   0 0 0 4 0") // Higher alpha multiplier
       .attr("result", "coloredBlur1");
-  
+
     // Second blur pass - core glow
-    filter.append("feGaussianBlur")
+    bloomFilter.append("feGaussianBlur")
       .attr("in", "SourceGraphic")
-      .attr("stdDeviation", "2")
+      .attr("stdDeviation", "3")
       .attr("result", "blur2");
-  
+
     // Intensify the core
-    filter.append("feColorMatrix")
+    bloomFilter.append("feColorMatrix")
       .attr("in", "blur2")
       .attr("type", "matrix")
-      .attr("values", "0 0 0 0 1   0 0 0 0 0.5   0 0 0 0 0.5   0 0 0 3 0")
+      .attr("values", "0 0 0 0 1   0 0 0 0 0.7   0 0 0 0 0.7   0 0 0 3 0")
       .attr("result", "coloredBlur2");
-  
+
     // Add composite operations to stack the effects
-    const composite = filter.append("feComposite")
+    bloomFilter.append("feComposite")
       .attr("in", "coloredBlur1")
       .attr("in2", "coloredBlur2")
       .attr("operator", "arithmetic")
@@ -162,32 +310,16 @@ function TheActualPage() {
       .attr("k3", "1")
       .attr("k4", "0")
       .attr("result", "bloom");
-  
+
     // Final merge - combine the bloom with the original
-    const merge = filter.append("feMerge");
-    merge.append("feMergeNode").attr("in", "bloom");
-    merge.append("feMergeNode").attr("in", "SourceGraphic");
-  
+    const bloomMerge = bloomFilter.append("feMerge");
+    bloomMerge.append("feMergeNode").attr("in", "bloom");
+    bloomMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
     // Create a group for animated arcs
-    const animationGroup = d3SvgRef.current.append("g")
-      .attr("class", "animatedCircles");
-  
-    // For each link, create an arc that will animate along the path
-    links.forEach((link, i) => {
-      // Add an arc to the animation group with super bloom
-      animationGroup.append("path")
-        .attr("d", d3.arc()({
-          innerRadius: 6,
-          outerRadius: 10,
-          startAngle: 0,
-          endAngle: Math.PI
-        }))
-        .attr("fill", "#FF3030") // Brighter red
-        .attr("id", `animated-arc-${i}`)
-        .style("opacity", 1) // Full opacity
-        .style("filter", "url(#super-bloom)"); // Apply the intense bloom filter
-    });
-  }, [links]);
+    d3SvgRef.current.append("g")
+      .attr("class", "animatedArcs");
+  }, []);
 
   const createLinks = useCallback(() => {
     if (!d3SvgRef.current) return;
@@ -228,7 +360,7 @@ function TheActualPage() {
         .on("tick", tick);
 
       if (links.length > 0) {
-        simulation.force("link", d3.forceLink(links))
+        simulation.force("link", d3.forceLink(links).distance(100))
       }
 
       setupAnimations();
