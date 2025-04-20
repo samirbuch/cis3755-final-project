@@ -90,7 +90,8 @@ function TheActualPage() {
           endAngle: endAngle
         }))
         .attr("fill", color)
-        .style("filter", filter);
+        .style("filter", filter)
+        .classed("gpu-accelerated", true) // Add class for GPU acceleration;
 
       // Create animation with staggered start
       const delay = i * staggerStep;
@@ -254,15 +255,15 @@ function TheActualPage() {
     // Create a super-bloom filter with less intense outer glow
     const bloomFilter = defs.append("filter")
       .attr("id", "super-bloom")
-      .attr("x", "-50%") // Reduced from -100%
-      .attr("y", "-50%") // Reduced from -100%
-      .attr("width", "200%") // Reduced from 300%
-      .attr("height", "200%"); // Reduced from 300%
+      .attr("x", "-30%") // Reduced from -100%
+      .attr("y", "-30%") // Reduced from -100%
+      .attr("width", "160%") // Reduced from 300%
+      .attr("height", "160%"); // Reduced from 300%
 
     // First blur pass - use a smaller blur for less spread
     bloomFilter.append("feGaussianBlur")
       .attr("in", "SourceGraphic")
-      .attr("stdDeviation", "6") // Reduced from 15 to 6 for less spread
+      .attr("stdDeviation", "4") // Reduced from 15 to 6 for less spread
       .attr("result", "blur1");
 
     // Color matrix to intensify the glow but with less alpha
@@ -336,16 +337,17 @@ function TheActualPage() {
     if (nodes.length > 0) {
       // Use a force simulation to position the nodes
       const simulation = d3.forceSimulation(nodes)
-        .force("charge", d3.forceManyBody().strength(-10))
-        .force("collide", d3.forceCollide(30))
+        .force("charge", d3.forceManyBody().strength(-30))
+        .force("collide", d3.forceCollide(40))
         .force("center", d3.forceCenter(
           svgContainerRef.current.clientWidth / 2,
           svgContainerRef.current.clientHeight / 2
         ))
+        .alphaDecay(0.05)
         .on("tick", tick);
 
       if (links.length > 0) {
-        simulation.force("link", d3.forceLink(links).distance(200))
+        simulation.force("link", d3.forceLink(links).distance(200).strength(0.2))
       }
 
       setupAnimations();

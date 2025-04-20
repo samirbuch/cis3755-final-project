@@ -17,3 +17,8 @@
 .panelContent > * {
   margin-bottom: 10px;
 }
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
