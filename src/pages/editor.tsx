@@ -36,7 +36,7 @@ function TheActualPage() {
 
   const d3SvgRef = useRef<d3.Selection<SVGSVGElement, unknown, null, undefined>>(null);
   const svgLinksRef = useRef<d3.Selection<SVGLineElement, Link, SVGGElement, unknown>>(null);
-  const svgAnimationGroupRef = useRef<SVGGElement>(null);
+  // const svgAnimationGroupRef = useRef<SVGGElement>(null);
   const svgNodeGroupsRef = useRef<d3.Selection<SVGGElement, Node, SVGGElement, unknown>>(null);
   const svgTextsRef = useRef<d3.Selection<SVGTextElement, Node, SVGGElement, unknown>>(null);
   const svgNodesRef = useRef<d3.Selection<SVGCircleElement, Node, SVGGElement, unknown>>(null);
@@ -115,14 +115,45 @@ function TheActualPage() {
   const createAnimations = useCallback(() => {
     if (!d3SvgRef.current) return;
 
-    // Create a group for animated circles
+    // Add SVG filter definitions for glow effect
+    const defs = d3SvgRef.current.append("defs");
+
+    // Create a filter for the glow effect
+    const filter = defs.append("filter")
+      .attr("id", "glow")
+      .attr("x", "-50%")
+      .attr("y", "-50%")
+      .attr("width", "200%")
+      .attr("height", "200%");
+
+    // Add a blur effect
+    filter.append("feGaussianBlur")
+      .attr("stdDeviation", "5") // Glow width
+      .attr("result", "blur");
+
+    // Add color matrix to intensify the glow
+    filter.append("feColorMatrix")
+      .attr("in", "blur")
+      .attr("type", "matrix")
+      // Increase red/brightness values (first column)
+      // Format is:  R  G  B  A  constant (for each color channel)
+      .attr("values", "0 0 0 0 1   0 0 0 0 0.2   0 0 0 0 0.2   0 0 0 1 0")
+      .attr("result", "glow");
+
+    // Merge original and glow
+    filter.append("feMerge")
+      .selectAll("feMergeNode")
+      .data(["glow", "SourceGraphic"])
+      .enter().append("feMergeNode")
+      .attr("in", d => d);
+
+    // Create a group for animated arcs
     const animationGroup = d3SvgRef.current.append("g")
       .attr("class", "animatedCircles");
 
     // For each link, create an arc that will animate along the path
     links.forEach((link, i) => {
-
-      // Add a circle to the animation group
+      // Add an arc to the animation group
       animationGroup.append("path")
         .attr("d", d3.arc()({
           innerRadius: 8,
@@ -132,7 +163,8 @@ function TheActualPage() {
         }))
         .attr("fill", "#FF0000")
         .attr("id", `animated-arc-${i}`)
-        .style("opacity", 0.8);
+        .style("opacity", 0.8)
+        .style("filter", "url(#glow)"); // Apply the glow filter
     });
   }, [links]);
 
@@ -157,10 +189,10 @@ function TheActualPage() {
 
     d3SvgRef.current = d3.select(svgContainerRef.current);
 
+    // Order of operations is important here.
+    // We want links to be on the bottom, then animations, then nodes on top.
     createLinks();
-
     createAnimations();
-    
     createNodes();
 
     if (nodes.length > 0) {
@@ -189,7 +221,15 @@ function TheActualPage() {
       animationsRef.current.forEach(anim => anim.pause());
       animationsRef.current = [];
     }
-  }, [nodes, links, tick, createNodes, createAnimations, createLinks]);
+  }, [
+    nodes,
+    links,
+    tick,
+    createNodes,
+    createAnimations,
+    createLinks,
+    setupAnimations
+  ]);
 
   return (
     <Flex direction={"column"}>
