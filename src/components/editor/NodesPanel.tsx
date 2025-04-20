@@ -12,16 +12,14 @@ export default function NodesPanel() {
   function createNode() {
     console.log("Creating node");
     const newNode: Node = {
-      id: editorContext.nodes.length,
-      name: `Node ${editorContext.nodes.length}`,
+      id: editorContext.nodeCounter,
+      name: `Node ${editorContext.nodeCounter}`,
 
       x: Math.random() * 100,
       y: Math.random() * 100,
     };
 
-    // setNodes((prev) => [...prev, newNode]);
-    // props.onNodeCreate(newNode);
-    editorContext.setNodes((prev) => [...prev, newNode]);
+    editorContext.addNode(newNode);
   }
 
   function editNode(node: Node) {
@@ -33,6 +31,11 @@ export default function NodesPanel() {
   function deleteNode(node: Node) {
     console.log("Deleting node", node);
     editorContext.setNodes((prev) => prev.filter((n) => n.id !== node.id));
+
+    // Delete all links that reference this node
+    editorContext.setLinks((prev) =>
+      prev.filter((link) => link.source.id !== node.id && link.target.id !== node.id)
+    );
   }
 
   return (

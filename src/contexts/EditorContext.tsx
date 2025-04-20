@@ -6,6 +6,11 @@ import type Link from '@/interfaces/Link';
 export interface EditorContextType {
   nodes: Node[];
   links: Link[];
+  nodeCounter: number;
+  linkCounter: number;
+
+  addNode: (node: Node) => void;
+  addLink: (link: Link) => void;
 
   setNodes: React.Dispatch<React.SetStateAction<Node[]>>;
   setLinks: React.Dispatch<React.SetStateAction<Link[]>>;
@@ -19,6 +24,18 @@ const EditorContext = createContext<EditorContextType | undefined>(undefined);
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [links, setLinks] = useState<Link[]>([]);
+  const [nodeCounter, setNodeCounter] = useState(0);
+  const [linkCounter, setLinkCounter] = useState(0);
+
+  const addNode = (node: Node) => {
+    setNodes(prevNodes => [...prevNodes, node]);
+    setNodeCounter(prev => prev + 1);
+  };
+
+  const addLink = (link: Link) => {
+    setLinks(prevLinks => [...prevLinks, link]);
+    setLinkCounter(prev => prev + 1);
+  };
 
   const updateNode = (id: Node["id"], newNode: Partial<Node>) => {
     // Find the existing node
@@ -45,7 +62,18 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <EditorContext.Provider
-      value={{ nodes, links, setNodes, setLinks, updateNode, updateLink }}
+      value={{ 
+        nodes, 
+        links, 
+        nodeCounter,
+        linkCounter,
+        addNode,
+        addLink,
+        setNodes, 
+        setLinks, 
+        updateNode, 
+        updateLink 
+      }}
     >
       {children}
     </EditorContext.Provider>
