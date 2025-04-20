@@ -1,6 +1,6 @@
 import { Button, Flex, SegmentedControl, Text, Title } from "@mantine/core";
 import { useEffect, useRef, useState } from "react"
-import { animate, svg as animeSVG } from 'animejs';
+import { animate, svg as animeSVG, JSAnimation } from 'animejs';
 
 import type Node from "@/interfaces/Node";
 
@@ -32,7 +32,7 @@ function TheActualPage() {
   const [tab, setTab] = useState<"nodes" | "links">("nodes");
 
   // Store all animations so they can be cleaned up later
-  const animationsRef = useRef<any[]>([]);
+  const animationsRef = useRef<JSAnimation[]>([]);
 
   useEffect(() => {
     if (!svgContainerRef.current) return;
