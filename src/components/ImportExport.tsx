@@ -36,9 +36,30 @@ export default function ImportExport() {
     URL.revokeObjectURL(url);
   }
 
+  function importData() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataStr = e.target?.result as string;
+        const data = JSON.parse(dataStr);
+
+        editorContext.setNodes(data.nodes);
+        editorContext.setLinks(data.links);
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
   return (
     <Group>
-      <Button>
+      <Button onClick={importData}>
         Import
       </Button>
 
