@@ -12,20 +12,55 @@ export default function LinksPanel() {
 
   function createLink() {
     console.log("Creating link");
-    const newLink: Link = {
-      id: links.length,
-      source: nodes[0],
-      target: nodes[1],
+    // const newLink: Link = {
+    //   id: links.length,
+    //   source: nodes[0],
+    //   target: nodes[1],
 
-      toPPM: {
-        ppm: 20,
-        mppm: 3,
-      },
-      fromPPM: {
-        ppm: 10,
-        mppm: 1,
+    //   toPPM: {
+    //     ppm: 20,
+    //     mppm: 3,
+    //   },
+    //   fromPPM: {
+    //     ppm: 10,
+    //     mppm: 1,
+    //   }
+    // };
+
+    function createRandomLink() {
+      // If we have already created all possible links, return null.
+      if (links.length >= nodes.length * (nodes.length - 1)) {
+        return null;
       }
-    };
+
+      // We need to find a link that is not already in the list
+      const randomSource = nodes[Math.floor(Math.random() * nodes.length)];
+      const randomTarget = nodes[Math.floor(Math.random() * nodes.length)];
+
+      if (randomSource.id === randomTarget.id) {
+        return createRandomLink();
+      }
+      const newLink: Link = {
+        id: links.length,
+        source: randomSource,
+        target: randomTarget,
+        toPPM: {
+          ppm: Math.floor(Math.random() * 100),
+          mppm: Math.floor(Math.random() * 100),
+        },
+        fromPPM: {
+          ppm: Math.floor(Math.random() * 100),
+          mppm: Math.floor(Math.random() * 100),
+        },
+      };
+      return newLink;
+    }
+
+    const newLink = createRandomLink();
+    if(!newLink) {
+      console.warn("No more links can be created");
+      return;
+    }
 
     // setLinks((prev) => [...prev, newLink]);
     // props.onLinkCreate(newLink);
