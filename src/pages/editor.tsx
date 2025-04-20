@@ -425,28 +425,34 @@ function TheActualPage() {
             0 FPS
           </div>
 
-          {/* Svg container. Should take up majority of page width */}
-          <svg
-            ref={svgContainerRef}
-            style={{
-              width: "100%",
-              height: "100%",
-              position: "absolute",
-              top: 0,
-              left: 0
-            }}
-          />
-          <canvas
-            ref={canvasRef}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              pointerEvents: "none"
-            }}
-          />
+          <div style={{
+            position: "relative",
+            width: "100%",
+            height: "100%",
+            overflow: "hidden",
+          }}>
+            {/* Svg container. Should take up majority of page width */}
+            <svg
+              ref={svgContainerRef}
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "block"
+              }}
+            />
+            <canvas
+              ref={canvasRef}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
+                zIndex: 1, // Ensure canvas is on top
+              }}
+            />
+          </div>
         </Flex>
         <Flex
           flex={1}
