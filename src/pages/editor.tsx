@@ -52,6 +52,16 @@ function TheActualPage() {
     filter,
     reverse = false,
     scale = 1
+  }: {
+    parentGroup: d3.Selection<d3.BaseType, unknown, HTMLElement, unknown>;
+    pathId: string;
+    prefix: string;
+    count: number;
+    intervalMs: number;
+    color: string;
+    filter: string;
+    reverse?: boolean;
+    scale?: number;
   }) {
     // Don't create arcs if the interval is too small (avoids performance issues)
     if (intervalMs < 100) return;
@@ -62,41 +72,40 @@ function TheActualPage() {
     for (let i = 0; i < count; i++) {
       const arcId = `${prefix}-${i}`;
 
-      // Create the arc element
-      const arc = parentGroup.append("path")
+      // Create a container group for the arc that we can rotate
+      const arcGroup = parentGroup.append("g")
         .attr("class", "arc-element")
+        .attr("id", arcId);
+
+      // For reverse direction, flip the arc by adjusting the startAngle and endAngle
+      const startAngle = reverse ? Math.PI : 0;
+      const endAngle = reverse ? 2 * Math.PI : Math.PI;
+
+      // Create the arc element inside the container
+      arcGroup.append("path")
         .attr("d", d3.arc()({
           innerRadius: 6 * scale,
           outerRadius: 10 * scale,
-          startAngle: reverse ? Math.PI : 0, // Flip the arc if reverse is true
-          endAngle: reverse ? 0 : Math.PI
+          startAngle: startAngle,
+          endAngle: endAngle
         }))
         .attr("fill", color)
-        .attr("id", arcId)
-        .style("opacity", 0) // Start invisible
         .style("filter", filter);
 
       // Create animation with staggered start
       const delay = i * staggerStep;
 
+      // Path animation
       const animation = animate(`#${arcId}`, {
         easing: 'linear',
-        duration: 2000, // 2 seconds to travel the path
+        duration: 2000,
         delay,
         loop: true,
-        // direction: reverse ? 'reverse' : 'normal', // Travel direction
         reversed: reverse,
         ...animeSVG.createMotionPath(`#${pathId}`)
-        // ...animeSVG.createMotionPath({
-        //   path: `#${pathId}`,
-        //   align: 'self',
-        //   rotateWithPath: true,
-        //   offsetDistance: reverse ? '100%' : '0%', // Start position
-        //   direction: reverse ? 'reverse' : 'normal', // Travel direction
-        // })
       });
 
-      // Animate opacity to fade in/out at start/end of path
+      // Opacity animation
       const opacityAnimation = animate(`#${arcId}`, {
         opacity: [0, 1, 1, 0],
         easing: 'linear',
@@ -104,7 +113,7 @@ function TheActualPage() {
         delay,
         loop: true,
         reversed: reverse,
-        offset: [0, 0.1, 0.9, 1] // Fade in at 0-10%, stay visible 10-90%, fade out 90-100%
+        offset: [0, 0.1, 0.9, 1]
       });
 
       animationsRef.current.push(animation, opacityAnimation);
