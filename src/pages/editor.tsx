@@ -84,9 +84,9 @@ function TheActualPage() {
         .attr("y2", (d) => d.target.y)
         .attr("id", (d) => `SOURCE${d.source.id}_TARGET${d.target.id}`);
 
-      setupAnimations();
+      // setupAnimations();
     }
-  }, [nodes, links, setupAnimations]);
+  }, [nodes, links]);
 
   const createNodes = useCallback(() => {
     if (!d3SvgRef.current) return;
@@ -177,6 +177,10 @@ function TheActualPage() {
       if (links.length > 0) {
         simulation.force("link", d3.forceLink(links))
       }
+
+      setupAnimations();
+
+      simulation.on("end", setupAnimations);
     }
 
     // Cleanup
