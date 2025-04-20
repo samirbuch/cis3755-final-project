@@ -16,7 +16,15 @@ export default function LinksPanel() {
       id: links.length,
       source: nodes[0],
       target: nodes[1],
-      distance: 100,
+
+      toPPM: {
+        ppm: 20,
+        mppm: 3,
+      },
+      fromPPM: {
+        ppm: 10,
+        mppm: 1,
+      }
     };
 
     // setLinks((prev) => [...prev, newLink]);
