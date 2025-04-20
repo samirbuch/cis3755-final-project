@@ -81,7 +81,7 @@ function TheActualPage() {
       animationGroup.append("circle")
         .attr("r", 5)
         .attr("fill", "#4CAF50")
-        .attr("id", `animated-circle-${i}`)
+        .attr("class", `animated-circle-${i}`)
         .style("opacity", 0.8);
     });
 
@@ -105,7 +105,7 @@ function TheActualPage() {
           .attr("y1", (d) => d.source.y)
           .attr("x2", (d) => d.target.x)
           .attr("y2", (d) => d.target.y)
-          .attr("id", (d) => `SOURCE${d.source.id}_TARGET${d.target.id}`);
+          .attr("class", (d) => `SOURCE${d.source.id}_TARGET${d.target.id}`);
 
         // Setup AnimeJS animations after positions are set
         setupAnimations();
@@ -122,11 +122,11 @@ function TheActualPage() {
         if (!link.source.x || !link.target.x) return;
 
         // Setup animation
-        const animation = animate(`#animated-circle-${i}`, {
+        const animation = animate(`.animated-circle-${i}`, {
           easing: 'linear',
           duration: 1000,
           loop: true,
-          ...animeSVG.createMotionPath(`#SOURCE${link.source.id}_TARGET${link.target.id}`),
+          ...animeSVG.createMotionPath(`.SOURCE${link.source.id}_TARGET${link.target.id}`),
         });
 
         animationsRef.current.push(animation);
