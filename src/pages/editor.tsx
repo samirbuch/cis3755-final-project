@@ -114,57 +114,78 @@ function TheActualPage() {
 
   const createAnimations = useCallback(() => {
     if (!d3SvgRef.current) return;
-
+  
     // Add SVG filter definitions for glow effect
     const defs = d3SvgRef.current.append("defs");
-
-    // Create a filter for the glow effect
+  
+    // Create a super-intense bloom filter
     const filter = defs.append("filter")
-      .attr("id", "glow")
-      .attr("x", "-50%")
-      .attr("y", "-50%")
-      .attr("width", "200%")
-      .attr("height", "200%");
-
-    // Add a blur effect
+      .attr("id", "super-bloom")
+      .attr("x", "-100%")
+      .attr("y", "-100%")
+      .attr("width", "300%")
+      .attr("height", "300%"); // Bigger area to allow for more bloom spread
+  
+    // First blur pass - wide glow
     filter.append("feGaussianBlur")
-      .attr("stdDeviation", "5") // Glow width
-      .attr("result", "blur");
-
-    // Add color matrix to intensify the glow
+      .attr("in", "SourceGraphic")
+      .attr("stdDeviation", "10") // Much wider blur
+      .attr("result", "blur1");
+  
+    // Color matrix to intensify the glow and shift color
     filter.append("feColorMatrix")
-      .attr("in", "blur")
+      .attr("in", "blur1")
       .attr("type", "matrix")
-      // Increase red/brightness values (first column)
-      // Format is:  R  G  B  A  constant (for each color channel)
-      .attr("values", "0 0 0 0 1   0 0 0 0 0.2   0 0 0 0 0.2   0 0 0 1 0")
-      .attr("result", "glow");
-
-    // Merge original and glow
-    filter.append("feMerge")
-      .selectAll("feMergeNode")
-      .data(["glow", "SourceGraphic"])
-      .enter().append("feMergeNode")
-      .attr("in", d => d);
-
+      .attr("values", "0 0 0 0 1   0 0 0 0 0.2   0 0 0 0 0.2   0 0 0 3 0") // Much higher alpha multiplier
+      .attr("result", "coloredBlur1");
+  
+    // Second blur pass - core glow
+    filter.append("feGaussianBlur")
+      .attr("in", "SourceGraphic")
+      .attr("stdDeviation", "2")
+      .attr("result", "blur2");
+  
+    // Intensify the core
+    filter.append("feColorMatrix")
+      .attr("in", "blur2")
+      .attr("type", "matrix")
+      .attr("values", "0 0 0 0 1   0 0 0 0 0.5   0 0 0 0 0.5   0 0 0 3 0")
+      .attr("result", "coloredBlur2");
+  
+    // Add composite operations to stack the effects
+    const composite = filter.append("feComposite")
+      .attr("in", "coloredBlur1")
+      .attr("in2", "coloredBlur2")
+      .attr("operator", "arithmetic")
+      .attr("k1", "0")
+      .attr("k2", "1")
+      .attr("k3", "1")
+      .attr("k4", "0")
+      .attr("result", "bloom");
+  
+    // Final merge - combine the bloom with the original
+    const merge = filter.append("feMerge");
+    merge.append("feMergeNode").attr("in", "bloom");
+    merge.append("feMergeNode").attr("in", "SourceGraphic");
+  
     // Create a group for animated arcs
     const animationGroup = d3SvgRef.current.append("g")
       .attr("class", "animatedCircles");
-
+  
     // For each link, create an arc that will animate along the path
     links.forEach((link, i) => {
-      // Add an arc to the animation group
+      // Add an arc to the animation group with super bloom
       animationGroup.append("path")
         .attr("d", d3.arc()({
-          innerRadius: 8,
+          innerRadius: 6,
           outerRadius: 10,
           startAngle: 0,
           endAngle: Math.PI
         }))
-        .attr("fill", "#FF0000")
+        .attr("fill", "#FF3030") // Brighter red
         .attr("id", `animated-arc-${i}`)
-        .style("opacity", 0.8)
-        .style("filter", "url(#glow)"); // Apply the glow filter
+        .style("opacity", 1) // Full opacity
+        .style("filter", "url(#super-bloom)"); // Apply the intense bloom filter
     });
   }, [links]);
 
