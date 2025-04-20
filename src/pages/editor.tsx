@@ -1,5 +1,5 @@
 import { Button, Flex, SegmentedControl, Text, Title } from "@mantine/core";
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { animate, svg as animeSVG, JSAnimation } from 'animejs';
 
 import type Node from "@/interfaces/Node";
@@ -34,29 +34,65 @@ function TheActualPage() {
   // Store all animations so they can be cleaned up later
   const animationsRef = useRef<JSAnimation[]>([]);
 
-  useEffect(() => {
-    if (!svgContainerRef.current) return;
+  const d3SvgRef = useRef<d3.Selection<SVGSVGElement, unknown, null, undefined>>(null);
+  const svgLinksRef = useRef<d3.Selection<SVGLineElement, Link, SVGGElement, unknown>>(null);
+  const svgAnimationGroupRef = useRef<SVGGElement>(null);
+  const svgNodeGroupsRef = useRef<d3.Selection<SVGGElement, Node, SVGGElement, unknown>>(null);
+  const svgTextsRef = useRef<d3.Selection<SVGTextElement, Node, SVGGElement, unknown>>(null);
+  const svgNodesRef = useRef<d3.Selection<SVGCircleElement, Node, SVGGElement, unknown>>(null);
 
-    // Clear existing elements
-    d3.select(svgContainerRef.current).selectAll("*").remove();
+  const setupAnimations = useCallback(() => {
+    // Clean up old animations first
+    animationsRef.current.forEach(anim => anim.pause());
+    animationsRef.current = [];
 
-    const svg = d3.select(svgContainerRef.current);
+    // Create new animations for each link
+    links.forEach((link, i) => {
+      if (!link.source.x || !link.target.x) return;
 
-    const svgLinks = svg.append("g")
-      .attr("class", "links")
-      .selectAll("line")
-      .data(links)
-      .enter()
-      .append("line")
-      .attr("stroke", "white")
-      .attr("stroke-width", 2);
+      // Setup animation
+      const animation = animate(`#animated-arc-${i}`, {
+        easing: 'linear',
+        duration: 1000,
+        loop: true,
+        ...animeSVG.createMotionPath(`#SOURCE${link.source.id}_TARGET${link.target.id}`),
+      });
 
-    // Create a group for animated circles
-    const animationGroup = svg.append("g")
-      .attr("class", "animatedCircles");
+      animationsRef.current.push(animation);
+    });
+  }, [links]);
+
+  const tick = useCallback(() => {
+    if (!svgNodesRef.current || !svgTextsRef.current || !svgLinksRef.current) return;
+
+    if (nodes.length > 0) {
+      svgNodesRef.current
+        .attr("cx", (d: Node) => d.x)
+        .attr("cy", (d: Node) => d.y);
+
+      svgTextsRef.current
+        .attr("x", (d: Node) => d.x + 15)
+        .attr("y", (d: Node) => d.y + 5)
+        .text((d: Node) => d.name);
+    }
+
+    if (links.length > 0) {
+      svgLinksRef.current
+        .attr("x1", (d) => d.source.x)
+        .attr("y1", (d) => d.source.y)
+        .attr("x2", (d) => d.target.x)
+        .attr("y2", (d) => d.target.y)
+        .attr("id", (d) => `SOURCE${d.source.id}_TARGET${d.target.id}`);
+
+      setupAnimations();
+    }
+  }, [nodes, links, setupAnimations]);
+
+  const createNodes = useCallback(() => {
+    if (!d3SvgRef.current) return;
 
     // Create node groups containing both circle and text
-    const nodeGroups = svg.append("g")
+    svgNodeGroupsRef.current = d3SvgRef.current.append("g")
       .attr("class", "nodes")
       .selectAll("g")
       .data(nodes)
@@ -64,18 +100,26 @@ function TheActualPage() {
       .append("g");
 
     // Add text to each group
-    const svgTexts = nodeGroups.append("text")
+    svgTextsRef.current = svgNodeGroupsRef.current.append("text")
       .attr("x", 15)
       .attr("y", 5)
       .attr("fill", "white")
       .text(d => d.name);
 
     // Add circles to each group
-    const svgNodes = nodeGroups.append("circle")
+    svgNodesRef.current = svgNodeGroupsRef.current.append("circle")
       .attr("r", 10)
       .attr("fill", "white");
+  }, [nodes]);
 
-    // For each link, create a circle that will animate along the path
+  const createAnimations = useCallback(() => {
+    if (!d3SvgRef.current) return;
+
+    // Create a group for animated circles
+    const animationGroup = d3SvgRef.current.append("g")
+      .attr("class", "animatedCircles");
+
+    // For each link, create an arc that will animate along the path
     links.forEach((link, i) => {
 
       // Add a circle to the animation group
@@ -84,60 +128,40 @@ function TheActualPage() {
           innerRadius: 8,
           outerRadius: 10,
           startAngle: 0,
-          endAngle: Math.PI 
+          endAngle: Math.PI
         }))
-        .attr("fill", "#4CAF50")
+        .attr("fill", "#FF0000")
         .attr("id", `animated-arc-${i}`)
         .style("opacity", 0.8);
     });
+  }, [links]);
 
-    function tick() {
-      if (nodes.length > 0) {
-        svgNodes
-          .attr("cx", (d) => d.x)
-          .attr("cy", (d) => d.y);
+  const createLinks = useCallback(() => {
+    if (!d3SvgRef.current) return;
 
-        svgTexts
-          .attr("x", (d) => d.x + 15)
-          .attr("y", (d) => d.y + 5)
-          .text((d) => d.name);
+    svgLinksRef.current = d3SvgRef.current.append("g")
+      .attr("class", "links")
+      .selectAll("line")
+      .data(links)
+      .enter()
+      .append("line")
+      .attr("stroke", "white")
+      .attr("stroke-width", 2);
+  }, [links]);
 
-        // console.log("Nodes", nodes.map((n) => n.name));
-      }
+  useEffect(() => {
+    if (!svgContainerRef.current) return;
 
-      if (links.length > 0) {
-        svgLinks
-          .attr("x1", (d) => d.source.x)
-          .attr("y1", (d) => d.source.y)
-          .attr("x2", (d) => d.target.x)
-          .attr("y2", (d) => d.target.y)
-          .attr("id", (d) => `SOURCE${d.source.id}_TARGET${d.target.id}`);
+    // Clear existing elements
+    d3.select(svgContainerRef.current).selectAll("*").remove();
 
-        // Setup AnimeJS animations after positions are set
-        setupAnimations();
-      }
-    }
+    d3SvgRef.current = d3.select(svgContainerRef.current);
 
-    function setupAnimations() {
-      // Clean up old animations first
-      animationsRef.current.forEach(anim => anim.pause());
-      animationsRef.current = [];
+    createLinks();
 
-      // Create new animations for each link
-      links.forEach((link, i) => {
-        if (!link.source.x || !link.target.x) return;
-
-        // Setup animation
-        const animation = animate(`#animated-arc-${i}`, {
-          easing: 'linear',
-          duration: 1000,
-          loop: true,
-          ...animeSVG.createMotionPath(`#SOURCE${link.source.id}_TARGET${link.target.id}`),
-        });
-
-        animationsRef.current.push(animation);
-      });
-    }
+    createAnimations();
+    
+    createNodes();
 
     if (nodes.length > 0) {
       // Use a force simulation to position the nodes
@@ -161,7 +185,7 @@ function TheActualPage() {
       animationsRef.current.forEach(anim => anim.pause());
       animationsRef.current = [];
     }
-  }, [nodes, links]);
+  }, [nodes, links, tick, createNodes, createAnimations, createLinks]);
 
   return (
     <Flex direction={"column"}>
