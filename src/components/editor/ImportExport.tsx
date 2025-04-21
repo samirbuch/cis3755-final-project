@@ -26,21 +26,17 @@ export default function ImportExport() {
       eventTitle: editorContext.eventTitle,
       eventDescription: editorContext.eventDescription,
       nodes: editorContext.nodes,
-      links: editorContext.links,
+      links: editorContext.links.map(link => ({
+        ...link,
+        source: link.source.id,
+        target: link.target.id,
+      })),
     }
 
     const dataStr = JSON.stringify(data, (key, value) => {
       // Remove the d3 properties from the nodes
       if (["x", "y", "vx", "vy", "index"].includes(key)) {
         return undefined;
-      }
-
-      // Convert the source and target properties of the links to their IDs
-      if (key === "source") {
-        return value.id;
-      }
-      if (key === "target") {
-        return value.id;
       }
 
       // Otherwise, return the value as is
@@ -83,11 +79,21 @@ export default function ImportExport() {
 
         console.log("Imported data:", data);
 
+        const fixedLinks = data.links.map(link => ({
+          ...link,
+          source: data.nodes.find(node => node.id === link.source),
+          target: data.nodes.find(node => node.id === link.target),
+        }));
+        const fixedData = {
+          ...data,
+          links: fixedLinks,
+        }
+
         // We're not using the result object here because the saved data
         // doesn't include the d3 properties. The editor context requires
         // them, but only in TypeScript. d3 adds them back when rendering.
         editorContext.setNodes(data.nodes);
-        editorContext.setLinks(data.links);
+        editorContext.setLinks(fixedData.links);
 
         editorContext.setEventTimestamp(data.eventTime);
         editorContext.setEventTitle(data.eventTitle);
