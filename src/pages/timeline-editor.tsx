@@ -7,9 +7,88 @@ import { notifications } from "@mantine/notifications";
 import useArrayState from "@/util/useArrayState";
 import { z } from "zod";
 import TimelineEvent from "@/components/timeline-editor/TimelineEvent";
+import { useEffect } from "react";
+
+const ZodTimelineData = z.array(ZodData);
 
 export default function TimelineEditor() {
   const events = useArrayState<z.infer<typeof ZodData>>();
+
+  useEffect(() => {
+    console.log("Events array changed:", events.array);
+  }, [events.array]);
+
+  const exportTimeline = () => {
+    console.log("Exporting events");
+
+    const dataStr = JSON.stringify(events.array, (key, value) => {
+      // Remove the d3 properties from the nodes
+      if (["x", "y", "vx", "vy", "index"].includes(key)) {
+        return undefined;
+      }
+
+      // Otherwise, return the value as is
+      return value;
+    }, 2);
+
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `timeline-${new Date().toISOString()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const importTimeline = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+
+    input.onchange = (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataStr = e.target?.result as string;
+        try {
+          const data = JSON.parse(dataStr);
+
+          const result = ZodTimelineData.safeParse(data);
+          if (!result.success) {
+            console.error("Invalid data format", result.error.format());
+            notifications.show({
+              title: "Invalid data format",
+              message: "File is not a valid timeline.",
+              color: "red",
+              position: "top-center"
+            });
+            return;
+          }
+
+          console.log("Imported data:", data);
+          events.dangerousSetArray(data);
+          notifications.show({
+            title: "Timeline imported",
+            message: "Timeline imported successfully.",
+            color: "green",
+            position: "bottom-right"
+          });
+        } catch (err) {
+          console.error("Error processing file", file.name, err);
+          notifications.show({
+            title: "Error processing file",
+            message: `File ${file.name} could not be parsed.`,
+            color: "red",
+            position: "top-center"
+          });
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
 
   const uploadEvent = () => {
     console.log("Uploading events");
@@ -94,10 +173,10 @@ export default function TimelineEditor() {
   return (
     <Flex direction={"column"}>
       <Header title="Timeline Editor">
-        <Button>
+        <Button onClick={() => importTimeline()}>
           Import
         </Button>
-        <Button>
+        <Button onClick={() => exportTimeline()}>
           Export
         </Button>
 
