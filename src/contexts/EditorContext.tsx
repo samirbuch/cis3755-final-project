@@ -4,6 +4,16 @@ import type Node from '@/interfaces/Node';
 import type Link from '@/interfaces/Link';
 
 export interface EditorContextType {
+  eventTitle: string | null;
+  eventDescription: string | null;
+  eventTimestamp: { year: number; month: number; day: number };
+
+  setEventTitle: React.Dispatch<React.SetStateAction<string | null>>;
+  setEventDescription: React.Dispatch<React.SetStateAction<string | null>>;
+  setEventTimestamp: React.Dispatch<
+    React.SetStateAction<{ year: number; month: number; day: number }>
+  >;
+
   nodes: Node[];
   links: Link[];
   nodeCounter: number;
@@ -22,6 +32,18 @@ export interface EditorContextType {
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
 
 export const EditorProvider = ({ children }: { children: ReactNode }) => {
+  const [eventTitle, setEventTitle] = useState<string | null>(null);
+  const [eventDescription, setEventDescription] = useState<string | null>(null);
+  const [eventTimestamp, setEventTimestamp] = useState<{
+    year: number;
+    month: number;
+    day: number;
+  }>({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    day: new Date().getDate(),
+  });
+
   const [nodes, setNodes] = useState<Node[]>([]);
   const [links, setLinks] = useState<Link[]>([]);
   const [nodeCounter, setNodeCounter] = useState(0);
@@ -62,17 +84,24 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <EditorContext.Provider
-      value={{ 
-        nodes, 
-        links, 
+      value={{
+        nodes,
+        links,
         nodeCounter,
         linkCounter,
         addNode,
         addLink,
-        setNodes, 
-        setLinks, 
-        updateNode, 
-        updateLink 
+        setNodes,
+        setLinks,
+        updateNode,
+        updateLink,
+
+        eventTitle,
+        eventDescription,
+        eventTimestamp,
+        setEventTitle,
+        setEventDescription,
+        setEventTimestamp,
       }}
     >
       {children}
