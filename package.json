@@ -27,7 +27,8 @@
     "react-spinners": "^0.15.0",
     "recharts": "2",
     "uuid": "^11.1.0",
-    "zod": "^3.24.3"
+    "zod": "^3.24.3",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
