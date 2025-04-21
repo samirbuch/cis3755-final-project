@@ -16,12 +16,13 @@ export const ZodData = z.object({
   nodes: z.array(ZodNodeNoPos),
   links: z.array(ZodLinkSourceTargetID),
 });
+type ZodDataT = z.infer<typeof ZodData>;
 
 export default function ImportExport() {
   const editorContext = useEditorContext();
 
   function exportData() {
-    const data = {
+    const data: ZodDataT = {
       eventTime: editorContext.eventTimestamp,
       eventTitle: editorContext.eventTitle,
       eventDescription: editorContext.eventDescription,
@@ -79,10 +80,10 @@ export default function ImportExport() {
 
         console.log("Imported data:", data);
 
-        const fixedLinks = data.links.map(link => ({
+        const fixedLinks = (data.links as ZodDataT["links"]).map(link => ({
           ...link,
-          source: data.nodes.find(node => node.id === link.source),
-          target: data.nodes.find(node => node.id === link.target),
+          source: (data.nodes as ZodDataT["nodes"]).find(node => node.id === link.source),
+          target: (data.nodes as ZodDataT["nodes"]).find(node => node.id === link.target),
         }));
         const fixedData = {
           ...data,
