@@ -91,6 +91,8 @@ export default function ImportExport() {
           return;
         }
 
+        console.log("Imported data:", data);
+
         // We're not using the result object here because the saved data
         // doesn't include the d3 properties. The editor context requires
         // them, but only in TypeScript. d3 adds them back when rendering.

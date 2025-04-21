@@ -1,7 +1,6 @@
 import type Node from "@/interfaces/Node";
-import { Button, Flex, Title } from "@mantine/core";
+import { Button } from "@mantine/core";
 
-import styles from "@/styles/Editor.module.css";
 import NodeCard from "./NodeCard";
 import { useEditorContext } from "@/contexts/EditorContext";
 
@@ -11,9 +10,12 @@ export default function NodesPanel() {
 
   function createNode() {
     console.log("Creating node");
+
+    const maxID = Math.max(...editorContext.nodes.map((node) => node.id), 0);
+
     const newNode: Node = {
-      id: editorContext.nodeCounter,
-      name: `Node ${editorContext.nodeCounter}`,
+      id: maxID + 1,
+      name: `Node ${maxID + 1}`,
 
       x: Math.random() * 100,
       y: Math.random() * 100,

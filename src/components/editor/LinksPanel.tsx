@@ -1,6 +1,5 @@
 import Link from "@/interfaces/Link";
-import Node from "@/interfaces/Node";
-import { Button, Flex, Text } from "@mantine/core";
+import { Button } from "@mantine/core";
 import LinkCard from "./LinkCard";
 import { useEditorContext } from "@/contexts/EditorContext";
 
