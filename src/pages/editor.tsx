@@ -6,7 +6,7 @@ import { IconPencil, IconCheck, IconExternalLink } from "@tabler/icons-react";
 import Header from "@/components/Header";
 import LinksPanel from "@/components/editor/LinksPanel";
 import NodesPanel from "@/components/editor/NodesPanel";
-import { EditorProvider, useEditorContext } from "@/contexts/EditorContext";
+import { useEditorContext } from "@/contexts/EditorContext";
 import styles from "@/styles/Editor.module.css";
 import ImportExport from "@/components/editor/ImportExport";
 import Graph from "@/components/editor/Graph";
@@ -14,9 +14,9 @@ import Link from "next/link";
 
 export default function Editor() {
   return (
-    <EditorProvider>
-      <TheActualPage />
-    </EditorProvider>
+    // <EditorProvider>
+    <TheActualPage />
+    // </EditorProvider>
   )
 }
 
