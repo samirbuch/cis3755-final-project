@@ -327,7 +327,25 @@ export default function Graph() {
         .on("tick", tick);
 
       if (links.length > 0) {
-        simulation.force("link", d3.forceLink(links).distance(200).strength(0.2))
+        simulation.force(
+          "link",
+          d3.forceLink(links)
+            .distance((d) => {
+              // Calculate total PPM in both directions
+              const totalPPM = (d.sourceToTargetPPM?.ppm || 0) +
+                (d.targetToSourcePPM?.ppm || 0) +
+                (d.sourceToTargetPPM?.mppm || 0) +
+                (d.targetToSourcePPM?.mppm || 0);
+
+              // Inverse relationship: higher PPM = shorter distance
+              // Base distance is 300, minimum distance is 50
+              if (totalPPM === 0) return 300; // Max distance for no communication
+
+              // Calculate distance with inverse proportion and clamping
+              return Math.max(50, 300 - Math.min(250, totalPPM * 2));
+            })
+            .strength(0.2)
+        )
       }
 
       setupAnimations();
