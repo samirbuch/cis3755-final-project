@@ -1,10 +1,10 @@
 import { Flex, Group, SegmentedControl, Text, Title } from "@mantine/core";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Header from "@/components/Header";
 import LinksPanel from "@/components/editor/LinksPanel";
 import NodesPanel from "@/components/editor/NodesPanel";
-import { EditorProvider, useEditorContext } from "@/contexts/EditorContext";
+import { EditorProvider } from "@/contexts/EditorContext";
 import styles from "@/styles/Editor.module.css";
 import ImportExport from "@/components/ImportExport";
 import Graph from "@/components/editor/Graph";
@@ -20,6 +20,18 @@ export default function Editor() {
 
 function TheActualPage() {
   const [tab, setTab] = useState<"waypoints" | "nodes" | "links">("waypoints");
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      // const message = "Before you go! Please export your data. Data is not saved in-browser.";
+      event.preventDefault();
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    }
+  }, []);
 
   return (
     <Flex direction={"column"}>
