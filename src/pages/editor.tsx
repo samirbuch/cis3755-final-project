@@ -90,7 +90,7 @@ function TheActualPage() {
             </Flex>
           )}
 
-          <Title order={3}>Event Name</Title>
+          <Title order={3}>Event Title</Title>
           {!isEditingTitle && (
             <Flex direction="row" align="center" justify={"space-between"}>
               <Text>{editorContext.eventTitle || "(No title)"}</Text>

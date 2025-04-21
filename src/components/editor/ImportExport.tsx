@@ -1,13 +1,20 @@
 import { useEditorContext } from "@/contexts/EditorContext";
-import { ZodLinkNoPos } from "@/interfaces/Link";
+import { ZodLinkSourceTargetID } from "@/interfaces/Link";
 import { ZodNodeNoPos } from "@/interfaces/Node";
 import { Button, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { z } from "zod";
 
 const Data = z.object({
+  eventTime: z.object({
+    year: z.number(),
+    month: z.number(),
+    day: z.number(),
+  }).optional(),
+  eventTitle: z.string(),
+  eventDescription: z.string().optional(),
   nodes: z.array(ZodNodeNoPos),
-  links: z.array(ZodLinkNoPos),
+  links: z.array(ZodLinkSourceTargetID),
 });
 
 export default function ImportExport() {
@@ -15,8 +22,21 @@ export default function ImportExport() {
 
   function exportData() {
     const data = {
+      eventTime: editorContext.eventTimestamp,
+      eventTitle: editorContext.eventTitle,
+      eventDescription: editorContext.eventDescription,
       nodes: editorContext.nodes,
       links: editorContext.links,
+    }
+
+    if(!data.eventTitle) {
+      notifications.show({
+        title: "Missing event title",
+        message: "Please add an event title before exporting.",
+        color: "red",
+        position: "top-center"
+      })
+      return;
     }
 
     const dataStr = JSON.stringify(data, (key, value) => {
@@ -36,6 +56,7 @@ export default function ImportExport() {
       // Otherwise, return the value as is
       return value;
     }, 2);
+
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -75,6 +96,10 @@ export default function ImportExport() {
         // them, but only in TypeScript. d3 adds them back when rendering.
         editorContext.setNodes(data.nodes);
         editorContext.setLinks(data.links);
+
+        editorContext.setEventTimestamp(data.eventTime);
+        editorContext.setEventTitle(data.eventTitle);
+        editorContext.setEventDescription(data.eventDescription);
       };
       reader.readAsText(file);
     };
