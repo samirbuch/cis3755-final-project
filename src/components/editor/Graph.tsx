@@ -3,10 +3,12 @@ import * as d3 from "d3";
 import { useRef, useCallback, useEffect } from "react";
 import Link from "@/interfaces/Link";
 import Node from "@/interfaces/Node";
-import { useEditorContext } from "@/contexts/EditorContext";
+import { useCurrentLinks, useCurrentNodes } from "@/contexts/EditorContext";
 
 export default function Graph() {
-  const { nodes, links } = useEditorContext();
+  // const { nodes, links } = useEditorContext();
+  const nodes = useCurrentNodes();
+  const links = useCurrentLinks();
 
   // Store all animations so they can be cleaned up later
   const animationsRef = useRef<JSAnimation[]>([]);

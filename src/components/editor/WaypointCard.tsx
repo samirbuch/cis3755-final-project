@@ -11,7 +11,10 @@ export default function WaypointCard(props: WaypointCardProps) {
     <Card>
       <Flex direction={"column"} gap={10}>
         <Title order={3}>Waypoint {waypoint.id}</Title>
-        <Flex></Flex>
+        <Text></Text>
+        <Flex direction="row">
+          <Text></Text>
+        </Flex>
       </Flex>
     </Card>
   )

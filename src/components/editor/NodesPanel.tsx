@@ -3,17 +3,21 @@ import { Button, Flex, Title } from "@mantine/core";
 
 import styles from "@/styles/Editor.module.css";
 import NodeCard from "./NodeCard";
-import { useEditorContext } from "@/contexts/EditorContext";
+import { useEditorContext, useCurrentNodes } from "@/contexts/EditorContext";
 
 // Section of the editor panel that handles creating and editing nodes
 export default function NodesPanel() {
   const editorContext = useEditorContext();
+  const currentNodes = useCurrentNodes();
 
   function createNode() {
     console.log("Creating node");
+
+    const maxID = Math.max(...currentNodes.map((node) => node.id), 0);
+
     const newNode: Node = {
-      id: editorContext.nodeCounter,
-      name: `Node ${editorContext.nodeCounter}`,
+      id: maxID + 1,
+      name: `Node ${maxID + 1}`,
 
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -30,12 +34,6 @@ export default function NodesPanel() {
 
   function deleteNode(node: Node) {
     console.log("Deleting node", node);
-    editorContext.setNodes((prev) => prev.filter((n) => n.id !== node.id));
-
-    // Delete all links that reference this node
-    editorContext.setLinks((prev) =>
-      prev.filter((link) => link.source.id !== node.id && link.target.id !== node.id)
-    );
   }
 
   return (
@@ -44,7 +42,7 @@ export default function NodesPanel() {
         Create Node
       </Button>
 
-      {editorContext.nodes.map((node) => (
+      {currentNodes.map((node) => (
         <NodeCard
           key={node.id}
           node={node}

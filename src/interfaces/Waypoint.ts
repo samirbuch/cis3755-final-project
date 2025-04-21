@@ -1,25 +1,20 @@
+// Each waypoint is differentiated by its event. Each waypoint can have only
+// one event mapped to it, but it can have multiple timestamps. Each timestamp
+// has a year/month/day, and each timestamp can have multiple nodes and links.
+
 import { z } from "zod";
-import { ZodNode, ZodNodeNoPos } from "./Node";
-import { ZodLink, ZodLinkNoPos } from "./Link";
 import { ZodEvent } from "./Event";
+import { ZodTimestampNoPos, ZodTimestamp } from "./Timestamp";
 
 export const ZodWaypointNoPos = z.object({
   id: z.number(),
-  timestamp: z.object({
-    year: z.number().optional(),
-    month: z.number().optional(),
-    day: z.number().optional(),
-  }).optional(),
-  events: z.array(ZodEvent),
-
-  nodes: z.array(ZodNodeNoPos),
-  links: z.array(ZodLinkNoPos)
+  timestamps: z.array(ZodTimestampNoPos),
+  event: ZodEvent,
 });
 export type WaypointNoPos = z.infer<typeof ZodWaypointNoPos>;
 
 export const ZodWaypoint = ZodWaypointNoPos.extend({
-  nodes: z.array(ZodNode),
-  links: z.array(ZodLink)
+  timestamps: z.array(ZodTimestamp),
 });
 type Waypoint = z.infer<typeof ZodWaypoint>;
 export default Waypoint;

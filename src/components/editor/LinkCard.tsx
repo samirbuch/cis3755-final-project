@@ -1,4 +1,4 @@
-import { useEditorContext } from "@/contexts/EditorContext";
+import { useCurrentNodes, useEditorContext } from "@/contexts/EditorContext";
 import Link from "@/interfaces/Link";
 import { Flex, Text, Button, Card, ActionIcon, Title, Group, Select, Fieldset, Slider } from "@mantine/core";
 import { IconArrowRight, IconPencil, IconTrash } from "@tabler/icons-react";
@@ -13,6 +13,7 @@ export default function LinkCard(props: LinkCardProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   const editorContext = useEditorContext();
+  const nodes = useCurrentNodes();
 
   const [fromSelected, setFromSelected] = useState(props.link.source.id);
   const [toSelected, setToSelected] = useState(props.link.target.id);
@@ -47,7 +48,7 @@ export default function LinkCard(props: LinkCardProps) {
           {isEditing && (
             <Select
               searchable
-              data={editorContext.nodes
+              data={nodes
                 .filter((node) => node.id !== toSelected) // Cannot connect to themselves
                 .map((node) => ({
                   value: node.id.toString(),
@@ -62,7 +63,7 @@ export default function LinkCard(props: LinkCardProps) {
                   setFromSelected(parseInt(option.value));
                   props.onLinkEdit({
                     ...props.link,
-                    source: editorContext.nodes.find((node) => node.id === parseInt(option.value))!
+                    source: nodes.find((node) => node.id === parseInt(option.value))!
                   });
                 }
               }}
@@ -76,7 +77,7 @@ export default function LinkCard(props: LinkCardProps) {
           {isEditing && (
             <Select
               searchable
-              data={editorContext.nodes
+              data={nodes
                 .filter((node) => node.id !== fromSelected) // Cannot connect to themselves
                 .map((node) => ({
                   value: node.id.toString(),
@@ -91,7 +92,7 @@ export default function LinkCard(props: LinkCardProps) {
                   setToSelected(parseInt(option.value));
                   props.onLinkEdit({
                     ...props.link,
-                    target: editorContext.nodes.find((node) => node.id === parseInt(option.value))!
+                    target: nodes.find((node) => node.id === parseInt(option.value))!
                   });
                 }
               }}

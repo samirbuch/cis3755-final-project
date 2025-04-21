@@ -7,19 +7,10 @@ export default function WaypointsPanel() {
   const editorContext = useEditorContext();
 
   const createWaypoint = () => {
-    const waypoint: Waypoint = {
-      id: editorContext.waypointCounter,
-      nodes: [],
-      links: [],
-      events: [],
-      timestamp: {
-        year: new Date().getFullYear(),
-        month: new Date().getMonth() + 1,
-        day: new Date().getDate(),
-      },
-    }
+    const currentWaypoint = editorContext.currentWaypoint;
+    const clonedWaypoint = { ...currentWaypoint, id: currentWaypoint.id + 1 };
 
-    editorContext.addWaypoint(waypoint);
+    editorContext.addWaypoint(clonedWaypoint);
   }
 
   return (

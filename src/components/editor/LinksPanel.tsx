@@ -2,13 +2,13 @@ import Link from "@/interfaces/Link";
 import Node from "@/interfaces/Node";
 import { Button, Flex, Text } from "@mantine/core";
 import LinkCard from "./LinkCard";
-import { useEditorContext } from "@/contexts/EditorContext";
+import { useCurrentLinks, useCurrentNodes, useEditorContext } from "@/contexts/EditorContext";
 
 export default function LinksPanel() {
 
   const editorContext = useEditorContext();
-  const nodes = editorContext.nodes;
-  const links = editorContext.links;
+  const nodes = useCurrentNodes();
+  const links = useCurrentLinks();
 
   function createLink() {
     console.log("Creating link");
@@ -29,7 +29,8 @@ export default function LinksPanel() {
 
     // setLinks((prev) => [...prev, newLink]);
     // props.onLinkCreate(newLink);
-    editorContext.setLinks((prev) => [...prev, newLink]);
+    // editorContext.setLinks((prev) => [...prev, newLink]);
+    editorContext.addLink(newLink);
   }
 
   function editLink(link: Link) {
@@ -39,7 +40,7 @@ export default function LinksPanel() {
 
   function deleteLink(link: Link) {
     console.log("Deleting link", link);
-    editorContext.setLinks((prev) => prev.filter((l) => l.id !== link.id));
+    // editorContext.setLinks((prev) => prev.filter((l) => l.id !== link.id));
   }
 
   return (
