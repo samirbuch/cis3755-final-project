@@ -5,14 +5,14 @@ import { Button, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { z } from "zod";
 
-const Data = z.object({
+export const ZodData = z.object({
   eventTime: z.object({
     year: z.number(),
     month: z.number(),
     day: z.number(),
-  }).optional(),
-  eventTitle: z.string(),
-  eventDescription: z.string().optional(),
+  }),
+  eventTitle: z.string().nullable(),
+  eventDescription: z.string().nullable(),
   nodes: z.array(ZodNodeNoPos),
   links: z.array(ZodLinkSourceTargetID),
 });
@@ -27,16 +27,6 @@ export default function ImportExport() {
       eventDescription: editorContext.eventDescription,
       nodes: editorContext.nodes,
       links: editorContext.links,
-    }
-
-    if(!data.eventTitle) {
-      notifications.show({
-        title: "Missing event title",
-        message: "Please add an event title before exporting.",
-        color: "red",
-        position: "top-center"
-      })
-      return;
     }
 
     const dataStr = JSON.stringify(data, (key, value) => {
@@ -79,7 +69,7 @@ export default function ImportExport() {
         const dataStr = e.target?.result as string;
         const data = JSON.parse(dataStr);
 
-        const result = Data.safeParse(data);
+        const result = ZodData.safeParse(data);
         if (!result.success) {
           console.error("Invalid data format", result.error.format());
           notifications.show({

@@ -1,0 +1,133 @@
+import Header from "@/components/Header";
+import { Button, Flex } from "@mantine/core";
+import Link from "next/link";
+import { IconExternalLink } from "@tabler/icons-react";
+import { ZodData } from "@/components/editor/ImportExport";
+import { notifications } from "@mantine/notifications";
+import useArrayState from "@/util/useArrayState";
+import { z } from "zod";
+import TimelineEvent from "@/components/timeline-editor/TimelineEvent";
+
+export default function TimelineEditor() {
+  const events = useArrayState<z.infer<typeof ZodData>>();
+
+  const uploadEvent = () => {
+    console.log("Uploading events");
+
+    // File upload, accept multiple .json files
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.multiple = true;
+
+    input.onchange = (event) => {
+      const files = (event.target as HTMLInputElement).files;
+      if (!files) return;
+
+      Array.from(files).forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const dataStr = e.target?.result as string;
+          try {
+            const data = JSON.parse(dataStr);
+
+            const result = ZodData.safeParse(data);
+            if (!result.success) {
+              console.error("Invalid data format", result.error.format());
+              notifications.show({
+                title: "Invalid data format",
+                message: `File ${file.name} is not a valid export.`,
+                color: "red",
+                position: "top-center"
+              });
+              return;
+            }
+
+            console.log("Imported data:", data);
+            events.push(data);
+            notifications.show({
+              title: "Event uploaded",
+              message: `File ${file.name} uploaded successfully.`,
+              color: "green",
+              position: "bottom-right"
+            });
+          } catch (err) {
+            console.error("Error processing file", file.name, err);
+            notifications.show({
+              title: "Error processing file",
+              message: `File ${file.name} could not be parsed.`,
+              color: "red",
+              position: "top-center"
+            });
+          }
+        };
+        reader.readAsText(file);
+      });
+    };
+    input.click();
+  }
+
+  const deleteEvent = (index: number) => {
+    events.removeIndex(index);
+    notifications.show({
+      title: "Event deleted",
+      message: "Event deleted successfully.",
+      color: "green",
+      position: "bottom-right"
+    })
+  };
+
+  const moveEventUp = (index: number) => {
+    if (index === 0) return;
+    const event = events.array[index];
+    events.updateItem(index, events.array[index - 1]);
+    events.updateItem(index - 1, event);
+  }
+
+  const moveEventDown = (index: number) => {
+    if (index === events.array.length - 1) return;
+    const event = events.array[index];
+    events.updateItem(index, events.array[index + 1]);
+    events.updateItem(index + 1, event);
+  }
+
+  return (
+    <Flex direction={"column"}>
+      <Header title="Timeline Editor">
+        <Button>
+          Import
+        </Button>
+        <Button>
+          Export
+        </Button>
+
+        <Link href="/editor" style={{ marginLeft: "auto" }}>
+          <Button variant="outline" rightSection={<IconExternalLink />}>
+            Editor
+          </Button>
+        </Link>
+      </Header>
+
+      <Flex direction="column" gap="lg" maw={600} miw={600} p="md" style={{ alignSelf: "center" }}>
+        {events.array.map((event, index) => (
+          <TimelineEvent
+            position={index + 1}
+            key={index}
+            eventTitle={event.eventTitle}
+            eventDescription={event.eventDescription}
+            eventTimestamp={event.eventTime}
+            numNodes={event.nodes.length}
+            numLinks={event.links.length}
+            onClickDelete={() => deleteEvent(index)}
+            onClickUp={() => moveEventUp(index)}
+            onClickDown={() => moveEventDown(index)}
+          />
+        ))}
+
+        <Button onClick={uploadEvent}>
+          Upload event
+        </Button>
+      </Flex>
+    </Flex>
+  )
+}

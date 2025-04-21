@@ -1,7 +1,7 @@
-import { Flex, SegmentedControl, Text, Title, ActionIcon, TextInput, Divider } from "@mantine/core";
+import { Flex, SegmentedControl, Text, Title, ActionIcon, TextInput, Divider, Button } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates"
 import { useState } from "react";
-import { IconPencil, IconCheck } from "@tabler/icons-react";
+import { IconPencil, IconCheck, IconExternalLink } from "@tabler/icons-react";
 
 import Header from "@/components/Header";
 import LinksPanel from "@/components/editor/LinksPanel";
@@ -10,6 +10,7 @@ import { EditorProvider, useEditorContext } from "@/contexts/EditorContext";
 import styles from "@/styles/Editor.module.css";
 import ImportExport from "@/components/editor/ImportExport";
 import Graph from "@/components/editor/Graph";
+import Link from "next/link";
 
 export default function Editor() {
   return (
@@ -35,8 +36,14 @@ function TheActualPage() {
 
   return (
     <Flex direction={"column"}>
-      <Header title="Editor">
+      <Header title="Event Editor">
         <ImportExport />
+
+        <Link href="/timeline-editor" style={{ marginLeft: "auto" }}>
+          <Button rightSection={<IconExternalLink />} variant="outline">
+            Timeline Editor
+          </Button>
+        </Link>
       </Header>
       <Flex direction="row">
         <Flex flex={3}>
