@@ -1,4 +1,4 @@
-import { Flex, SegmentedControl, Text, Title } from "@mantine/core";
+import { Flex, Group, SegmentedControl, Text, Title } from "@mantine/core";
 import { useRef, useState } from "react";
 
 import Header from "@/components/Header";
@@ -8,6 +8,7 @@ import { EditorProvider, useEditorContext } from "@/contexts/EditorContext";
 import styles from "@/styles/Editor.module.css";
 import ImportExport from "@/components/ImportExport";
 import Graph from "@/components/editor/Graph";
+import WaypointsPanel from "@/components/editor/WaypointsPanel";
 
 export default function Editor() {
   return (
@@ -18,12 +19,28 @@ export default function Editor() {
 }
 
 function TheActualPage() {
-  const [tab, setTab] = useState<"nodes" | "links">("nodes");
+  const [tab, setTab] = useState<"waypoints" | "nodes" | "links">("waypoints");
 
   return (
     <Flex direction={"column"}>
       <Header title="Editor">
         <ImportExport />
+
+        <Group style={{ marginLeft: "auto" }}>
+          <Title order={3}>View:</Title>
+          <SegmentedControl
+            color="blue"
+            data={[
+              { label: <Text>Waypoints</Text>, value: "waypoints" },
+              { label: <Text>Nodes</Text>, value: "nodes" },
+              { label: <Text>Links</Text>, value: "links" },
+            ]}
+            onChange={(e) => {
+              setTab(e as "nodes" | "links" | "waypoints");
+            }}
+            value={tab}
+          />
+        </Group>
       </Header>
       <Flex direction="row">
         <Flex flex={3}>
@@ -38,21 +55,9 @@ function TheActualPage() {
         >
           {/* Editor panel. Should take up remaining width */}
 
-          <Title order={2}>Nodes & Links</Title>
-          <SegmentedControl
-            data={[
-              { label: <Text>Nodes</Text>, value: "nodes" },
-              { label: <Text>Connections</Text>, value: "links" },
-            ]}
-            defaultValue="nodes"
-            onChange={(e) => {
-              setTab(e as "nodes" | "links");
-            }}
-            value={tab}
-          />
-
           {/* Add a scrollable container for the panels */}
           <div className={styles.panelContent}>
+            {tab === "waypoints" && <WaypointsPanel />}
             {tab === "nodes" && <NodesPanel />}
             {tab === "links" && <LinksPanel />}
           </div>
