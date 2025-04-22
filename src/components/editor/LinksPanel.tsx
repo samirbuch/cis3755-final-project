@@ -17,11 +17,11 @@ export default function LinksPanel() {
       target: nodes[1],
 
       sourceToTargetPPM: {
-        ppm: 20,
-        mppm: 3,
+        ppm: 5,
+        mppm: 1,
       },
       targetToSourcePPM: {
-        ppm: 10,
+        ppm: 5,
         mppm: 1,
       }
     };
