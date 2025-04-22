@@ -46,6 +46,8 @@ export default function LinkCard(props: LinkCardProps) {
           {!isEditing && <Text>{props.link.source.name}</Text>}
           {isEditing && (
             <Select
+              min={0}
+              max={10}
               searchable
               data={editorContext.nodes
                 .filter((node) => node.id !== toSelected) // Cannot connect to themselves
@@ -75,6 +77,8 @@ export default function LinkCard(props: LinkCardProps) {
           {!isEditing && <Text>{props.link.target.name}</Text>}
           {isEditing && (
             <Select
+              min={0}
+              max={10}
               searchable
               data={editorContext.nodes
                 .filter((node) => node.id !== fromSelected) // Cannot connect to themselves
@@ -111,12 +115,12 @@ export default function LinkCard(props: LinkCardProps) {
       {isEditing && (
         <Flex direction="column" mt="md" gap="lg">
           <Fieldset legend="From -> To">
-            <Text>Pings per Minute</Text>
+            <Text>Ping Rate</Text>
             <Slider
               value={fromPPM}
               onChange={setFromPPM}
             />
-            <Text mt="sm">Meaningful PPM</Text>
+            <Text mt="sm">Meaningful Pings</Text>
             <Slider
               value={fromMPPM}
               onChange={setFromMPPM}
@@ -124,12 +128,12 @@ export default function LinkCard(props: LinkCardProps) {
           </Fieldset>
 
           <Fieldset legend="To -> From">
-            <Text>Pings per Minute</Text>
+            <Text>Ping Rate</Text>
             <Slider
               value={toPPM}
               onChange={setToPPM}
             />
-            <Text mt="sm">Meaningful PPM</Text>
+            <Text mt="sm">Meaningful Pings</Text>
             <Slider
               value={toMPPM}
               onChange={setToMPPM}
