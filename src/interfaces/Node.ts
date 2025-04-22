@@ -2,7 +2,8 @@ import { z } from "zod";
 
 export const ZodNodeNoPos = z.object({
   id: z.number(),
-  name: z.string()
+  name: z.string(),
+  highlighted: z.boolean()
 });
 export type NodeNoPos = z.infer<typeof ZodNodeNoPos>;
 

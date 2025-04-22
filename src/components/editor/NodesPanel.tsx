@@ -19,6 +19,8 @@ export default function NodesPanel() {
 
       x: Math.random() * 100,
       y: Math.random() * 100,
+
+      highlighted: false,
     };
 
     editorContext.addNode(newNode);

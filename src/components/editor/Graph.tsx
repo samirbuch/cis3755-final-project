@@ -223,7 +223,13 @@ export default function Graph() {
     // Add circles to each group
     svgNodesRef.current = svgNodeGroupsRef.current.append("circle")
       .attr("r", 10)
-      .attr("fill", "white");
+      .attr("fill", "white")
+      .attr("opacity", (d) => {
+        if(nodes.some(node => node.highlighted)) {
+          return d.highlighted ? 1 : 0.5;
+        }
+        return 1;
+      });
   }, [nodes]);
 
   const createAnimations = useCallback(() => {
