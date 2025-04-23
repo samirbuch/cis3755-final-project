@@ -20,6 +20,8 @@ export default function Graph() {
 
   const svgContainerRef = useRef<SVGSVGElement>(null);
 
+  const simulationRef = useRef<d3.Simulation<Node, Link> | null>(null);
+
   // Helper function to create arcs that appear at regular intervals
   function createPeriodicArcs({
     parentGroup,
@@ -263,7 +265,35 @@ export default function Graph() {
             .duration(200)
             .attr("stroke-width", 2); // Return to original width
         }
-      });
+      })
+      // Add drag behavior to nodes
+      .call(d3.drag<SVGCircleElement, Node>()
+        .on("start", (event, d) => {
+          if (!event.active && simulationRef.current) 
+            simulationRef.current.alphaTarget(0.3).restart();
+
+          d.fx = d.x;
+          d.fy = d.y;
+        })
+        .on("drag", (event, d) => {
+          d.fx = event.x;
+          d.fy = event.y;
+        })
+        .on("end", (event, d) => {
+          if (!event.active && simulationRef.current) simulationRef.current.alphaTarget(0);
+
+          // // When drag ends, update the node's position in the state
+          // editorContext.setNodes(currentNodes =>
+          //   currentNodes.map(node =>
+          //     node.id === d.id ? { ...node, x: d.x, y: d.y } : node
+          //   )
+          // );
+
+          // Clear the fixed position after updating state
+          d.fx = null;
+          d.fy = null;
+        })
+      );;
   }, [nodes]);
 
   const createAnimations = useCallback(() => {
@@ -359,7 +389,7 @@ export default function Graph() {
 
     if (nodes.length > 0) {
       // Use a force simulation to position the nodes
-      const simulation = d3.forceSimulation(nodes)
+      simulationRef.current = d3.forceSimulation(nodes)
         .force("charge", d3.forceManyBody().strength(-30))
         .force("collide", d3.forceCollide(40))
         .force("center", d3.forceCenter(
@@ -370,7 +400,7 @@ export default function Graph() {
         .on("tick", tick);
 
       if (links.length > 0) {
-        simulation.force(
+        simulationRef.current.force(
           "link",
           d3.forceLink(links)
             .distance((d) => {
@@ -393,12 +423,12 @@ export default function Graph() {
 
       setupAnimations();
 
-      simulation.on("end", setupAnimations);
+      simulationRef.current.on("end", setupAnimations);
     }
 
     // Cleanup
     return () => {
-      d3.forceSimulation().stop();
+      simulationRef.current?.restart();
       animationsRef.current.forEach(anim => anim.pause());
       animationsRef.current = [];
     }
