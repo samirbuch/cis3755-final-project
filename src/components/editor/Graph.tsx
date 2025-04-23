@@ -225,10 +225,44 @@ export default function Graph() {
       .attr("r", 10)
       .attr("fill", "white")
       .attr("opacity", (d) => {
-        if(nodes.some(node => node.highlighted)) {
+        if (nodes.some(node => node.highlighted)) {
           return d.highlighted ? 1 : 0.5;
         }
         return 1;
+      })
+      // Add hover interactions
+      .on("mouseenter", function (event, d) {
+        // Enlarge this node
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .attr("r", 14); // Increase radius
+
+        // Highlight connected links
+        if (svgLinksRef.current) {
+          svgLinksRef.current
+            .transition()
+            .duration(200)
+            .attr("stroke-width", link => {
+              // Check if this link connects to the hovered node
+              return (link.source.id === d.id || link.target.id === d.id) ? 4 : 2;
+            });
+        }
+      })
+      .on("mouseleave", function () {
+        // Reset this node
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .attr("r", 10); // Return to original radius
+
+        // Reset all links
+        if (svgLinksRef.current) {
+          svgLinksRef.current
+            .transition()
+            .duration(200)
+            .attr("stroke-width", 2); // Return to original width
+        }
       });
   }, [nodes]);
 
@@ -303,7 +337,10 @@ export default function Graph() {
       .enter()
       .append("line")
       .attr("stroke", "white")
-      .attr("stroke-width", 2);
+      .attr("stroke-width", 2)
+      .attr("data-source", d => d.source.id) // Add data attributes for easier selection
+      .attr("data-target", d => d.target.id)
+      .attr("stroke-opacity", 0.7); // Slightly transparent by default;
   }, [links]);
 
   useEffect(() => {
