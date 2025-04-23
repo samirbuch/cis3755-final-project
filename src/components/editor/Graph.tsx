@@ -269,7 +269,7 @@ export default function Graph() {
       // Add drag behavior to nodes
       .call(d3.drag<SVGCircleElement, Node>()
         .on("start", (event, d) => {
-          if (!event.active && simulationRef.current) 
+          if (!event.active && simulationRef.current)
             simulationRef.current.alphaTarget(0.3).restart();
 
           d.fx = d.x;
@@ -404,20 +404,33 @@ export default function Graph() {
           "link",
           d3.forceLink(links)
             .distance((d) => {
-              // Calculate total PPM in both directions
-              const totalPPM = (d.sourceToTargetPPM?.ppm || 0) +
-                (d.targetToSourcePPM?.ppm || 0) +
-                (d.sourceToTargetPPM?.mppm || 0) +
-                (d.targetToSourcePPM?.mppm || 0);
+              // Calculate total PPM in both directions with more dramatic weighting
+              // Since PPM and MPPM both range from 0-10, we can apply stronger weights
+              const totalPPM = (d.sourceToTargetPPM?.ppm || 0) * 1 +
+                (d.targetToSourcePPM?.ppm || 0) * 1 +
+                (d.sourceToTargetPPM?.mppm || 0) * 10 + // Much stronger weight for MPPM
+                (d.targetToSourcePPM?.mppm || 0) * 10;  // Much stronger weight for MPPM
 
-              // Inverse relationship: higher PPM = shorter distance
-              // Base distance is 300, minimum distance is 50
-              if (totalPPM === 0) return 300; // Max distance for no communication
+              // For no communication, use maximum distance
+              if (totalPPM === 0) return 500; // Increased max distance for no communication
 
-              // Calculate distance with inverse proportion and clamping
-              return Math.max(50, 300 - Math.min(250, totalPPM * 2));
+              // For low communication (total < 10), scale distance more dramatically
+              if (totalPPM < 10) {
+                return 300 - (totalPPM * 5); // Range from 300 down to 250
+              }
+
+              // For medium communication (10-40), scale more aggressively
+              if (totalPPM < 40) {
+                return 250 - ((totalPPM - 10) * 4); // Range from 250 down to 130
+              }
+
+              // For high communication (> 40), get very close
+              const minDistance = 30; // Minimum distance to prevent overlap
+              const scaleFactor = Math.pow(totalPPM, 1.2); // More aggressive power scaling
+
+              return Math.max(minDistance, 130 - (scaleFactor / 10));
             })
-            .strength(0.2)
+            .strength(1)
         )
       }
 
