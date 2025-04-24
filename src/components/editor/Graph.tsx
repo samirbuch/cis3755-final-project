@@ -71,135 +71,87 @@ export default function Graph() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Current time for animation calculations
     const currentTime = performance.now();
 
-    // // Calculate FPS
-    // const elapsed = currentTime - lastFrameTimeRef.current;
-    // lastFrameTimeRef.current = currentTime;
-
-    // // Keep only the last 60 frame times (1 second at 60fps)
-    // frameTimesRef.current.push(elapsed);
-    // if (frameTimesRef.current.length > 60) {
-    //   frameTimesRef.current.shift();
-    // }
-
-    // // Calculate average FPS from the frame times
-    // const averageFrameTime = frameTimesRef.current.reduce((a, b) => a + b, 0) /
-    //   frameTimesRef.current.length;
-    // const fps = Math.round(1000 / averageFrameTime);
-
-    // // Update FPS counter display
-    // if (fpsCounterRef.current) {
-    //   fpsCounterRef.current.textContent = `${fps} FPS`;
-
-    //   // Add color coding based on performance
-    //   if (fps >= 50) {
-    //     fpsCounterRef.current.style.color = '#4CAF50'; // Green
-    //   } else if (fps >= 30) {
-    //     fpsCounterRef.current.style.color = '#FF9800'; // Orange
-    //   } else {
-    //     fpsCounterRef.current.style.color = '#F44336'; // Red
-    //   }
-    // }
-
-    // // Match canvas size to display size
-    // const rect = canvas.getBoundingClientRect();
-    // if (canvas.width !== rect.width || canvas.height !== rect.height) {
-    //   canvas.width = rect.width;
-    //   canvas.height = rect.height;
-    // }
-
-    // // Clear canvas
-    // ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Draw all arcs
-
-    // Create a node map for quick lookups
-
+    // Create node map for quick lookups
     const nodeMap = new Map();
     nodes.forEach(node => {
       nodeMap.set(node.id, node);
     });
 
-    arcAnimations.current.forEach((anim) => {
-      // Look up current node positions
+    // Draw and update each animation
+    arcAnimations.current = arcAnimations.current.filter(anim => {
+      // Get current node positions
       const sourceNode = nodeMap.get(anim.sourceId);
       const targetNode = nodeMap.get(anim.targetId);
 
-      // If nodes still exist, ensure path points are up-to-date
-      if (sourceNode && targetNode) {
-        // Only update path points if node positions have changed
-        const firstPoint = anim.pathPoints[0];
-        const lastPoint = anim.pathPoints[anim.pathPoints.length - 1];
+      // Skip if nodes no longer exist
+      if (!sourceNode || !targetNode) return false;
 
-        // Check if positions have moved significantly
-        const sourceChanged = Math.abs(sourceNode.x - firstPoint.x) > 1 ||
-          Math.abs(sourceNode.y - firstPoint.y) > 1;
-        const targetChanged = Math.abs(targetNode.x - lastPoint.x) > 1 ||
-          Math.abs(targetNode.y - lastPoint.y) > 1;
+      // Update path if needed
+      if (anim.pathPoints.length === 0 ||
+        Math.abs(sourceNode.x - anim.pathPoints[0].x) > 1 ||
+        Math.abs(sourceNode.y - anim.pathPoints[0].y) > 1 ||
+        Math.abs(targetNode.x - anim.pathPoints[anim.pathPoints.length - 1].x) > 1 ||
+        Math.abs(targetNode.y - anim.pathPoints[anim.pathPoints.length - 1].y) > 1) {
 
-        if (sourceChanged || targetChanged) {
-          // Update path points in real-time
-          anim.pathPoints = calculatePathPoints(
-            { x: sourceNode.x, y: sourceNode.y },
-            { x: targetNode.x, y: targetNode.y },
-            100
-          );
-        }
+        anim.pathPoints = calculatePathPoints(
+          { x: sourceNode.x, y: sourceNode.y },
+          { x: targetNode.x, y: targetNode.y },
+          100
+        );
       }
 
-      // Calculate animation progress
+      // Calculate elapsed time and progress
       const elapsed = currentTime - anim.startTime;
-      anim.progress = (elapsed / anim.duration) % 1;
+      const rawProgress = (elapsed % anim.duration) / anim.duration;
+      anim.progress = rawProgress;
 
       // Calculate opacity based on progress
-      if (anim.progress < 0.1) {
-        anim.opacity = anim.progress * 10; // Fade in
-      } else if (anim.progress > 0.9) {
-        anim.opacity = (1 - anim.progress) * 10; // Fade out
+      if (rawProgress < 0.1) {
+        anim.opacity = rawProgress * 10; // Fade in
+      } else if (rawProgress > 0.9) {
+        anim.opacity = (1 - rawProgress) * 10; // Fade out
       } else {
         anim.opacity = 1;
       }
 
       // Get position along the path
-      const pathIndex = Math.floor(anim.progress * (anim.pathPoints.length - 1));
-      const position = anim.pathPoints[anim.reverse ?
-        anim.pathPoints.length - 1 - pathIndex : pathIndex];
+      const pathIndex = Math.floor(rawProgress * (anim.pathPoints.length - 1));
+      const position = anim.reverse ?
+        anim.pathPoints[anim.pathPoints.length - 1 - pathIndex] :
+        anim.pathPoints[pathIndex];
 
-      if (!position) return;
+      // Skip if position is undefined
+      if (!position) return true;
 
       // Calculate angle of motion by looking ahead/behind
+      const lookAhead = 5;
       const lookIndex = anim.reverse ?
-        Math.max(0, pathIndex - 5) :
-        Math.min(anim.pathPoints.length - 1, pathIndex + 5);
+        Math.max(0, pathIndex - lookAhead) :
+        Math.min(anim.pathPoints.length - 1, pathIndex + lookAhead);
 
-      const lookPosition = anim.pathPoints[anim.reverse ?
-        anim.pathPoints.length - 1 - lookIndex : lookIndex];
+      const lookPosition = anim.reverse ?
+        anim.pathPoints[anim.pathPoints.length - 1 - lookIndex] :
+        anim.pathPoints[lookIndex];
 
-      if (!lookPosition) return;
+      // Skip if lookPosition is undefined
+      if (!lookPosition) return true;
 
-      // Calculate angle of motion
-      let angle = Math.atan2(
+      // Calculate angle
+      const angle = Math.atan2(
         lookPosition.y - position.y,
         lookPosition.x - position.x
-      );
-
-      // Adjust angle based on direction
-      if (anim.reverse) {
-        angle += Math.PI; // Flip 180 degrees if traveling in reverse
-      }
+      ) + (anim.reverse ? Math.PI : 0);
 
       // Draw the arc
       ctx.save();
       ctx.globalAlpha = anim.opacity;
-
-      // Position at the current point on the path
       ctx.translate(position.x, position.y);
+      ctx.rotate(angle - Math.PI / 2);
 
-      // Rotate to align with direction of travel
-      ctx.rotate(angle - Math.PI / 2); // Rotate 90 degrees to align with arc
-
-      // Set up glow effect
+      // Set glow effect
       if (anim.glow === 'bloom') {
         ctx.shadowBlur = 15;
         ctx.shadowColor = anim.color;
@@ -208,27 +160,22 @@ export default function Graph() {
         ctx.shadowColor = anim.color;
       }
 
-      // Draw the arc shape
+      // Draw arc shape
       ctx.beginPath();
       const radius = 8 * anim.scale;
-      // Use consistent angle references now that we've rotated the context
-      const startAngle = 0;
-      const endAngle = Math.PI;
-
-      // Draw outer arc
-      ctx.arc(0, 0, radius, startAngle, endAngle);
-
-      // Draw inner arc (to create the arc shape)
-      ctx.arc(0, 0, radius * 0.6, endAngle, startAngle, true);
-
+      ctx.arc(0, 0, radius, 0, Math.PI); // Outer arc
+      ctx.arc(0, 0, radius * 0.6, Math.PI, 0, true); // Inner arc
       ctx.closePath();
       ctx.fillStyle = anim.color;
       ctx.fill();
 
       ctx.restore();
+
+      // Keep animation
+      return true;
     });
 
-    // Request next frame
+    // Request next animation frame
     animationFrameId.current = requestAnimationFrame(drawCanvas);
   }, [calculatePathPoints, nodes]);
 
@@ -459,17 +406,17 @@ export default function Graph() {
           d.fx = event.x;
           d.fy = event.y;
 
-          updateCanvasAnimations();
+          // updateCanvasAnimations();
         })
         .on("end", (event, d) => {
           if (!event.active && simulationRef.current)
             simulationRef.current.alphaTarget(0);
 
-          updateCanvasAnimations();
-
           // Clear the fixed position after updating state
           d.fx = null;
           d.fy = null;
+
+          updateCanvasAnimations();
         })
       );;
   }, [nodes, updateCanvasAnimations]);
@@ -555,18 +502,23 @@ export default function Graph() {
         )
       }
 
-      // setupAnimations();
+      // Set up animations after brief delay to ensure simulation has started positioning
+      setTimeout(() => updateCanvasAnimations(), 100);
 
+      // Update animations when simulation stabilizes
       simulationRef.current.on("end", updateCanvasAnimations);
     }
 
     // Cleanup
     return () => {
       simulationRef.current?.restart();
+
       if (animationFrameId.current !== null) {
         cancelAnimationFrame(animationFrameId.current);
         animationFrameId.current = null;
       }
+      
+      arcAnimations.current = [];
       // animationsRef.current.forEach(anim => anim.pause());
       // animationsRef.current = [];
     }
