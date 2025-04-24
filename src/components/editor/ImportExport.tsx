@@ -36,7 +36,7 @@ export default function ImportExport() {
 
     const dataStr = JSON.stringify(data, (key, value) => {
       // Remove the d3 properties from the nodes
-      if (["x", "y", "vx", "vy", "index"].includes(key)) {
+      if (["x", "y", "vx", "vy", "fx", "fy", "index"].includes(key)) {
         return undefined;
       }
 
