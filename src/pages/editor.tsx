@@ -1,4 +1,4 @@
-import { Flex, SegmentedControl, Text, Title, ActionIcon, TextInput, Divider, Button } from "@mantine/core";
+import { Flex, SegmentedControl, Text, Title, ActionIcon, TextInput, Divider, Button, Group, Switch } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates"
 import { useState } from "react";
 import { IconPencil, IconCheck, IconExternalLink } from "@tabler/icons-react";
@@ -24,6 +24,8 @@ function TheActualPage() {
   const [tab, setTab] = useState<"nodes" | "links">("nodes");
   const editorContext = useEditorContext();
 
+  const [showFPS, setShowFPS] = useState(false);
+
   const [eventDate, setEventDate] = useState(
     new Date(`${editorContext.eventTimestamp.year}-${String(editorContext.eventTimestamp.month).padStart(2, "0")}-${String(editorContext.eventTimestamp.day + 1).padStart(2, "0")}`)
   );
@@ -39,16 +41,23 @@ function TheActualPage() {
       <Header title="Event Editor">
         <ImportExport />
 
-        <Link href="/timeline-editor" style={{ marginLeft: "auto" }}>
-          <Button rightSection={<IconExternalLink />} variant="outline">
-            Timeline Editor
-          </Button>
-        </Link>
+        <Group style={{ marginLeft: "auto" }}>
+          <Switch 
+            checked={showFPS}
+            onChange={(e) => setShowFPS(e.currentTarget.checked)}
+            label="Show FPS"
+          />
+          <Link href="/timeline-editor">
+            <Button rightSection={<IconExternalLink />} variant="outline">
+              Timeline Editor
+            </Button>
+          </Link>
+        </Group>
       </Header>
       <Flex direction="row">
         <Flex flex={3}>
           {/* Svg container. Should take up majority of page width */}
-          <Graph />
+          <Graph showFPS={showFPS} />
         </Flex>
         <Flex
           flex={1}
