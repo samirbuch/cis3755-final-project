@@ -7,6 +7,8 @@ import { useEditorContext } from "@/contexts/EditorContext";
 
 // Define the animation data structure
 interface ArcAnimation {
+  sourceId: number;                          // Store node IDs instead of path points
+  targetId: number;
   pathPoints: Array<{ x: number, y: number }>; // Pre-calculated path points
   progress: number;                          // 0-1 for position along path
   opacity: number;                           // Current opacity
@@ -36,6 +38,21 @@ export default function Graph() {
   const arcAnimations = useRef<ArcAnimation[]>([]);
 
   const simulationRef = useRef<d3.Simulation<Node, Link> | null>(null);
+
+  // Function to calculate points along a path
+  const calculatePathPoints = useCallback((source: { x: number, y: number }, target: { x: number, y: number }, pointCount = 100) => {
+    const points = [];
+
+    for (let i = 0; i <= pointCount; i++) {
+      const t = i / pointCount;
+      points.push({
+        x: source.x + (target.x - source.x) * t,
+        y: source.y + (target.y - source.y) * t
+      });
+    }
+
+    return points;
+  }, []);
 
   // Canvas draw function - called every frame
   const drawCanvas = useCallback(() => {
@@ -98,7 +115,40 @@ export default function Graph() {
 
     // Draw all arcs
 
+    // Create a node map for quick lookups
+
+    const nodeMap = new Map();
+    nodes.forEach(node => {
+      nodeMap.set(node.id, node);
+    });
+
     arcAnimations.current.forEach((anim) => {
+      // Look up current node positions
+      const sourceNode = nodeMap.get(anim.sourceId);
+      const targetNode = nodeMap.get(anim.targetId);
+
+      // If nodes still exist, ensure path points are up-to-date
+      if (sourceNode && targetNode) {
+        // Only update path points if node positions have changed
+        const firstPoint = anim.pathPoints[0];
+        const lastPoint = anim.pathPoints[anim.pathPoints.length - 1];
+
+        // Check if positions have moved significantly
+        const sourceChanged = Math.abs(sourceNode.x - firstPoint.x) > 1 ||
+          Math.abs(sourceNode.y - firstPoint.y) > 1;
+        const targetChanged = Math.abs(targetNode.x - lastPoint.x) > 1 ||
+          Math.abs(targetNode.y - lastPoint.y) > 1;
+
+        if (sourceChanged || targetChanged) {
+          // Update path points in real-time
+          anim.pathPoints = calculatePathPoints(
+            { x: sourceNode.x, y: sourceNode.y },
+            { x: targetNode.x, y: targetNode.y },
+            100
+          );
+        }
+      }
+
       // Calculate animation progress
       const elapsed = currentTime - anim.startTime;
       anim.progress = (elapsed / anim.duration) % 1;
@@ -181,89 +231,112 @@ export default function Graph() {
 
     // Request next frame
     animationFrameId.current = requestAnimationFrame(drawCanvas);
-  }, []);
+  }, [calculatePathPoints, nodes]);
 
-  // Function to calculate points along a path
-  const calculatePathPoints = useCallback((source: { x: number, y: number }, target: { x: number, y: number }, pointCount = 100) => {
-    const points = [];
-
-    for (let i = 0; i <= pointCount; i++) {
-      const t = i / pointCount;
-      points.push({
-        x: source.x + (target.x - source.x) * t,
-        y: source.y + (target.y - source.y) * t
-      });
+  const updateCanvasAnimations = useCallback(() => {
+    // Don't interrupt ongoing animation frame loop
+    if (animationFrameId.current === null) {
+      animationFrameId.current = requestAnimationFrame(drawCanvas);
     }
 
-    return points;
-  }, []);
+    // Don't recreate animations if no links
+    if (links.length === 0) return;
 
-  const setupCanvasAnimations = useCallback(() => {
-    // Clear existing animations
-    arcAnimations.current = [];
+    // Create a map of existing animations by source-target pair
+    const existingAnimsByNodePair: Record<string, ArcAnimation[]> = {};
 
-    // Create animated arcs for each link
+    arcAnimations.current.forEach(anim => {
+      const key = anim.reverse
+        ? `${anim.targetId}-${anim.sourceId}`
+        : `${anim.sourceId}-${anim.targetId}`;
+
+      if (!existingAnimsByNodePair[key]) {
+        existingAnimsByNodePair[key] = [];
+      }
+
+      existingAnimsByNodePair[key].push(anim);
+    });
+
+    const newAnimations: ArcAnimation[] = [];
+
+    // Process all links
     links.forEach(link => {
       if (!link.source.x || !link.target.x) return;
 
-      // Calculate path points once
+      // Create animation source-target key
+      const sourceToTargetKey = `${link.source.id}-${link.target.id}`;
+      const targetToSourceKey = `${link.target.id}-${link.source.id}`;
+
+      // Always update path points for all animations to match current node positions
       const pathPoints = calculatePathPoints(
         { x: link.source.x, y: link.source.y },
         { x: link.target.x, y: link.target.y },
-        100 // Number of points along path
+        100
       );
 
-      // Calculate timing based on pings per minute (same as before)
+      // Helper function to create or update animations
+      const updateOrCreateArcGroup = (
+        count: number,
+        interval: number,
+        color: string,
+        reverse: boolean,
+        scale: number,
+        glow: 'standard' | 'bloom'
+      ) => {
+        if (interval < 300) return;
+
+        const key = reverse ? targetToSourceKey : sourceToTargetKey;
+        const existingAnims = existingAnimsByNodePair[key]?.filter(
+          a => a.color === color && a.glow === glow
+        ) || [];
+
+        // If we have existing animations, update them
+        if (existingAnims.length > 0) {
+          existingAnims.forEach(anim => {
+            // Just update path points
+            anim.pathPoints = pathPoints;
+            newAnimations.push(anim);
+          });
+        }
+        // Otherwise create new animations
+        else {
+          const actualCount = interval < 1000 ? Math.min(2, count) : count;
+
+          for (let i = 0; i < actualCount; i++) {
+            const startTime = performance.now() + (i * (interval / actualCount));
+            newAnimations.push({
+              sourceId: link.source.id,
+              targetId: link.target.id,
+              pathPoints, // Initial path points
+              progress: 0,
+              opacity: 0,
+              color,
+              scale,
+              reverse,
+              speed: 1,
+              startTime,
+              duration: 2000,
+              glow
+            });
+          }
+        }
+      };
+
+      // Calculate intervals based on PPM values
       const toDelay = Math.floor(60000 / Math.max(link.sourceToTargetPPM.ppm, 1));
       const toBloomDelay = Math.floor(60000 / Math.max(link.sourceToTargetPPM.mppm, 1));
       const fromDelay = Math.floor(60000 / Math.max(link.targetToSourcePPM.ppm, 1));
       const fromBloomDelay = Math.floor(60000 / Math.max(link.targetToSourcePPM.mppm, 1));
 
-      // Helper to create animation groups
-      const createArcGroup = (count: number, interval: number, color: string,
-        reverse: boolean, scale: number, glow: 'standard' | 'bloom') => {
-        // Don't create arcs if the interval is too small
-        if (interval < 300) return;
-
-        // Reduce count for performance if needed
-        const actualCount = interval < 1000 ? Math.min(2, count) : count;
-
-        // Create staggered animations
-        for (let i = 0; i < actualCount; i++) {
-          const startTime = performance.now() + (i * (interval / actualCount));
-
-          arcAnimations.current.push({
-            pathPoints,
-            progress: 0,
-            opacity: 0,
-            color,
-            scale,
-            reverse,
-            speed: 1,
-            startTime,
-            duration: 2000, // 2 seconds to travel the path
-            glow
-          });
-        }
-      };
-
-      // Create regular arcs from source to target (same logic as before)
-      createArcGroup(5, toDelay, "#FF3030", false, 1, 'standard');
-
-      // Create bloom arcs from source to target
-      createArcGroup(3, toBloomDelay, "#FF0000", false, 1.2, 'bloom');
-
-      // Create regular arcs from target to source
-      createArcGroup(5, fromDelay, "#30A0FF", true, 1, 'standard');
-
-      // Create bloom arcs from target to source
-      createArcGroup(3, fromBloomDelay, "#00A0FF", true, 1.2, 'bloom');
+      // Update or create all animation types
+      updateOrCreateArcGroup(5, toDelay, "#FF3030", false, 1, 'standard');
+      updateOrCreateArcGroup(3, toBloomDelay, "#FF0000", false, 1.2, 'bloom');
+      updateOrCreateArcGroup(5, fromDelay, "#30A0FF", true, 1, 'standard');
+      updateOrCreateArcGroup(3, fromBloomDelay, "#00A0FF", true, 1.2, 'bloom');
     });
 
-    // Start animation loop if not already running
-    if (animationFrameId.current === null) {
-      animationFrameId.current = requestAnimationFrame(drawCanvas);
-    }
+    // Replace the animations array with our preserved+new animations
+    arcAnimations.current = newAnimations;
   }, [links, calculatePathPoints, drawCanvas]);
 
   const tick = useCallback(() => {
@@ -287,8 +360,6 @@ export default function Graph() {
         .attr("x2", (d) => d.target.x)
         .attr("y2", (d) => d.target.y)
         .attr("id", (d) => `SOURCE${d.source.id}_TARGET${d.target.id}`);
-
-      // setupAnimations();
     }
   }, [nodes, links]);
 
@@ -366,17 +437,21 @@ export default function Graph() {
         .on("drag", (event, d) => {
           d.fx = event.x;
           d.fy = event.y;
+
+          updateCanvasAnimations();
         })
         .on("end", (event, d) => {
           if (!event.active && simulationRef.current)
             simulationRef.current.alphaTarget(0);
+
+          updateCanvasAnimations();
 
           // Clear the fixed position after updating state
           d.fx = null;
           d.fy = null;
         })
       );;
-  }, [nodes]);
+  }, [nodes, updateCanvasAnimations]);
 
   const createLinks = useCallback(() => {
     if (!d3SvgRef.current) return;
@@ -420,7 +495,7 @@ export default function Graph() {
         .on("tick", () => {
           tick();
           if (simulationRef.current && simulationRef.current.alpha() < 0.3) {
-            setupCanvasAnimations();
+            updateCanvasAnimations();
           }
         });
 
@@ -461,7 +536,7 @@ export default function Graph() {
 
       // setupAnimations();
 
-      simulationRef.current.on("end", setupCanvasAnimations);
+      simulationRef.current.on("end", updateCanvasAnimations);
     }
 
     // Cleanup
@@ -474,7 +549,7 @@ export default function Graph() {
       // animationsRef.current.forEach(anim => anim.pause());
       // animationsRef.current = [];
     }
-  }, [nodes, links, tick, createNodes, createLinks, setupCanvasAnimations]);
+  }, [nodes, links, tick, createNodes, createLinks, updateCanvasAnimations]);
 
   return (
     <div style={{
@@ -495,7 +570,7 @@ export default function Graph() {
           height: "100%",
         }}
       />
-      <canvas 
+      <canvas
         ref={canvasRef}
         style={{
           position: "absolute",
