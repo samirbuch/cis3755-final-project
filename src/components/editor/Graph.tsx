@@ -5,11 +5,22 @@ import Link from "@/interfaces/Link";
 import Node from "@/interfaces/Node";
 import { useEditorContext } from "@/contexts/EditorContext";
 
+// Define the animation data structure
+interface ArcAnimation {
+  pathPoints: Array<{ x: number, y: number }>; // Pre-calculated path points
+  progress: number;                          // 0-1 for position along path
+  opacity: number;                           // Current opacity
+  color: string;                             // Arc color
+  scale: number;                             // Size scale
+  reverse: boolean;                          // Direction
+  speed: number;                             // Animation speed
+  startTime: number;                         // When this animation started
+  duration: number;                          // How long it should last
+  glow: 'standard' | 'bloom';                // Glow effect type
+}
+
 export default function Graph() {
   const { nodes, links } = useEditorContext();
-
-  // Store all animations so they can be cleaned up later
-  const animationsRef = useRef<JSAnimation[]>([]);
 
   const d3SvgRef = useRef<d3.Selection<SVGSVGElement, unknown, null, undefined>>(null);
   const svgLinksRef = useRef<d3.Selection<SVGLineElement, Link, SVGGElement, unknown>>(null);
@@ -19,164 +30,241 @@ export default function Graph() {
   const svgNodesRef = useRef<d3.Selection<SVGCircleElement, Node, SVGGElement, unknown>>(null);
 
   const svgContainerRef = useRef<SVGSVGElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const animationFrameId = useRef<number | null>(null);
+  const arcAnimations = useRef<ArcAnimation[]>([]);
 
   const simulationRef = useRef<d3.Simulation<Node, Link> | null>(null);
 
-  // Helper function to create arcs that appear at regular intervals
-  function createPeriodicArcs({
-    parentGroup,
-    pathId,
-    prefix,
-    count,
-    intervalMs,
-    color,
-    filter,
-    reverse = false,
-    scale = 1
-  }: {
-    parentGroup: d3.Selection<d3.BaseType, unknown, HTMLElement, unknown>;
-    pathId: string;
-    prefix: string;
-    count: number;
-    intervalMs: number;
-    color: string;
-    filter: string;
-    reverse?: boolean;
-    scale?: number;
-  }) {
-    // Don't create arcs if the interval is too small (avoids performance issues)
-    if (intervalMs < 100) return;
+  // Canvas draw function - called every frame
+  const drawCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    // Calculate staggered delays for the initial set of arcs
-    const staggerStep = intervalMs / count;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    for (let i = 0; i < count; i++) {
-      const arcId = `${prefix}-${i}`;
-
-      // Create a container group for the arc that we can rotate
-      const arcGroup = parentGroup.append("g")
-        .attr("class", "arc-element")
-        .attr("id", arcId);
-
-      // For reverse direction, flip the arc by adjusting the startAngle and endAngle
-      const startAngle = reverse ? Math.PI : 0;
-      const endAngle = reverse ? 2 * Math.PI : Math.PI;
-
-      // Create the arc element inside the container
-      arcGroup.append("path")
-        .attr("d", d3.arc()({
-          innerRadius: 6 * scale,
-          outerRadius: 10 * scale,
-          startAngle: startAngle,
-          endAngle: endAngle
-        }))
-        .attr("fill", color)
-        .style("filter", filter)
-        .classed("gpu-accelerated", true) // Add class for GPU acceleration;
-
-      // Create animation with staggered start
-      const delay = i * staggerStep;
-
-      // Path animation
-      const animation = animate(`#${arcId}`, {
-        easing: 'linear',
-        duration: 2000,
-        delay,
-        loop: true,
-        reversed: reverse,
-        ...animeSVG.createMotionPath(`#${pathId}`)
-      });
-
-      // Opacity animation
-      const opacityAnimation = animate(`#${arcId}`, {
-        opacity: [0, 1, 1, 0],
-        easing: 'linear',
-        duration: 2000,
-        delay,
-        loop: true,
-        reversed: reverse,
-        offset: [0, 0.1, 0.9, 1]
-      });
-
-      animationsRef.current.push(animation, opacityAnimation);
+    // Match canvas size to display size
+    const rect = canvas.getBoundingClientRect();
+    if (canvas.width !== rect.width || canvas.height !== rect.height) {
+      canvas.width = rect.width;
+      canvas.height = rect.height;
     }
-  }
 
-  const setupAnimations = useCallback(() => {
-    // Clean up old animations first
-    animationsRef.current.forEach(anim => anim.pause());
-    animationsRef.current = [];
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Remove any previously created arc elements
-    d3.selectAll(".arc-element").remove();
+    const currentTime = performance.now();
+
+    // // Calculate FPS
+    // const elapsed = currentTime - lastFrameTimeRef.current;
+    // lastFrameTimeRef.current = currentTime;
+
+    // // Keep only the last 60 frame times (1 second at 60fps)
+    // frameTimesRef.current.push(elapsed);
+    // if (frameTimesRef.current.length > 60) {
+    //   frameTimesRef.current.shift();
+    // }
+
+    // // Calculate average FPS from the frame times
+    // const averageFrameTime = frameTimesRef.current.reduce((a, b) => a + b, 0) /
+    //   frameTimesRef.current.length;
+    // const fps = Math.round(1000 / averageFrameTime);
+
+    // // Update FPS counter display
+    // if (fpsCounterRef.current) {
+    //   fpsCounterRef.current.textContent = `${fps} FPS`;
+
+    //   // Add color coding based on performance
+    //   if (fps >= 50) {
+    //     fpsCounterRef.current.style.color = '#4CAF50'; // Green
+    //   } else if (fps >= 30) {
+    //     fpsCounterRef.current.style.color = '#FF9800'; // Orange
+    //   } else {
+    //     fpsCounterRef.current.style.color = '#F44336'; // Red
+    //   }
+    // }
+
+    // // Match canvas size to display size
+    // const rect = canvas.getBoundingClientRect();
+    // if (canvas.width !== rect.width || canvas.height !== rect.height) {
+    //   canvas.width = rect.width;
+    //   canvas.height = rect.height;
+    // }
+
+    // // Clear canvas
+    // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw all arcs
+
+    arcAnimations.current.forEach((anim) => {
+      // Calculate animation progress
+      const elapsed = currentTime - anim.startTime;
+      anim.progress = (elapsed / anim.duration) % 1;
+
+      // Calculate opacity based on progress
+      if (anim.progress < 0.1) {
+        anim.opacity = anim.progress * 10; // Fade in
+      } else if (anim.progress > 0.9) {
+        anim.opacity = (1 - anim.progress) * 10; // Fade out
+      } else {
+        anim.opacity = 1;
+      }
+
+      // Get position along the path
+      const pathIndex = Math.floor(anim.progress * (anim.pathPoints.length - 1));
+      const position = anim.pathPoints[anim.reverse ?
+        anim.pathPoints.length - 1 - pathIndex : pathIndex];
+
+      if (!position) return;
+
+      // Calculate angle of motion by looking ahead/behind
+      const lookIndex = anim.reverse ?
+        Math.max(0, pathIndex - 5) :
+        Math.min(anim.pathPoints.length - 1, pathIndex + 5);
+
+      const lookPosition = anim.pathPoints[anim.reverse ?
+        anim.pathPoints.length - 1 - lookIndex : lookIndex];
+
+      if (!lookPosition) return;
+
+      // Calculate angle of motion
+      let angle = Math.atan2(
+        lookPosition.y - position.y,
+        lookPosition.x - position.x
+      );
+
+      // Adjust angle based on direction
+      if (anim.reverse) {
+        angle += Math.PI; // Flip 180 degrees if traveling in reverse
+      }
+
+      // Draw the arc
+      ctx.save();
+      ctx.globalAlpha = anim.opacity;
+
+      // Position at the current point on the path
+      ctx.translate(position.x, position.y);
+
+      // Rotate to align with direction of travel
+      ctx.rotate(angle - Math.PI / 2); // Rotate 90 degrees to align with arc
+
+      // Set up glow effect
+      if (anim.glow === 'bloom') {
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = anim.color;
+      } else {
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = anim.color;
+      }
+
+      // Draw the arc shape
+      ctx.beginPath();
+      const radius = 8 * anim.scale;
+      // Use consistent angle references now that we've rotated the context
+      const startAngle = 0;
+      const endAngle = Math.PI;
+
+      // Draw outer arc
+      ctx.arc(0, 0, radius, startAngle, endAngle);
+
+      // Draw inner arc (to create the arc shape)
+      ctx.arc(0, 0, radius * 0.6, endAngle, startAngle, true);
+
+      ctx.closePath();
+      ctx.fillStyle = anim.color;
+      ctx.fill();
+
+      ctx.restore();
+    });
+
+    // Request next frame
+    animationFrameId.current = requestAnimationFrame(drawCanvas);
+  }, []);
+
+  // Function to calculate points along a path
+  const calculatePathPoints = useCallback((source: { x: number, y: number }, target: { x: number, y: number }, pointCount = 100) => {
+    const points = [];
+
+    for (let i = 0; i <= pointCount; i++) {
+      const t = i / pointCount;
+      points.push({
+        x: source.x + (target.x - source.x) * t,
+        y: source.y + (target.y - source.y) * t
+      });
+    }
+
+    return points;
+  }, []);
+
+  const setupCanvasAnimations = useCallback(() => {
+    // Clear existing animations
+    arcAnimations.current = [];
 
     // Create animated arcs for each link
     links.forEach(link => {
       if (!link.source.x || !link.target.x) return;
 
-      const animationGroup = d3.select(".animatedArcs");
-      const sourceToTargetId = `SOURCE${link.source.id}_TARGET${link.target.id}`;
-      // const targetToSourceId = `SOURCE${link.target.id}_TARGET${link.source.id}`;
-      // ^ not necessary, we can just reverse the arcs
+      // Calculate path points once
+      const pathPoints = calculatePathPoints(
+        { x: link.source.x, y: link.source.y },
+        { x: link.target.x, y: link.target.y },
+        100 // Number of points along path
+      );
 
-      // Calculate timing based on pings per minute
-      // Convert ppm (pings per minute) to delay in ms between pings
-      const toDelay = link.sourceToTargetPPM.ppm > 0 ? Math.floor(60000 / link.sourceToTargetPPM.ppm) : 0;
-      const toBloomDelay = link.sourceToTargetPPM.mppm > 0 ? Math.floor(60000 / link.sourceToTargetPPM.mppm) : 0;
-      const fromDelay = link.targetToSourcePPM.ppm > 0 ? Math.floor(60000 / link.targetToSourcePPM.ppm) : 0;
-      const fromBloomDelay = link.targetToSourcePPM.mppm > 0 ? Math.floor(60000 / link.targetToSourcePPM.mppm) : 0;
+      // Calculate timing based on pings per minute (same as before)
+      const toDelay = Math.floor(60000 / Math.max(link.sourceToTargetPPM.ppm, 1));
+      const toBloomDelay = Math.floor(60000 / Math.max(link.sourceToTargetPPM.mppm, 1));
+      const fromDelay = Math.floor(60000 / Math.max(link.targetToSourcePPM.ppm, 1));
+      const fromBloomDelay = Math.floor(60000 / Math.max(link.targetToSourcePPM.mppm, 1));
 
-      // Create regular arcs from source to target
-      createPeriodicArcs({
-        parentGroup: animationGroup,
-        pathId: sourceToTargetId,
-        prefix: `to-regular-${link.id}`,
-        count: 5, // Keep 5 arcs in circulation
-        intervalMs: toDelay,
-        color: "#FF3030",
-        filter: "url(#standard-glow)",
-        reverse: false
-      });
+      // Helper to create animation groups
+      const createArcGroup = (count: number, interval: number, color: string,
+        reverse: boolean, scale: number, glow: 'standard' | 'bloom') => {
+        // Don't create arcs if the interval is too small
+        if (interval < 300) return;
+
+        // Reduce count for performance if needed
+        const actualCount = interval < 1000 ? Math.min(2, count) : count;
+
+        // Create staggered animations
+        for (let i = 0; i < actualCount; i++) {
+          const startTime = performance.now() + (i * (interval / actualCount));
+
+          arcAnimations.current.push({
+            pathPoints,
+            progress: 0,
+            opacity: 0,
+            color,
+            scale,
+            reverse,
+            speed: 1,
+            startTime,
+            duration: 2000, // 2 seconds to travel the path
+            glow
+          });
+        }
+      };
+
+      // Create regular arcs from source to target (same logic as before)
+      createArcGroup(5, toDelay, "#FF3030", false, 1, 'standard');
 
       // Create bloom arcs from source to target
-      createPeriodicArcs({
-        parentGroup: animationGroup,
-        pathId: sourceToTargetId,
-        prefix: `to-bloom-${link.id}`,
-        count: 3, // Keep 3 bloom arcs in circulation
-        intervalMs: toBloomDelay,
-        color: "#FF0000", // Brighter red
-        filter: "url(#super-bloom)",
-        reverse: false,
-        scale: 1.2 // Slightly larger
-      });
+      createArcGroup(3, toBloomDelay, "#FF0000", false, 1.2, 'bloom');
 
       // Create regular arcs from target to source
-      createPeriodicArcs({
-        parentGroup: animationGroup,
-        pathId: sourceToTargetId, // Same path, but we'll reverse the direction
-        prefix: `from-regular-${link.id}`,
-        count: 5,
-        intervalMs: fromDelay,
-        color: "#30A0FF", // Blue for opposite direction
-        filter: "url(#standard-glow)",
-        reverse: true
-      });
+      createArcGroup(5, fromDelay, "#30A0FF", true, 1, 'standard');
 
       // Create bloom arcs from target to source
-      createPeriodicArcs({
-        parentGroup: animationGroup,
-        pathId: sourceToTargetId,
-        prefix: `from-bloom-${link.id}`,
-        count: 3,
-        intervalMs: fromBloomDelay,
-        color: "#00A0FF", // Brighter blue
-        filter: "url(#super-bloom)",
-        reverse: true,
-        scale: 1.2
-      });
+      createArcGroup(3, fromBloomDelay, "#00A0FF", true, 1.2, 'bloom');
     });
-  }, [links]);
+
+    // Start animation loop if not already running
+    if (animationFrameId.current === null) {
+      animationFrameId.current = requestAnimationFrame(drawCanvas);
+    }
+  }, [links, calculatePathPoints, drawCanvas]);
 
   const tick = useCallback(() => {
     if (!svgNodesRef.current || !svgTextsRef.current || !svgLinksRef.current) return;
@@ -280,14 +368,8 @@ export default function Graph() {
           d.fy = event.y;
         })
         .on("end", (event, d) => {
-          if (!event.active && simulationRef.current) simulationRef.current.alphaTarget(0);
-
-          // // When drag ends, update the node's position in the state
-          // editorContext.setNodes(currentNodes =>
-          //   currentNodes.map(node =>
-          //     node.id === d.id ? { ...node, x: d.x, y: d.y } : node
-          //   )
-          // );
+          if (!event.active && simulationRef.current)
+            simulationRef.current.alphaTarget(0);
 
           // Clear the fixed position after updating state
           d.fx = null;
@@ -295,67 +377,6 @@ export default function Graph() {
         })
       );;
   }, [nodes]);
-
-  const createAnimations = useCallback(() => {
-    if (!d3SvgRef.current) return;
-
-    // Add SVG filter definitions for glow effects
-    const defs = d3SvgRef.current.append("defs");
-
-    // Create a super-bloom filter with less intense outer glow
-    const bloomFilter = defs.append("filter")
-      .attr("id", "super-bloom")
-      .attr("x", "-30%") // Reduced from -100%
-      .attr("y", "-30%") // Reduced from -100%
-      .attr("width", "160%") // Reduced from 300%
-      .attr("height", "160%"); // Reduced from 300%
-
-    // First blur pass - use a smaller blur for less spread
-    bloomFilter.append("feGaussianBlur")
-      .attr("in", "SourceGraphic")
-      .attr("stdDeviation", "4") // Reduced from 15 to 6 for less spread
-      .attr("result", "blur1");
-
-    // Color matrix to intensify the glow but with less alpha
-    bloomFilter.append("feColorMatrix")
-      .attr("in", "blur1")
-      .attr("type", "matrix")
-      .attr("values", "0 0 0 0 1   0 0 0 0 0.3   0 0 0 0 0.3   0 0 0 2.5 0") // Reduced alpha from 4 to 2.5
-      .attr("result", "coloredBlur1");
-
-    // Second blur pass - core glow (keep this the same for nice core glow)
-    bloomFilter.append("feGaussianBlur")
-      .attr("in", "SourceGraphic")
-      .attr("stdDeviation", "3")
-      .attr("result", "blur2");
-
-    // Intensify the core (keep this the same)
-    bloomFilter.append("feColorMatrix")
-      .attr("in", "blur2")
-      .attr("type", "matrix")
-      .attr("values", "0 0 0 0 1   0 0 0 0 0.7   0 0 0 0 0.7   0 0 0 3 0")
-      .attr("result", "coloredBlur2");
-
-    // Add composite operations to stack the effects
-    bloomFilter.append("feComposite")
-      .attr("in", "coloredBlur1")
-      .attr("in2", "coloredBlur2")
-      .attr("operator", "arithmetic")
-      .attr("k1", "0")
-      .attr("k2", "0.7") // Reduced from 1.0 to 0.7 for less intensity
-      .attr("k3", "1")
-      .attr("k4", "0")
-      .attr("result", "bloom");
-
-    // Final merge - combine the bloom with the original
-    const bloomMerge = bloomFilter.append("feMerge");
-    bloomMerge.append("feMergeNode").attr("in", "bloom");
-    bloomMerge.append("feMergeNode").attr("in", "SourceGraphic");
-
-    // Create a group for animated arcs
-    d3SvgRef.current.append("g")
-      .attr("class", "animatedArcs");
-  }, []);
 
   const createLinks = useCallback(() => {
     if (!d3SvgRef.current) return;
@@ -382,9 +403,8 @@ export default function Graph() {
     d3SvgRef.current = d3.select(svgContainerRef.current);
 
     // Order of operations is important here.
-    // We want links to be on the bottom, then animations, then nodes on top.
+    // We want links to be on the bottom then nodes on top.
     createLinks();
-    createAnimations();
     createNodes();
 
     if (nodes.length > 0) {
@@ -397,7 +417,12 @@ export default function Graph() {
           svgContainerRef.current.clientHeight / 2
         ))
         .alphaDecay(0.05)
-        .on("tick", tick);
+        .on("tick", () => {
+          tick();
+          if (simulationRef.current && simulationRef.current.alpha() < 0.3) {
+            setupCanvasAnimations();
+          }
+        });
 
       if (links.length > 0) {
         simulationRef.current.force(
@@ -434,35 +459,54 @@ export default function Graph() {
         )
       }
 
-      setupAnimations();
+      // setupAnimations();
 
-      simulationRef.current.on("end", setupAnimations);
+      simulationRef.current.on("end", setupCanvasAnimations);
     }
 
     // Cleanup
     return () => {
       simulationRef.current?.restart();
-      animationsRef.current.forEach(anim => anim.pause());
-      animationsRef.current = [];
+      if (animationFrameId.current !== null) {
+        cancelAnimationFrame(animationFrameId.current);
+        animationFrameId.current = null;
+      }
+      // animationsRef.current.forEach(anim => anim.pause());
+      // animationsRef.current = [];
     }
-  }, [
-    nodes,
-    links,
-    tick,
-    createNodes,
-    createAnimations,
-    createLinks,
-    setupAnimations
-  ]);
+  }, [nodes, links, tick, createNodes, createLinks, setupCanvasAnimations]);
 
   return (
-    <svg
-      ref={svgContainerRef}
-      style={{
-        width: "100%",
-        height: "100%",
-        // backgroundColor: "lightgray",
-      }}
-    />
+    <div style={{
+      position: "relative",
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      flex: "1 1 auto",
+      overflow: "hidden",
+    }}>
+      <svg
+        ref={svgContainerRef}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+        }}
+      />
+      <canvas 
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none", // Allow mouse events to pass through
+          zIndex: 10, // Ensure canvas is above the SVG
+        }}
+      />
+    </div>
   )
 }
