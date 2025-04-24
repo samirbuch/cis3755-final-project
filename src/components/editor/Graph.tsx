@@ -37,6 +37,8 @@ export default function Graph() {
 
   const simulationRef = useRef<d3.Simulation<Node, Link> | null>(null);
 
+  const hoveredNodeRef = useRef<number | null>(null);
+
   // Function to calculate points along a path
   const calculatePathPoints = useCallback((source: { x: number, y: number }, target: { x: number, y: number }, pointCount = 100) => {
     const points = [];
@@ -51,6 +53,43 @@ export default function Graph() {
 
     return points;
   }, []);
+
+  // Create helper functions to determine opacity
+  const getNodeOpacity = useCallback((node: Node): number => {
+    const hoveredId = hoveredNodeRef.current;
+    const hasHighlighted = nodes.some(n => n.highlighted);
+
+    // Case 1: A node is being hovered
+    if (hoveredId !== null) {
+      return node.id === hoveredId ? 1 : 0.3;
+    }
+    // Case 2: Some nodes are highlighted
+    else if (hasHighlighted) {
+      return node.highlighted ? 1 : 0.3;
+    }
+    // Case 3: Default state - all nodes fully visible
+    return 1;
+  }, [nodes]);
+
+  // Helper function for link opacity
+  const getLinkOpacity = useCallback((link: Link): number => {
+    const hoveredId = hoveredNodeRef.current;
+    const hasHighlighted = nodes.some(n => n.highlighted);
+
+    // Case 1: A node is being hovered
+    if (hoveredId !== null) {
+      return (link.source.id === hoveredId || link.target.id === hoveredId) ? 0.8 : 0.2;
+    }
+    // Case 2: Some nodes are highlighted
+    else if (hasHighlighted) {
+      const isHighlighted =
+        nodes.find(n => n.id === link.source.id)?.highlighted ||
+        nodes.find(n => n.id === link.target.id)?.highlighted;
+      return isHighlighted ? 0.8 : 0.2;
+    }
+    // Case 3: Default state - all links visible
+    return 0.7;
+  }, [nodes]);
 
   // Canvas draw function - called every frame
   const drawCanvas = useCallback(() => {
@@ -78,6 +117,10 @@ export default function Graph() {
     nodes.forEach(node => {
       nodeMap.set(node.id, node);
     });
+
+    // Get current hover/highlight state
+    const hoveredId = hoveredNodeRef.current;
+    const hasHighlighted = nodes.some(node => node.highlighted);
 
     // Draw and update each animation
     arcAnimations.current = arcAnimations.current.filter(anim => {
@@ -144,9 +187,28 @@ export default function Graph() {
         lookPosition.x - position.x
       ) + (anim.reverse ? Math.PI : 0);
 
+      // Calculate animation opacity based on hover/highlight state
+      let baseOpacity = anim.opacity; // The original fade-in/out opacity
+
+      // Determine if this animation should be dimmed based on hover/highlight state
+      if (hoveredId !== null) {
+        // If a node is hovered, dim animations not connected to it
+        const isConnected = anim.sourceId === hoveredId || anim.targetId === hoveredId;
+        baseOpacity *= isConnected ? 1 : 0.25;
+      }
+      else if (hasHighlighted) {
+        // If some nodes are highlighted, dim animations not connected to highlighted nodes
+        const sourceHighlighted = nodeMap.get(anim.sourceId)?.highlighted || false;
+        const targetHighlighted = nodeMap.get(anim.targetId)?.highlighted || false;
+        baseOpacity *= (sourceHighlighted || targetHighlighted) ? 1 : 0.25;
+      }
+
+      
       // Draw the arc
       ctx.save();
-      ctx.globalAlpha = anim.opacity;
+      // Apply the calculated opacity
+      ctx.globalAlpha = baseOpacity;
+      // ctx.globalAlpha = baseOpacity;
       ctx.translate(position.x, position.y);
       ctx.rotate(angle - Math.PI / 2);
 
@@ -179,7 +241,7 @@ export default function Graph() {
   }, [calculatePathPoints, nodes]);
 
   const updateCanvasAnimations = useCallback(() => {
-    if(!svgContainerRef.current) return;
+    if (!svgContainerRef.current) return;
 
     console.log("Running updateCanvasAnimations with", links.length, "links");
 
@@ -377,19 +439,32 @@ export default function Graph() {
     svgNodesRef.current = svgNodeGroupsRef.current.append("circle")
       .attr("r", 10)
       .attr("fill", "white")
-      .attr("opacity", (d) => {
-        if (nodes.some(node => node.highlighted)) {
-          return d.highlighted ? 1 : 0.5;
-        }
-        return 1;
-      })
-      // Add hover interactions
+      .attr("opacity", d => getNodeOpacity(d))
       .on("mouseenter", function (event, d) {
+        // Store hovered node ID
+        hoveredNodeRef.current = d.id;
+
         // Enlarge this node
         d3.select(this)
           .transition()
           .duration(200)
-          .attr("r", 14); // Increase radius
+          .attr("r", 14);
+
+        // Update all node opacities based on hover state
+        if (svgNodesRef.current) {
+          svgNodesRef.current
+            .transition()
+            .duration(200)
+            .attr("opacity", node => getNodeOpacity(node));
+        }
+
+        // Update all text opacities
+        if (svgTextsRef.current) {
+          svgTextsRef.current
+            .transition()
+            .duration(200)
+            .attr("opacity", node => getNodeOpacity(node));
+        }
 
         // Highlight connected links
         if (svgLinksRef.current) {
@@ -397,24 +472,44 @@ export default function Graph() {
             .transition()
             .duration(200)
             .attr("stroke-width", link => {
-              // Check if this link connects to the hovered node
               return (link.source.id === d.id || link.target.id === d.id) ? 4 : 2;
-            });
+            })
+            .attr("stroke-opacity", link => getLinkOpacity(link));
         }
       })
       .on("mouseleave", function () {
+        // Clear hovered node reference
+        hoveredNodeRef.current = null;
+
         // Reset this node
         d3.select(this)
           .transition()
           .duration(200)
-          .attr("r", 10); // Return to original radius
+          .attr("r", 10);
+
+        // Reset opacities
+        if (svgNodesRef.current) {
+          svgNodesRef.current
+            .transition()
+            .duration(200)
+            .attr("opacity", d => getNodeOpacity(d));
+        }
+
+        // Reset text opacities
+        if (svgTextsRef.current) {
+          svgTextsRef.current
+            .transition()
+            .duration(200)
+            .attr("opacity", d => getNodeOpacity(d));
+        }
 
         // Reset all links
         if (svgLinksRef.current) {
           svgLinksRef.current
             .transition()
             .duration(200)
-            .attr("stroke-width", 2); // Return to original width
+            .attr("stroke-width", 2)
+            .attr("stroke-opacity", link => getLinkOpacity(link));
         }
       })
       // Add drag behavior to nodes
@@ -463,7 +558,7 @@ export default function Graph() {
           updateCanvasAnimations();
         })
       );;
-  }, [calculatePathPoints, nodes, updateCanvasAnimations]);
+  }, [calculatePathPoints, getLinkOpacity, getNodeOpacity, nodes, updateCanvasAnimations]);
 
   const createLinks = useCallback(() => {
     if (!d3SvgRef.current) return;
@@ -478,8 +573,8 @@ export default function Graph() {
       .attr("stroke-width", 2)
       .attr("data-source", d => d.source.id) // Add data attributes for easier selection
       .attr("data-target", d => d.target.id)
-      .attr("stroke-opacity", 0.7); // Slightly transparent by default;
-  }, [links]);
+      .attr("stroke-opacity", link => getLinkOpacity(link)); // Set initial opacity
+  }, [getLinkOpacity, links]);
 
   useEffect(() => {
     if (!svgContainerRef.current) return;
