@@ -1,7 +1,7 @@
 import { useEditorContext } from "@/contexts/EditorContext";
 import Link from "@/interfaces/Link";
-import { Flex, Text, Button, Card, ActionIcon, Title, Group, Select, Fieldset, Slider } from "@mantine/core";
-import { IconArrowRight, IconPencil, IconTrash } from "@tabler/icons-react";
+import { Flex, Text, Button, Card, ActionIcon, Title, Group, Select, Fieldset, Slider, Tooltip } from "@mantine/core";
+import { IconArrowRight, IconPencil, IconRefresh, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 
 export interface LinkCardProps {
@@ -36,6 +36,25 @@ export default function LinkCard(props: LinkCardProps) {
         mppm: toMPPM
       }
     });
+  }
+
+  const swap = () => {
+    setFromSelected(toSelected);
+    setToSelected(fromSelected);
+
+    props.onLinkEdit({
+      ...props.link,
+      source: props.link.target,
+      target: props.link.source,
+      sourceToTargetPPM: {
+        ppm: toPPM,
+        mppm: toMPPM
+      },
+      targetToSourcePPM: {
+        ppm: fromPPM,
+        mppm: fromMPPM
+      }
+    })
   }
 
   return (
@@ -144,9 +163,16 @@ export default function LinkCard(props: LinkCardProps) {
             />
           </Fieldset>
 
-          <Button mt="sm" onClick={save}>
-            Done
-          </Button>
+          <Flex mt="sm" direction="row" gap="lg" align="center">
+            <Tooltip label="Swap To & From">
+              <ActionIcon onClick={swap}>
+                <IconRefresh />
+              </ActionIcon>
+            </Tooltip>
+            <Button onClick={save} fullWidth>
+              Done
+            </Button>
+          </Flex>
         </Flex>
       )}
     </Card>
