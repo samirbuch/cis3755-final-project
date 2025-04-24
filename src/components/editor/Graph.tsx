@@ -401,6 +401,8 @@ export default function Graph() {
 
           d.fx = d.x;
           d.fy = d.y;
+
+          updateCanvasAnimations();
         })
         .on("drag", (event, d) => {
           d.fx = event.x;
@@ -460,12 +462,7 @@ export default function Graph() {
           svgContainerRef.current.clientHeight / 2
         ))
         .alphaDecay(0.05)
-        .on("tick", () => {
-          tick();
-          if (simulationRef.current && simulationRef.current.alpha() < 0.3) {
-            updateCanvasAnimations();
-          }
-        });
+        .on("tick", tick);
 
       if (links.length > 0) {
         simulationRef.current.force(
@@ -517,7 +514,7 @@ export default function Graph() {
         cancelAnimationFrame(animationFrameId.current);
         animationFrameId.current = null;
       }
-      
+
       arcAnimations.current = [];
       // animationsRef.current.forEach(anim => anim.pause());
       // animationsRef.current = [];
