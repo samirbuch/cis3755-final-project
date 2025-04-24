@@ -7,18 +7,17 @@ import { useEditorContext } from "@/contexts/EditorContext";
 
 // Define the animation data structure
 interface ArcAnimation {
-  sourceId: number;                          // Store node IDs instead of path points
+  sourceId: number;
   targetId: number;
-  pathPoints: Array<{ x: number, y: number }>; // Pre-calculated path points
-  progress: number;                          // 0-1 for position along path
-  opacity: number;                           // Current opacity
-  color: string;                             // Arc color
-  scale: number;                             // Size scale
-  reverse: boolean;                          // Direction
-  speed: number;                             // Animation speed
-  startTime: number;                         // When this animation started
-  duration: number;                          // How long it should last
-  glow: 'standard' | 'bloom';                // Glow effect type
+  pathPoints: Array<{ x: number, y: number }>;
+  progress: number;
+  opacity: number;
+  color: string;
+  scale: number;
+  reverse: boolean;
+  startTime: number;
+  duration: number;
+  glow: 'standard' | 'bloom';
 }
 
 export default function Graph() {
@@ -234,108 +233,130 @@ export default function Graph() {
   }, [calculatePathPoints, nodes]);
 
   const updateCanvasAnimations = useCallback(() => {
-    // Don't interrupt ongoing animation frame loop
+    // Ensure animation loop is running
     if (animationFrameId.current === null) {
       animationFrameId.current = requestAnimationFrame(drawCanvas);
     }
 
-    // Don't recreate animations if no links
-    if (links.length === 0) return;
-
-    // Create a map of existing animations by source-target pair
-    const existingAnimsByNodePair: Record<string, ArcAnimation[]> = {};
-
-    arcAnimations.current.forEach(anim => {
-      const key = anim.reverse
-        ? `${anim.targetId}-${anim.sourceId}`
-        : `${anim.sourceId}-${anim.targetId}`;
-
-      if (!existingAnimsByNodePair[key]) {
-        existingAnimsByNodePair[key] = [];
-      }
-
-      existingAnimsByNodePair[key].push(anim);
-    });
-
+    // Start fresh with animations
     const newAnimations: ArcAnimation[] = [];
 
-    // Process all links
+    // Process each link exactly once
     links.forEach(link => {
+      // Skip links without positions
       if (!link.source.x || !link.target.x) return;
 
-      // Create animation source-target key
-      const sourceToTargetKey = `${link.source.id}-${link.target.id}`;
-      const targetToSourceKey = `${link.target.id}-${link.source.id}`;
-
-      // Always update path points for all animations to match current node positions
+      // Create path points for this link
       const pathPoints = calculatePathPoints(
         { x: link.source.x, y: link.source.y },
         { x: link.target.x, y: link.target.y },
         100
       );
 
-      // Helper function to create or update animations
-      const updateOrCreateArcGroup = (
-        count: number,
-        interval: number,
-        color: string,
-        reverse: boolean,
-        scale: number,
-        glow: 'standard' | 'bloom'
-      ) => {
-        if (interval < 300) return;
+      // Extract PPM values as plain numbers - CRITICAL FIX
+      // Force to numeric values with explicit fallback to 0
+      const sourceToPPM = typeof link.sourceToTargetPPM?.ppm === 'number' ? link.sourceToTargetPPM.ppm : 0;
+      const sourceToMPPM = typeof link.sourceToTargetPPM?.mppm === 'number' ? link.sourceToTargetPPM.mppm : 0;
+      const targetToPPM = typeof link.targetToSourcePPM?.ppm === 'number' ? link.targetToSourcePPM.ppm : 0;
+      const targetToMPPM = typeof link.targetToSourcePPM?.mppm === 'number' ? link.targetToSourcePPM.mppm : 0;
 
-        const key = reverse ? targetToSourceKey : sourceToTargetKey;
-        const existingAnims = existingAnimsByNodePair[key]?.filter(
-          a => a.color === color && a.glow === glow
-        ) || [];
+      console.log("Animation values:", {
+        sourceToPPM, sourceToMPPM, targetToPPM, targetToMPPM,
+        rawSourcePPM: link.sourceToTargetPPM?.ppm,
+        rawSourceMPPM: link.sourceToTargetPPM?.mppm
+      });
 
-        // If we have existing animations, update them
-        if (existingAnims.length > 0) {
-          existingAnims.forEach(anim => {
-            // Just update path points
-            anim.pathPoints = pathPoints;
-            newAnimations.push(anim);
+      // Create animations for source -> target regular pings
+      if (sourceToPPM > 0) {
+        const interval = 60000 / sourceToPPM; // One ping every X ms
+        const count = Math.min(5, Math.max(1, Math.ceil(sourceToPPM / 2)));
+
+        // Create staggered animations
+        for (let i = 0; i < count; i++) {
+          newAnimations.push({
+            sourceId: link.source.id,
+            targetId: link.target.id,
+            pathPoints,
+            progress: i / count, // Stagger starting positions
+            opacity: 0.8,
+            color: "#FF3030", // Standard red
+            scale: 1,
+            reverse: false,
+            startTime: performance.now() - (i * (interval / count)),
+            duration: 2000,
+            glow: 'standard'
           });
         }
-        // Otherwise create new animations
-        else {
-          const actualCount = interval < 1000 ? Math.min(2, count) : count;
+      }
 
-          for (let i = 0; i < actualCount; i++) {
-            const startTime = performance.now() + (i * (interval / actualCount));
-            newAnimations.push({
-              sourceId: link.source.id,
-              targetId: link.target.id,
-              pathPoints, // Initial path points
-              progress: 0,
-              opacity: 0,
-              color,
-              scale,
-              reverse,
-              speed: 1,
-              startTime,
-              duration: 2000,
-              glow
-            });
-          }
+      // Create animations for source -> target mass pings
+      if (sourceToMPPM > 0) {
+        const interval = 60000 / sourceToMPPM;
+        const count = Math.min(3, Math.max(1, Math.ceil(sourceToMPPM / 3)));
+
+        for (let i = 0; i < count; i++) {
+          newAnimations.push({
+            sourceId: link.source.id,
+            targetId: link.target.id,
+            pathPoints,
+            progress: i / count,
+            opacity: 1,
+            color: "#FF0000", // Bright red
+            scale: 1.2,
+            reverse: false,
+            startTime: performance.now() - (i * (interval / count)),
+            duration: 2000,
+            glow: 'bloom'
+          });
         }
-      };
+      }
 
-      // Calculate intervals based on PPM values
-      const toDelay = Math.floor(60000 / Math.max(link.sourceToTargetPPM.ppm, 1));
-      const toBloomDelay = Math.floor(60000 / Math.max(link.sourceToTargetPPM.mppm, 1));
-      const fromDelay = Math.floor(60000 / Math.max(link.targetToSourcePPM.ppm, 1));
-      const fromBloomDelay = Math.floor(60000 / Math.max(link.targetToSourcePPM.mppm, 1));
+      // Create animations for target -> source regular pings
+      if (targetToPPM > 0) {
+        const interval = 60000 / targetToPPM;
+        const count = Math.min(5, Math.max(1, Math.ceil(targetToPPM / 2)));
 
-      // Update or create all animation types
-      updateOrCreateArcGroup(5, toDelay, "#FF3030", false, 1, 'standard');
-      updateOrCreateArcGroup(3, toBloomDelay, "#FF0000", false, 1.2, 'bloom');
-      updateOrCreateArcGroup(5, fromDelay, "#30A0FF", true, 1, 'standard');
-      updateOrCreateArcGroup(3, fromBloomDelay, "#00A0FF", true, 1.2, 'bloom');
+        for (let i = 0; i < count; i++) {
+          newAnimations.push({
+            sourceId: link.source.id,
+            targetId: link.target.id,
+            pathPoints,
+            progress: i / count,
+            opacity: 0.8,
+            color: "#30A0FF", // Standard blue
+            scale: 1,
+            reverse: true, // Coming from target
+            startTime: performance.now() - (i * (interval / count)),
+            duration: 2000,
+            glow: 'standard'
+          });
+        }
+      }
+
+      // Create animations for target -> source mass pings
+      if (targetToMPPM > 0) {
+        const interval = 60000 / targetToMPPM;
+        const count = Math.min(3, Math.max(1, Math.ceil(targetToMPPM / 3)));
+
+        for (let i = 0; i < count; i++) {
+          newAnimations.push({
+            sourceId: link.source.id,
+            targetId: link.target.id,
+            pathPoints,
+            progress: i / count,
+            opacity: 1,
+            color: "#00A0FF", // Bright blue
+            scale: 1.2,
+            reverse: true,
+            startTime: performance.now() - (i * (interval / count)),
+            duration: 2000,
+            glow: 'bloom'
+          });
+        }
+      }
     });
 
-    // Replace the animations array with our preserved+new animations
+    // Replace all animations
     arcAnimations.current = newAnimations;
   }, [links, calculatePathPoints, drawCanvas]);
 
