@@ -1,4 +1,3 @@
-import { JSAnimation, animate, svg as animeSVG } from "animejs";
 import * as d3 from "d3";
 import { useRef, useCallback, useEffect } from "react";
 import Link from "@/interfaces/Link";
@@ -180,132 +179,157 @@ export default function Graph() {
   }, [calculatePathPoints, nodes]);
 
   const updateCanvasAnimations = useCallback(() => {
-    // Ensure animation loop is running
+    if(!svgContainerRef.current) return;
+
+    console.log("Running updateCanvasAnimations with", links.length, "links");
+
+    // CRITICAL: Ensure animation frame is running
     if (animationFrameId.current === null) {
       animationFrameId.current = requestAnimationFrame(drawCanvas);
     }
 
-    // Start fresh with animations
-    const newAnimations: ArcAnimation[] = [];
+    // Create a map of current node positions for quick lookups
+    const nodeMap = new Map();
+    nodes.forEach(node => nodeMap.set(node.id, node));
 
-    // Process each link exactly once
-    links.forEach(link => {
-      // Skip links without positions
-      if (!link.source.x || !link.target.x) return;
+    // Create a map of existing animations by link ID
+    const linkAnimMap = new Map();
 
-      // Create path points for this link
-      const pathPoints = calculatePathPoints(
-        { x: link.source.x, y: link.source.y },
-        { x: link.target.x, y: link.target.y },
-        100
-      );
+    // First update existing animations with fresh path points
+    arcAnimations.current.forEach(anim => {
+      const sourceNode = nodeMap.get(anim.sourceId);
+      const targetNode = nodeMap.get(anim.targetId);
 
-      // Extract PPM values as plain numbers - CRITICAL FIX
-      // Force to numeric values with explicit fallback to 0
-      const sourceToPPM = typeof link.sourceToTargetPPM?.ppm === 'number' ? link.sourceToTargetPPM.ppm : 0;
-      const sourceToMPPM = typeof link.sourceToTargetPPM?.mppm === 'number' ? link.sourceToTargetPPM.mppm : 0;
-      const targetToPPM = typeof link.targetToSourcePPM?.ppm === 'number' ? link.targetToSourcePPM.ppm : 0;
-      const targetToMPPM = typeof link.targetToSourcePPM?.mppm === 'number' ? link.targetToSourcePPM.mppm : 0;
+      if (sourceNode && targetNode) {
+        // Update path points
+        anim.pathPoints = calculatePathPoints(
+          { x: sourceNode.x, y: sourceNode.y },
+          { x: targetNode.x, y: targetNode.y },
+          100
+        );
 
-      console.log("Animation values:", {
-        sourceToPPM, sourceToMPPM, targetToPPM, targetToMPPM,
-        rawSourcePPM: link.sourceToTargetPPM?.ppm,
-        rawSourceMPPM: link.sourceToTargetPPM?.mppm
-      });
-
-      // Create animations for source -> target regular pings
-      if (sourceToPPM > 0) {
-        const interval = 60000 / sourceToPPM; // One ping every X ms
-        const count = Math.min(5, Math.max(1, Math.ceil(sourceToPPM / 2)));
-
-        // Create staggered animations
-        for (let i = 0; i < count; i++) {
-          newAnimations.push({
-            sourceId: link.source.id,
-            targetId: link.target.id,
-            pathPoints,
-            progress: i / count, // Stagger starting positions
-            opacity: 0.8,
-            color: "#FF3030", // Standard red
-            scale: 1,
-            reverse: false,
-            startTime: performance.now() - (i * (interval / count)),
-            duration: 2000,
-            glow: 'standard'
-          });
+        // Track that we have an animation for this link direction
+        const key = `${anim.sourceId}-${anim.targetId}-${anim.reverse}-${anim.glow}`;
+        if (!linkAnimMap.has(key)) {
+          linkAnimMap.set(key, []);
         }
-      }
-
-      // Create animations for source -> target mass pings
-      if (sourceToMPPM > 0) {
-        const interval = 60000 / sourceToMPPM;
-        const count = Math.min(3, Math.max(1, Math.ceil(sourceToMPPM / 3)));
-
-        for (let i = 0; i < count; i++) {
-          newAnimations.push({
-            sourceId: link.source.id,
-            targetId: link.target.id,
-            pathPoints,
-            progress: i / count,
-            opacity: 1,
-            color: "#FF0000", // Bright red
-            scale: 1.2,
-            reverse: false,
-            startTime: performance.now() - (i * (interval / count)),
-            duration: 2000,
-            glow: 'bloom'
-          });
-        }
-      }
-
-      // Create animations for target -> source regular pings
-      if (targetToPPM > 0) {
-        const interval = 60000 / targetToPPM;
-        const count = Math.min(5, Math.max(1, Math.ceil(targetToPPM / 2)));
-
-        for (let i = 0; i < count; i++) {
-          newAnimations.push({
-            sourceId: link.source.id,
-            targetId: link.target.id,
-            pathPoints,
-            progress: i / count,
-            opacity: 0.8,
-            color: "#30A0FF", // Standard blue
-            scale: 1,
-            reverse: true, // Coming from target
-            startTime: performance.now() - (i * (interval / count)),
-            duration: 2000,
-            glow: 'standard'
-          });
-        }
-      }
-
-      // Create animations for target -> source mass pings
-      if (targetToMPPM > 0) {
-        const interval = 60000 / targetToMPPM;
-        const count = Math.min(3, Math.max(1, Math.ceil(targetToMPPM / 3)));
-
-        for (let i = 0; i < count; i++) {
-          newAnimations.push({
-            sourceId: link.source.id,
-            targetId: link.target.id,
-            pathPoints,
-            progress: i / count,
-            opacity: 1,
-            color: "#00A0FF", // Bright blue
-            scale: 1.2,
-            reverse: true,
-            startTime: performance.now() - (i * (interval / count)),
-            duration: 2000,
-            glow: 'bloom'
-          });
-        }
+        linkAnimMap.get(key).push(anim);
       }
     });
 
-    // Replace all animations
-    arcAnimations.current = newAnimations;
-  }, [links, calculatePathPoints, drawCanvas]);
+    // Store the updated animations
+    const updatedAnimations = [...arcAnimations.current];
+
+    // DEBUG: Log the links being processed
+    console.log("Processing links:", links.map(l => ({
+      source: l.source.id,
+      target: l.target.id,
+      fromPPM: l.sourceToTargetPPM?.ppm,
+      fromMPPM: l.sourceToTargetPPM?.mppm,
+      toPPM: l.targetToSourcePPM?.ppm,
+      toMPPM: l.targetToSourcePPM?.mppm,
+      hasPositions: Boolean(l.source.x && l.target.x)
+    })));
+
+    // Now add new animations for any links that don't have them yet
+    links.forEach(link => {
+      // CRITICAL FIX: Handle links that may not have positions yet
+      // Use node positions from nodeMap if available, or fallback to center
+      const sourcePos = nodeMap.get(link.source.id) || {
+        x: svgContainerRef.current!.clientWidth / 2 || 500,
+        y: svgContainerRef.current!.clientHeight / 2 || 300
+      };
+
+      const targetPos = nodeMap.get(link.target.id) || {
+        x: (svgContainerRef.current!.clientWidth / 2 || 500) + 50, // Offset to avoid overlap
+        y: (svgContainerRef.current!.clientHeight / 2 || 300) + 50
+      };
+
+      const pathPoints = calculatePathPoints(
+        { x: sourcePos.x, y: sourcePos.y },
+        { x: targetPos.x, y: targetPos.y },
+        100
+      );
+
+      // CRITICAL FIX: More robust PPM value extraction with better debugging
+      // Use explicit fallbacks that preserve 0 values
+      const sourceToPPM = link.sourceToTargetPPM && typeof link.sourceToTargetPPM.ppm === 'number' ?
+        link.sourceToTargetPPM.ppm : 0;
+
+      const sourceToMPPM = link.sourceToTargetPPM && typeof link.sourceToTargetPPM.mppm === 'number' ?
+        link.sourceToTargetPPM.mppm : 0;
+
+      const targetToPPM = link.targetToSourcePPM && typeof link.targetToSourcePPM.ppm === 'number' ?
+        link.targetToSourcePPM.ppm : 0;
+
+      const targetToMPPM = link.targetToSourcePPM && typeof link.targetToSourcePPM.mppm === 'number' ?
+        link.targetToSourcePPM.mppm : 0;
+
+      // Debug log the exact PPM values for this link
+      console.log(`Link ${link.source.id} → ${link.target.id} PPM values:`, {
+        sourceToPPM, sourceToMPPM, targetToPPM, targetToMPPM,
+        rawSourceTo: link.sourceToTargetPPM,
+        rawTargetTo: link.targetToSourcePPM
+      });
+
+      // Helper to check if we need new animations and create them if needed
+      const createMissingAnimations = (
+        ppmValue: number,
+        reverse: boolean,
+        color: string,
+        scale: number,
+        glow: 'standard' | 'bloom'
+      ) => {
+        // CRITICAL FIX: The existing check is causing PPM=5 to be ignored in some cases
+        // Change this condition to explicitly check for positive values
+        if (ppmValue <= 0) {
+          return;
+        }
+
+        const key = `${link.source.id}-${link.target.id}-${reverse}-${glow}`;
+        const existingAnims = linkAnimMap.get(key) || [];
+
+        // If we don't have any animations for this type, create them
+        if (existingAnims.length === 0) {
+          // CRITICAL FIX: Ensure we're correctly calculating interval & count for PPM=5
+          const interval = 60000 / Math.max(ppmValue, 0.1); // Avoid division by very small values
+
+          // For PPM=5, this would create at least 3 animations 
+          // (ensuring enough visibility without overwhelming)
+          const count = Math.min(5, Math.max(2, Math.ceil(ppmValue / 1.5)));
+
+          console.log(`Creating ${count} animations for ${reverse ? "reverse" : "forward"} 
+            between ${link.source.id}-${link.target.id} with ${glow} - PPM is ${ppmValue}`);
+
+          for (let i = 0; i < count; i++) {
+            updatedAnimations.push({
+              sourceId: link.source.id,
+              targetId: link.target.id,
+              pathPoints,
+              progress: i / count,
+              opacity: 0.8,
+              color,
+              scale,
+              reverse,
+              startTime: performance.now() - (i * (interval / count)),
+              duration: 2000,
+              glow
+            });
+          }
+        }
+      };
+
+      // Check and create animations for each direction/type
+      createMissingAnimations(sourceToPPM, false, "#FF3030", 1, 'standard');
+      createMissingAnimations(sourceToMPPM, false, "#FF0000", 1.2, 'bloom');
+      createMissingAnimations(targetToPPM, true, "#30A0FF", 1, 'standard');
+      createMissingAnimations(targetToMPPM, true, "#00A0FF", 1.2, 'bloom');
+    });
+
+    // Update animations reference with both updated and new animations
+    arcAnimations.current = updatedAnimations;
+    console.log("Animation count:", updatedAnimations.length);
+  }, [links, nodes, drawCanvas, calculatePathPoints]);
 
   const tick = useCallback(() => {
     if (!svgNodesRef.current || !svgTextsRef.current || !svgLinksRef.current) return;
@@ -408,7 +432,25 @@ export default function Graph() {
           d.fx = event.x;
           d.fy = event.y;
 
-          // updateCanvasAnimations();
+          // This prevents freezing by refreshing path points based on current positions
+          if (arcAnimations.current.length > 0) {
+            const nodeMap = new Map();
+            nodes.forEach(node => nodeMap.set(node.id, node));
+
+            arcAnimations.current.forEach(anim => {
+              const sourceNode = nodeMap.get(anim.sourceId);
+              const targetNode = nodeMap.get(anim.targetId);
+
+              if (sourceNode && targetNode) {
+                // Update path points during drag without resetting progress
+                anim.pathPoints = calculatePathPoints(
+                  { x: sourceNode.x, y: sourceNode.y },
+                  { x: targetNode.x, y: targetNode.y },
+                  100
+                );
+              }
+            });
+          }
         })
         .on("end", (event, d) => {
           if (!event.active && simulationRef.current)
@@ -421,7 +463,7 @@ export default function Graph() {
           updateCanvasAnimations();
         })
       );;
-  }, [nodes, updateCanvasAnimations]);
+  }, [calculatePathPoints, nodes, updateCanvasAnimations]);
 
   const createLinks = useCallback(() => {
     if (!d3SvgRef.current) return;
@@ -520,6 +562,36 @@ export default function Graph() {
       // animationsRef.current = [];
     }
   }, [nodes, links, tick, createNodes, createLinks, updateCanvasAnimations]);
+
+  useEffect(() => {
+    // Start animation frame loop that runs independently of other state changes
+    if (animationFrameId.current === null) {
+      animationFrameId.current = requestAnimationFrame(drawCanvas);
+    }
+
+    return () => {
+      // Only cancel animation when component unmounts
+      if (animationFrameId.current !== null) {
+        cancelAnimationFrame(animationFrameId.current);
+        animationFrameId.current = null;
+      }
+    };
+  }, [drawCanvas]);
+
+  // Add an additional useEffect to ensure animations restart if they stop
+  useEffect(() => {
+    // Create a heartbeat timer to check if animations are running
+    const heartbeat = setInterval(() => {
+      if (animationFrameId.current === null && canvasRef.current) {
+        console.log("Animation heartbeat: Restarting animation loop");
+        animationFrameId.current = requestAnimationFrame(drawCanvas);
+      }
+    }, 1000); // Check every second
+
+    return () => {
+      clearInterval(heartbeat);
+    };
+  }, [drawCanvas]);
 
   return (
     <div style={{
