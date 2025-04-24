@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useState } from "react";
 import Link from "@/interfaces/Link";
 import Node from "@/interfaces/Node";
 import { useEditorContext } from "@/contexts/EditorContext";
@@ -19,7 +19,11 @@ interface ArcAnimation {
   glow: 'standard' | 'bloom';
 }
 
-export default function Graph() {
+export interface GraphProps {
+  showFPS?: boolean
+}
+
+export default function Graph(props: GraphProps) {
   const { nodes, links } = useEditorContext();
 
   const d3SvgRef = useRef<d3.Selection<SVGSVGElement, unknown, null, undefined>>(null);
@@ -38,6 +42,11 @@ export default function Graph() {
   const simulationRef = useRef<d3.Simulation<Node, Link> | null>(null);
 
   const hoveredNodeRef = useRef<number | null>(null);
+
+  // Add these at the top with other state
+  const [fps, setFps] = useState<number>(0);
+  const frameCountRef = useRef<number>(0);
+  const lastFpsUpdateTimeRef = useRef<number>(0);
 
   // Function to calculate points along a path
   const calculatePathPoints = useCallback((source: { x: number, y: number }, target: { x: number, y: number }, pointCount = 100) => {
@@ -98,6 +107,21 @@ export default function Graph() {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Calculate FPS
+    const now = performance.now();
+    frameCountRef.current++;
+
+    // Update FPS every 500ms for stability
+    if (now - lastFpsUpdateTimeRef.current > 500) {
+      const elapsed = now - lastFpsUpdateTimeRef.current;
+      const currentFps = Math.round((frameCountRef.current / elapsed) * 1000);
+      setFps(currentFps);
+
+      // Reset counters
+      lastFpsUpdateTimeRef.current = now;
+      frameCountRef.current = 0;
+    }
 
     // Match canvas size to display size
     const rect = canvas.getBoundingClientRect();
@@ -203,7 +227,6 @@ export default function Graph() {
         baseOpacity *= (sourceHighlighted || targetHighlighted) ? 1 : 0.25;
       }
 
-      
       // Draw the arc
       ctx.save();
       // Apply the calculated opacity
@@ -236,9 +259,21 @@ export default function Graph() {
       return true;
     });
 
+    // Draw FPS counter if enabled
+    if (props.showFPS) {
+      ctx.save();
+      ctx.fillStyle = 'white';
+      ctx.font = '16px monospace';
+      ctx.textAlign = 'right';
+      ctx.shadowColor = 'black';
+      ctx.shadowBlur = 3;
+      ctx.fillText(`${fps} FPS`, canvas.width - 20, 30);
+      ctx.restore();
+    }
+
     // Request next animation frame
     animationFrameId.current = requestAnimationFrame(drawCanvas);
-  }, [calculatePathPoints, nodes]);
+  }, [calculatePathPoints, fps, nodes, props.showFPS]);
 
   const updateCanvasAnimations = useCallback(() => {
     if (!svgContainerRef.current) return;
