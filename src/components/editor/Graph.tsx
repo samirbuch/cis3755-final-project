@@ -417,10 +417,10 @@ export default function Graph(props: GraphProps) {
       };
 
       // Check and create animations for each direction/type
-      createMissingAnimations(sourceToPPM, false, "#FF3030", 1, 'standard');
-      createMissingAnimations(sourceToMPPM, false, "#FF0000", 1.2, 'bloom');
-      createMissingAnimations(targetToPPM, true, "#30A0FF", 1, 'standard');
-      createMissingAnimations(targetToMPPM, true, "#00A0FF", 1.2, 'bloom');
+      createMissingAnimations(sourceToPPM, false, link.source.color ?? "#FFFFFF", 1, 'standard');
+      createMissingAnimations(sourceToMPPM, false, link.source.color ?? "#FFFFFF", 1.2, 'bloom');
+      createMissingAnimations(targetToPPM, true, link.target.color ?? "#FFFFFF", 1, 'standard');
+      createMissingAnimations(targetToMPPM, true, link.target.color ?? "#FFFFFF", 1.2, 'bloom');
     });
 
     // Update animations reference with both updated and new animations
@@ -473,7 +473,7 @@ export default function Graph(props: GraphProps) {
     // Add circles to each group
     svgNodesRef.current = svgNodeGroupsRef.current.append("circle")
       .attr("r", 10)
-      .attr("fill", "white")
+      .attr("fill", (d) => d.color || "#FFFFFF")
       .attr("opacity", d => getNodeOpacity(d))
       .on("mouseenter", function (event, d) {
         // Store hovered node ID

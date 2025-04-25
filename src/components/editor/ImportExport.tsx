@@ -1,6 +1,6 @@
 import { useEditorContext } from "@/contexts/EditorContext";
 import { ZodLinkSourceTargetID } from "@/interfaces/Link";
-import { ZodNodeNoFixed, ZodNodeNoPos } from "@/interfaces/Node";
+import { ZodNodeNoFixed, OldZodNode } from "@/interfaces/Node";
 import { Button, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { z } from "zod";
@@ -13,7 +13,7 @@ export const ZodData = z.object({
   }),
   eventTitle: z.string().nullable(),
   eventDescription: z.string().nullable(),
-  nodes: z.array(z.union([ZodNodeNoFixed, ZodNodeNoPos])),
+  nodes: z.array(z.union([ZodNodeNoFixed, OldZodNode])),
   links: z.array(ZodLinkSourceTargetID),
 });
 type ZodDataT = z.infer<typeof ZodData>;
@@ -41,9 +41,7 @@ export default function ImportExport() {
       eventDescription: editorContext.eventDescription,
       nodes: editorContext.nodes.map(node => ({
         ...node,
-        // @ts-expect-error // X and Y will actually *always* exist on export despite the typing suggesting otherwise in some cases.
         x: (node.x / width) * 100, // Convert x to percentage
-        // @ts-expect-error // see above
         y: (node.y / height) * 100, // Convert y to percentage
       })),
       links: editorContext.links.map(link => ({
@@ -131,6 +129,7 @@ export default function ImportExport() {
             ...node,
             x: (index / data.nodes.length) * width, // Convert percentage to coordinate or default
             y: height / 2, // Convert percentage to coordinate or default
+            color: "#FFFFFF", // pure white
           };
         });
 

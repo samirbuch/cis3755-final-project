@@ -1,22 +1,31 @@
 import { z } from "zod";
 
-// This was an older version of the ZodNode schema, before we started
-// storing the x and y coordinates as percentages.
-export const ZodNodeNoPos = z.object({
+/**
+ * @deprecated
+ * This was an older version of the ZodNode schema, before we started
+ * storing the x and y coordinates as percentages.
+ */
+export const OldZodNode = z.object({
   id: z.number(),
   name: z.string(),
   highlighted: z.boolean()
 });
-export type NodeNoPos = z.infer<typeof ZodNodeNoPos>;
+/**
+ * @deprecated
+ * This was an older version of the ZodNode schema, before we started
+ * storing the x and y coordinates as percentages.
+ */
+export type OldNodeNoPos = z.infer<typeof OldZodNode>;
 
 // This is the schema most should Nodes be using.
-export const ZodNodeNoFixed = ZodNodeNoPos.extend({
+export const ZodNodeNoFixed = OldZodNode.extend({
   x: z.number(),
-  y: z.number()
+  y: z.number(),
+  color: z.string()
 });
 export type NodeNoFixed = z.infer<typeof ZodNodeNoFixed>;
 
-export const ZodNode = ZodNodeNoPos.extend({
+export const ZodNode = ZodNodeNoFixed.extend({
   fx: z.number().optional().nullable(),
   fy: z.number().optional().nullable(),
 });

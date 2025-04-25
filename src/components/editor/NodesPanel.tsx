@@ -3,6 +3,7 @@ import { Button } from "@mantine/core";
 
 import NodeCard from "./NodeCard";
 import { useEditorContext } from "@/contexts/EditorContext";
+import { NodeNoFixed } from "@/interfaces/Node";
 
 // Section of the editor panel that handles creating and editing nodes
 export default function NodesPanel() {
@@ -13,7 +14,7 @@ export default function NodesPanel() {
 
     const maxID = Math.max(...editorContext.nodes.map((node) => node.id), 0);
 
-    const newNode: Node = {
+    const newNode: NodeNoFixed = {
       id: maxID + 1,
       name: `Node ${maxID + 1}`,
 
@@ -21,6 +22,7 @@ export default function NodesPanel() {
       y: Math.random() * 100,
 
       highlighted: false,
+      color: "#FFFFFF" // pure white
     };
 
     editorContext.addNode(newNode);
