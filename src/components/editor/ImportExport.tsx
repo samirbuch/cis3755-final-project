@@ -1,6 +1,6 @@
 import { useEditorContext } from "@/contexts/EditorContext";
 import { ZodLinkSourceTargetID } from "@/interfaces/Link";
-import { ZodNodeNoPos } from "@/interfaces/Node";
+import { ZodNodeNoFixed, ZodNodeNoPos } from "@/interfaces/Node";
 import { Button, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { z } from "zod";
@@ -13,7 +13,7 @@ export const ZodData = z.object({
   }),
   eventTitle: z.string().nullable(),
   eventDescription: z.string().nullable(),
-  nodes: z.array(ZodNodeNoPos),
+  nodes: z.array(z.union([ZodNodeNoFixed, ZodNodeNoPos])),
   links: z.array(ZodLinkSourceTargetID),
 });
 type ZodDataT = z.infer<typeof ZodData>;
@@ -22,21 +22,40 @@ export default function ImportExport() {
   const editorContext = useEditorContext();
 
   function exportData() {
+    const svgContainer = document.getElementById("graph");
+    if (!svgContainer) {
+      notifications.show({
+        title: "SVG container not found",
+        message: "Please ensure the SVG container is present in the DOM.",
+        color: "red",
+        position: "top-center"
+      });
+      return;
+    }
+
+    const { width, height } = svgContainer.getBoundingClientRect();
+
     const data: ZodDataT = {
       eventTime: editorContext.eventTimestamp,
       eventTitle: editorContext.eventTitle,
       eventDescription: editorContext.eventDescription,
-      nodes: editorContext.nodes,
+      nodes: editorContext.nodes.map(node => ({
+        ...node,
+        // @ts-expect-error // X and Y will actually *always* exist on export despite the typing suggesting otherwise in some cases.
+        x: (node.x / width) * 100, // Convert x to percentage
+        // @ts-expect-error // see above
+        y: (node.y / height) * 100, // Convert y to percentage
+      })),
       links: editorContext.links.map(link => ({
         ...link,
         source: link.source.id,
         target: link.target.id,
       })),
-    }
+    };
 
     const dataStr = JSON.stringify(data, (key, value) => {
-      // Remove the d3 properties from the nodes
-      if (["x", "y", "vx", "vy", "fx", "fy", "index"].includes(key)) {
+      // Remove unnecessary d3 properties
+      if (["vx", "vy", "fx", "fy", "index"].includes(key)) {
         return undefined;
       }
 
@@ -80,20 +99,63 @@ export default function ImportExport() {
 
         console.log("Imported data:", data);
 
-        const fixedLinks = (data.links as ZodDataT["links"]).map(link => ({
-          ...link,
-          source: (data.nodes as ZodDataT["nodes"]).find(node => node.id === link.source),
-          target: (data.nodes as ZodDataT["nodes"]).find(node => node.id === link.target),
-        }));
-        const fixedData = {
-          ...data,
-          links: fixedLinks,
+        const svgContainer = document.getElementById("graph");
+        if (!svgContainer) {
+          notifications.show({
+            title: "SVG container not found",
+            message: "Please ensure the SVG container is present in the DOM.",
+            color: "red",
+            position: "top-center"
+          });
+          return;
         }
 
-        // We're not using the result object here because the saved data
-        // doesn't include the d3 properties. The editor context requires
-        // them, but only in TypeScript. d3 adds them back when rendering.
-        editorContext.setNodes(data.nodes);
+        const { width, height } = svgContainer.getBoundingClientRect();
+
+        let oldFormatWarning = false;
+        const fixedNodes = (data.nodes as ZodDataT["nodes"]).map((node, index) => {
+          if("x" in node && "y" in node) {
+            // We can safely assume we have a current exported node version.
+            return {
+              ...node,
+              x: (node.x / 100) * width, // Convert percentage to coordinate
+              y: (node.y / 100) * height, // Convert percentage to coordinate
+            };
+          }
+
+          oldFormatWarning = true;
+
+          // Else, we need to assume we have a previous exported node version.
+          // and set some sensible default values.
+          return {
+            ...node,
+            x: (index / data.nodes.length) * width, // Convert percentage to coordinate or default
+            y: height / 2, // Convert percentage to coordinate or default
+          };
+        });
+
+        if(oldFormatWarning) {
+          notifications.show({
+            title: "Old format detected",
+            message: "Some nodes in this file are in an older format. Default values are being used.",
+            color: "yellow",
+            position: "top-center"
+          });
+        }
+
+        const fixedLinks = (data.links as ZodDataT["links"]).map(link => ({
+          ...link,
+          source: fixedNodes.find(node => node.id === link.source),
+          target: fixedNodes.find(node => node.id === link.target),
+        }));
+
+        const fixedData = {
+          ...data,
+          nodes: fixedNodes,
+          links: fixedLinks,
+        };
+
+        editorContext.setNodes(fixedData.nodes);
         editorContext.setLinks(fixedData.links);
 
         editorContext.setEventTimestamp(data.eventTime);
@@ -107,6 +169,7 @@ export default function ImportExport() {
 
   return (
     <Group>
+      {/* TODO: This could have been a mantine FileButton. I didn't know it existed. */}
       <Button onClick={importData}>
         Import
       </Button>

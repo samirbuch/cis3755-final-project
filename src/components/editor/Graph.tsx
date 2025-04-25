@@ -278,7 +278,7 @@ export default function Graph(props: GraphProps) {
   const updateCanvasAnimations = useCallback(() => {
     if (!svgContainerRef.current) return;
 
-    console.log("Running updateCanvasAnimations with", links.length, "links");
+    // console.log("Running updateCanvasAnimations with", links.length, "links");
 
     // CRITICAL: Ensure animation frame is running
     if (animationFrameId.current === null) {
@@ -318,15 +318,15 @@ export default function Graph(props: GraphProps) {
     const updatedAnimations = [...arcAnimations.current];
 
     // DEBUG: Log the links being processed
-    console.log("Processing links:", links.map(l => ({
-      source: l.source.id,
-      target: l.target.id,
-      fromPPM: l.sourceToTargetPPM?.ppm,
-      fromMPPM: l.sourceToTargetPPM?.mppm,
-      toPPM: l.targetToSourcePPM?.ppm,
-      toMPPM: l.targetToSourcePPM?.mppm,
-      hasPositions: Boolean(l.source.x && l.target.x)
-    })));
+    // console.log("Processing links:", links.map(l => ({
+    //   source: l.source.id,
+    //   target: l.target.id,
+    //   fromPPM: l.sourceToTargetPPM?.ppm,
+    //   fromMPPM: l.sourceToTargetPPM?.mppm,
+    //   toPPM: l.targetToSourcePPM?.ppm,
+    //   toMPPM: l.targetToSourcePPM?.mppm,
+    //   hasPositions: Boolean(l.source.x && l.target.x)
+    // })));
 
     // Now add new animations for any links that don't have them yet
     links.forEach(link => {
@@ -363,11 +363,11 @@ export default function Graph(props: GraphProps) {
         link.targetToSourcePPM.mppm : 0;
 
       // Debug log the exact PPM values for this link
-      console.log(`Link ${link.source.id} → ${link.target.id} PPM values:`, {
-        sourceToPPM, sourceToMPPM, targetToPPM, targetToMPPM,
-        rawSourceTo: link.sourceToTargetPPM,
-        rawTargetTo: link.targetToSourcePPM
-      });
+      // console.log(`Link ${link.source.id} → ${link.target.id} PPM values:`, {
+      //   sourceToPPM, sourceToMPPM, targetToPPM, targetToMPPM,
+      //   rawSourceTo: link.sourceToTargetPPM,
+      //   rawTargetTo: link.targetToSourcePPM
+      // });
 
       // Helper to check if we need new animations and create them if needed
       const createMissingAnimations = (
@@ -395,8 +395,8 @@ export default function Graph(props: GraphProps) {
           // (ensuring enough visibility without overwhelming)
           const count = Math.min(5, Math.max(2, Math.ceil(ppmValue / 1.5)));
 
-          console.log(`Creating ${count} animations for ${reverse ? "reverse" : "forward"} 
-            between ${link.source.id}-${link.target.id} with ${glow} - PPM is ${ppmValue}`);
+          // console.log(`Creating ${count} animations for ${reverse ? "reverse" : "forward"} 
+          //   between ${link.source.id}-${link.target.id} with ${glow} - PPM is ${ppmValue}`);
 
           for (let i = 0; i < count; i++) {
             updatedAnimations.push({
@@ -425,7 +425,7 @@ export default function Graph(props: GraphProps) {
 
     // Update animations reference with both updated and new animations
     arcAnimations.current = updatedAnimations;
-    console.log("Animation count:", updatedAnimations.length);
+    // console.log("Animation count:", updatedAnimations.length);
   }, [links, nodes, drawCanvas, calculatePathPoints]);
 
   const tick = useCallback(() => {
@@ -733,6 +733,7 @@ export default function Graph(props: GraphProps) {
       overflow: "hidden",
     }}>
       <svg
+        id="graph"
         ref={svgContainerRef}
         style={{
           position: "absolute",
@@ -743,6 +744,7 @@ export default function Graph(props: GraphProps) {
         }}
       />
       <canvas
+        id="graph-canvas"
         ref={canvasRef}
         style={{
           position: "absolute",

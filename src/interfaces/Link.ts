@@ -1,4 +1,4 @@
-import { ZodNodeNoPos, ZodNode } from "./Node";
+import { ZodNodeNoFixed, ZodNode } from "./Node";
 import { z } from "zod";
 
 export const ZodLinkSourceTargetID = z.object({
@@ -18,8 +18,8 @@ export const ZodLinkSourceTargetID = z.object({
 export type LinkSourceTargetID = z.infer<typeof ZodLinkSourceTargetID>;
 
 export const ZodLinkNoPos = ZodLinkSourceTargetID.extend({
-  source: ZodNodeNoPos,
-  target: ZodNodeNoPos,
+  source: ZodNodeNoFixed,
+  target: ZodNodeNoFixed,
 });
 export type LinkNoPos = z.infer<typeof ZodLinkNoPos>;
 
