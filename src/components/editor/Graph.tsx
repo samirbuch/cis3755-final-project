@@ -23,6 +23,12 @@ export interface GraphProps {
   showFPS?: boolean
 }
 
+export function diffNodes(prevNodes: Node[], newNodes: Node[]) {
+  const added = newNodes.filter(node => !prevNodes.some(prevNode => prevNode.id === node.id));
+  const removed = prevNodes.filter(prevNode => !newNodes.some(node => node.id === prevNode.id));
+  return { added, removed };
+}
+
 export default function Graph(props: GraphProps) {
   const { nodes, links } = useEditorContext();
 
@@ -42,6 +48,9 @@ export default function Graph(props: GraphProps) {
   const simulationRef = useRef<d3.Simulation<Node, Link> | null>(null);
 
   const hoveredNodeRef = useRef<number | null>(null);
+
+  // State to track nodes with transition effects
+  const prevNodesRef = useRef<Node[]>([]);
 
   // Add these at the top with other state
   const [fps, setFps] = useState<number>(0);
@@ -455,6 +464,8 @@ export default function Graph(props: GraphProps) {
   const createNodes = useCallback(() => {
     if (!d3SvgRef.current) return;
 
+    const { added, removed } = diffNodes(prevNodesRef.current, nodes);
+
     // Create node groups containing both circle and text
     svgNodeGroupsRef.current = d3SvgRef.current.append("g")
       .attr("class", "nodes")
@@ -474,7 +485,14 @@ export default function Graph(props: GraphProps) {
     svgNodesRef.current = svgNodeGroupsRef.current.append("circle")
       .attr("r", 10)
       .attr("fill", (d) => d.color || "#FFFFFF")
-      .attr("opacity", d => getNodeOpacity(d))
+      .attr("opacity", (d) => {
+        // If the node was just added, set its opacity to 0.
+        if (added.some(node => node.id === d.id)) {
+          return 0;
+        }
+        // If it has been here for a while, set its default opacity.
+        return getNodeOpacity(d);
+      })
       .on("mouseenter", function (event, d) {
         // Store hovered node ID
         hoveredNodeRef.current = d.id;
@@ -592,7 +610,17 @@ export default function Graph(props: GraphProps) {
 
           updateCanvasAnimations();
         })
-      );;
+      );
+
+    // Fade in new nodes
+    svgNodesRef.current
+      .filter((d: Node) => added.some(node => node.id === d.id))
+      .transition()
+      .duration(2000)
+      .attr("opacity", (d: Node) => getNodeOpacity(d))
+
+    // Update the previous nodes reference
+    prevNodesRef.current = nodes;
   }, [calculatePathPoints, getLinkOpacity, getNodeOpacity, nodes, updateCanvasAnimations]);
 
   const createLinks = useCallback(() => {
