@@ -6,13 +6,13 @@ import { notifications } from "@mantine/notifications";
 import useArrayState from "@/util/useArrayState";
 import TimelineEvent from "@/components/timeline-editor/TimelineEvent";
 import { useEffect } from "react";
-import Timeline from "@/interfaces/Timeline";
-import { ZodEvent } from "@/interfaces/Event";
+import { ZodTimeline } from "@/interfaces/Timeline";
+import Event, { ZodEvent } from "@/interfaces/Event";
 
 // const ZodTimelineData = z.array(ZodData);
 
 export default function TimelineEditor() {
-  const events = useArrayState<Timeline>();
+  const events = useArrayState<Event>();
 
   useEffect(() => {
     console.log("Events array changed:", events.array);
@@ -55,7 +55,7 @@ export default function TimelineEditor() {
         try {
           const data = JSON.parse(dataStr);
 
-          const result = ZodTimelineData.safeParse(data);
+          const result = ZodTimeline.safeParse(data);
           if (!result.success) {
             console.error("Invalid data format", result.error.format());
             notifications.show({
