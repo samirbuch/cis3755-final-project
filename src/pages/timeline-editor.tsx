@@ -2,17 +2,17 @@ import Header from "@/components/Header";
 import { Button, Flex } from "@mantine/core";
 import Link from "next/link";
 import { IconExternalLink } from "@tabler/icons-react";
-import { ZodData } from "@/components/editor/ImportExport";
 import { notifications } from "@mantine/notifications";
 import useArrayState from "@/util/useArrayState";
-import { z } from "zod";
 import TimelineEvent from "@/components/timeline-editor/TimelineEvent";
 import { useEffect } from "react";
+import Timeline from "@/interfaces/Timeline";
+import { ZodEvent } from "@/interfaces/Event";
 
-const ZodTimelineData = z.array(ZodData);
+// const ZodTimelineData = z.array(ZodData);
 
 export default function TimelineEditor() {
-  const events = useArrayState<z.infer<typeof ZodData>>();
+  const events = useArrayState<Timeline>();
 
   useEffect(() => {
     console.log("Events array changed:", events.array);
@@ -110,7 +110,7 @@ export default function TimelineEditor() {
           try {
             const data = JSON.parse(dataStr);
 
-            const result = ZodData.safeParse(data);
+            const result = ZodEvent.safeParse(data);
             if (!result.success) {
               console.error("Invalid data format", result.error.format());
               notifications.show({

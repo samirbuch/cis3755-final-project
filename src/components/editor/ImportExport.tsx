@@ -1,22 +1,7 @@
 import { useEditorContext } from "@/contexts/EditorContext";
-import { ZodLinkSourceTargetID } from "@/interfaces/Link";
-import { ZodNodeNoFixed, OldZodNode } from "@/interfaces/Node";
 import { Button, Group } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { z } from "zod";
-
-export const ZodData = z.object({
-  eventTime: z.object({
-    year: z.number(),
-    month: z.number(),
-    day: z.number(),
-  }),
-  eventTitle: z.string().nullable(),
-  eventDescription: z.string().nullable(),
-  nodes: z.array(z.union([ZodNodeNoFixed, OldZodNode])),
-  links: z.array(ZodLinkSourceTargetID),
-});
-type ZodDataT = z.infer<typeof ZodData>;
+import Event, { ZodEvent } from "@/interfaces/Event";
 
 export default function ImportExport() {
   const editorContext = useEditorContext();
@@ -45,7 +30,7 @@ export default function ImportExport() {
 
     const { width, height } = svgContainer.getBoundingClientRect();
 
-    const data: ZodDataT = {
+    const data: Event = {
       eventTime: editorContext.eventTimestamp,
       eventTitle: editorContext.eventTitle,
       eventDescription: editorContext.eventDescription,
@@ -93,7 +78,7 @@ export default function ImportExport() {
         const dataStr = e.target?.result as string;
         const data = JSON.parse(dataStr);
 
-        const result = ZodData.safeParse(data);
+        const result = ZodEvent.safeParse(data);
         if (!result.success) {
           console.error("Invalid data format", result.error.format());
           notifications.show({
@@ -121,7 +106,7 @@ export default function ImportExport() {
         const { width, height } = svgContainer.getBoundingClientRect();
 
         let oldFormatWarning = false;
-        const fixedNodes = (data.nodes as ZodDataT["nodes"]).map((node, index) => {
+        const fixedNodes = (data.nodes as Event["nodes"]).map((node, index) => {
           if("x" in node && "y" in node) {
             // We can safely assume we have a current exported node version.
             return {
@@ -152,7 +137,7 @@ export default function ImportExport() {
           });
         }
 
-        const fixedLinks = (data.links as ZodDataT["links"]).map(link => ({
+        const fixedLinks = (data.links as Event["links"]).map(link => ({
           ...link,
           source: fixedNodes.find(node => node.id === link.source),
           target: fixedNodes.find(node => node.id === link.target),

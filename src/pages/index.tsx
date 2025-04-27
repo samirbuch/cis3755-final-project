@@ -2,14 +2,17 @@
 
 import Head from "next/head";
 // import Image from "next/image";
-import styles from "@/styles/Home.module.css";
 import { Button, Divider, Flex, Text, Title } from "@mantine/core";
-import CenteredOnPage from "@/components/CenteredOnPage";
 import { useEffect, useRef } from "react";
-
+import { useRouter } from "next/router";
 import { createScope, animate, type Scope, createTimeline, stagger } from "animejs";
 
+import styles from "@/styles/Home.module.css";
+import CenteredOnPage from "@/components/CenteredOnPage";
+
 export default function Home() {
+  const router = useRouter();
+
   const root = useRef<HTMLDivElement>(null);
   const scope = useRef<Scope>(null);
 
@@ -46,7 +49,7 @@ export default function Home() {
           easing: "ease"
         }, stagger(200, { start: "+=100" }));
 
-      scope.add("transition", () => {
+      scope.add("transition", (to: string) => {
         // timeline.reverse();
         createTimeline()
           .add("#title", {
@@ -67,15 +70,18 @@ export default function Home() {
             // translateY: ["10%", "0%"],
             duration: 500,
             easing: "ease"
-          }, stagger(200, { start: "+=50" }));
+          }, stagger(200, { start: "+=50" }))
+          .call(() => {
+            router.push(`/${to}`);
+          }, "<");
 
       });
 
     })
-  }, []);
+  }, [router]);
 
   function goToStoryline(storyline: string) {
-    scope.current?.methods.transition();
+    scope.current?.methods.transition(storyline);
   }
 
   return (
