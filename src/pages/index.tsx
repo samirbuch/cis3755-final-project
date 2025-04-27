@@ -72,7 +72,7 @@ export default function Home() {
             easing: "ease"
           }, stagger(200, { start: "+=50" }))
           .call(() => {
-            router.push(`/${to}`);
+            router.push(`/story?path=timeline-${to}.json`);
           }, "<");
 
       });

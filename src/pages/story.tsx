@@ -13,8 +13,12 @@ import { NodeNoFixed } from "@/interfaces/Node";
 import { ZodTimeline } from "@/interfaces/Timeline";
 import { wait } from "@/util/misc";
 import Legend from '@/components/Legend';
+import { useRouter } from "next/router";
 
-export default function Samir() {
+export default function Timeline() {
+  const router = useRouter();
+  const { path } = router.query;
+
   const [timeline, setTimeline] = useState<Event[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -61,9 +65,18 @@ export default function Samir() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEventIndex, timeline]);
 
+  // Ensure the path is available before proceeding
   useEffect(() => {
+    if (!router.isReady) return;
+
+    if (!path) {
+      setError("No path specified");
+      setIsLoading(false);
+      return;
+    }
+
     const fetchTimeline = async () => {
-      const res = await fetch("/storylines/timeline-samir.json");
+      const res = await fetch(`/storylines/${path}`);
       if (!res.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -82,7 +95,7 @@ export default function Samir() {
       await wait(3500); // Anticip ... 
 
       return data; // ... ation!
-    }
+    };
 
     fetchTimeline()
       .then(data => {
@@ -157,7 +170,25 @@ export default function Samir() {
         setIsLoading(false);
         console.error("Error fetching timeline data:", err);
       });
-  }, []);
+  }, [path, router.isReady]);
+
+  if (!path && router.isReady) {
+    return (
+      <CenteredOnPage>
+        <Flex direction={"column"} align="center">
+          <ClockLoader color="#FFF" size={50} />
+          <Title mt={"lg"}>No path specified</Title>
+          <Text>You&apos;re missing a <Code>?path=</Code> parameter.</Text>
+
+          <Link href="/" style={{ marginTop: "1rem" }}>
+            <Button variant="transparent">
+              Try going home
+            </Button>
+          </Link>
+        </Flex>
+      </CenteredOnPage>
+    )
+  }
 
   if (isLoading) {
     return (
@@ -172,9 +203,9 @@ export default function Samir() {
       <CenteredOnPage>
         <CenteredOnPage>
           <Flex direction={"column"} gap="sm" align={"center"}>
-            <Title>Sorry!</Title>
-            <Text>There was an error fetching the data.</Text>
-            <Text>Error text:</Text>
+            <ClockLoader color="#FFF" size={50} />
+            <Title>Whoops</Title>
+            <Text>There was an error fetching the story.</Text>
             <Code block>{error}</Code>
 
             <Link href="/">
