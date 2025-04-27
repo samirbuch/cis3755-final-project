@@ -11,6 +11,7 @@ import Graph from "@/components/editor/Graph";
 import { useEditorContext } from "@/contexts/EditorContext";
 import { NodeNoFixed } from "@/interfaces/Node";
 import { ZodTimeline } from "@/interfaces/Timeline";
+import { wait } from "@/util/misc";
 
 export default function Samir() {
   const [timeline, setTimeline] = useState<Event[] | null>(null);
@@ -77,7 +78,9 @@ export default function Samir() {
         throw new Error("Found JSON, but it was malformed: " + result.error.message);
       }
 
-      return data;
+      await wait(3500); // Anticip ... 
+
+      return data; // ... ation!
     }
 
     fetchTimeline()
