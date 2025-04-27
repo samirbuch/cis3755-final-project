@@ -512,7 +512,7 @@ export default function Graph(props: GraphProps) {
           d.fy = null;
         })
       );
-  }, []);
+  }, [getLinkOpacity, getNodeOpacity]);
 
   const createNodes = useCallback(() => {
     if (!d3SvgRef.current) return;
