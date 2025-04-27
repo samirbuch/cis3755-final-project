@@ -78,7 +78,7 @@ export default function Timeline() {
     const fetchTimeline = async () => {
       const res = await fetch(`/storylines/${path}`);
       if (!res.ok) {
-        if(res.status === 404) {
+        if (res.status === 404) {
           throw new Error(`404: Storyline ${path} not found`);
         }
 
@@ -103,24 +103,37 @@ export default function Timeline() {
 
     fetchTimeline()
       .then(data => {
-        setTimeline(data);
-
         const width = window.innerWidth;
         const height = window.innerHeight;
+
+        // We need to make sure the colors don't change between events.
+        // This means getting a list of all the nodes in the timeline and their
+        // colors.
+        // If a node is not in the map, we add it and its color to the map.
+        // If a node is in the map, we set its color to the one already seen in the map.
+        // Same thing for the coordinates.
 
         const nodeColorMap = new Map<number, string>();
         const nodeCoordMap = new Map<number, { x: number, y: number }>();
 
         const fixedTimeline = data.map((event: Event) => {
-          const fixedNodes = (event.nodes as Event["nodes"]).map((node, index) => {
+          const fixedNodes = (event.nodes as Event["nodes"]).map((node) => {
             if ("x" in node && "y" in node) {
               // We can safely assume we have a current exported node version.
               console.log("New version!");
 
               return {
                 ...node,
-                x: (node.x / 100) * width, // Convert percentage to coordinate
-                y: (node.y / 100) * height, // Convert percentage to coordinate
+                ...nodeCoordMap.has(node.id) ? {
+                  x: (nodeCoordMap.get(node.id)!.x / 100) * width, // Convert percentage to coordinate
+                  y: (nodeCoordMap.get(node.id)!.y / 100) * height, // ^^
+                } : (() => {
+                  nodeCoordMap.set(node.id, { x: node.x, y: node.y });
+                  return {
+                    x: (node.x / 100) * width, // Convert percentage to coordinate
+                    y: (node.y / 100) * height, // ^^
+                  };
+                })(),
                 color: nodeColorMap.has(node.id)
                   ? nodeColorMap.get(node.id)
                   : (() => {
@@ -135,8 +148,8 @@ export default function Timeline() {
             console.log("Old version!");
             return {
               ...node,
-              x: (index / event.nodes.length) * width, // Convert percentage to coordinate or default
-              y: height / 2, // Convert percentage to coordinate or default
+              x: (Math.random() * width) * width, // Convert percentage to coordinate or default
+              y: (Math.random() * height) / 2, // Convert percentage to coordinate or default
               color: "#FFFFFF", // pure white
             };
           });
@@ -155,13 +168,6 @@ export default function Timeline() {
 
           return fixedData;
         });
-
-        // We need to make sure the colors don't change between events.
-        // This means getting a list of all the nodes in the timeline and their
-        // colors.
-        // If a node is not in the map, we add it and its color to the map.
-        // If a node is in the map, we set its color to the one already seen in the map.
-        // Same thing for the coordinates.
 
         console.log("Fixed timeline:", fixedTimeline);
 
