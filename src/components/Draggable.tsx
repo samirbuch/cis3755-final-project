@@ -13,11 +13,10 @@ export default function Draggable(props: DraggableProps) {
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true);
 
-    // Calculate the offset between the pointer and the top-left corner of the element
-    const rect = (e.target as HTMLDivElement).getBoundingClientRect();
+    // Calculate the offset between the pointer and the current position of the element
     setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
     });
   };
 
