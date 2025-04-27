@@ -12,6 +12,7 @@ import { useEditorContext } from "@/contexts/EditorContext";
 import { NodeNoFixed } from "@/interfaces/Node";
 import { ZodTimeline } from "@/interfaces/Timeline";
 import { wait } from "@/util/misc";
+import Legend from '@/components/Legend';
 
 export default function Samir() {
   const [timeline, setTimeline] = useState<Event[] | null>(null);
@@ -189,6 +190,8 @@ export default function Samir() {
 
   return timeline && timeline.length > 0 && (
     <div>
+      <Legend />
+
       <div style={{
         position: "fixed",
         top: 0,
@@ -201,7 +204,7 @@ export default function Samir() {
       </div>
 
       <Draggable>
-        <Card maw={300}>
+        <Card maw={350} withBorder>
           <Title order={3}>{event?.eventTitle}</Title>
           <Text>{event?.eventDescription}</Text>
           {event?.nodes.some(node => node.highlighted) && (
