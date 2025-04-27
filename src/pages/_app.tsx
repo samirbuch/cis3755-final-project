@@ -38,7 +38,7 @@ export default function App({ Component, pageProps }: AppProps) {
     return (
       <Providers>
         <CenteredOnPage>
-          <ClockLoader color="#000" size={50} />
+          <ClockLoader color="#FFF" size={50} />
         </CenteredOnPage>
       </Providers>
     )
@@ -49,8 +49,9 @@ export default function App({ Component, pageProps }: AppProps) {
       <Providers>
         <CenteredOnPage>
           <Flex direction={"column"} gap="sm" align={"center"}>
+            <ClockLoader color="#FFF" size={50} />
             <Title>Sorry!</Title>
-            <Text>This experience is best viewed on a larger screen.</Text>
+            <Text>This experience is best viewed on a wider screen.</Text>
           </Flex>
         </CenteredOnPage>
       </Providers>
