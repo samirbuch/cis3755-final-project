@@ -9,6 +9,7 @@ import { ZodTimeline } from "@/interfaces/Timeline";
 import Graph from "@/components/editor/Graph";
 
 import { Waypoint } from "react-waypoint";
+import { NodeNoFixed } from "@/interfaces/Node";
 
 export default function Samir() {
   const [timeline, setTimeline] = useState<Event[] | null>(null);
@@ -30,7 +31,7 @@ export default function Samir() {
 
     const newEvent = timeline[currentEventIndex];
 
-    editorContext.setNodes(newEvent.nodes);
+    editorContext.setNodes(newEvent.nodes as NodeNoFixed[]);
     editorContext.setLinks(newEvent.links);
     editorContext.setEventTimestamp(newEvent.eventTime);
     editorContext.setEventTitle(newEvent.eventTitle);
@@ -67,19 +68,31 @@ export default function Samir() {
         const width = window.innerWidth;
         const height = window.innerHeight;
 
+        const nodeColorMap = new Map<number, string>();
+        const nodeCoordMap = new Map<number, { x: number, y: number }>();
+
         const fixedTimeline = data.map((event: Event) => {
           const fixedNodes = (event.nodes as Event["nodes"]).map((node, index) => {
             if ("x" in node && "y" in node) {
               // We can safely assume we have a current exported node version.
+              console.log("New version!");
+
               return {
                 ...node,
                 x: (node.x / 100) * width, // Convert percentage to coordinate
                 y: (node.y / 100) * height, // Convert percentage to coordinate
+                color: nodeColorMap.has(node.id)
+                  ? nodeColorMap.get(node.id)
+                  : (() => {
+                    nodeColorMap.set(node.id, node.color);
+                    return node.color;
+                  })() // iife's are cool :3
               };
             }
 
-            // Else, we need to assume we have a previous exported node version.
+            // Else, we need to assume we have a previous exported node version,
             // and set some sensible default values.
+            console.log("Old version!");
             return {
               ...node,
               x: (index / event.nodes.length) * width, // Convert percentage to coordinate or default
@@ -102,14 +115,17 @@ export default function Samir() {
 
           return fixedData;
         });
+
+        // We need to make sure the colors don't change between events.
+        // This means getting a list of all the nodes in the timeline and their
+        // colors.
+        // If a node is not in the map, we add it and its color to the map.
+        // If a node is in the map, we set its color to the one already seen in the map.
+        // Same thing for the coordinates.
+
+        console.log("Fixed timeline:", fixedTimeline);
+
         setTimeline(fixedTimeline);
-
-        // editorContext.setNodes(fixedData.nodes);
-        // editorContext.setLinks(fixedData.links);
-
-        // editorContext.setEventTimestamp(data.eventTime);
-        // editorContext.setEventTitle(data.eventTitle);
-        // editorContext.setEventDescription(data.eventDescription);
 
         setIsLoading(false);
       })
@@ -173,17 +189,16 @@ export default function Samir() {
         <Waypoint
           // debug
           key={index}
-          onEnter={() => {
+          onEnter={({ currentPosition, previousPosition }) => {
+            console.log("Current position:", currentPosition);
+            console.log("Previous position:", previousPosition);
             setCurrentEventIndex(index);
-          }}
-          onLeave={() => {
-
           }}
         >
           <div style={{
-            height: "100vh",
-            width: "100vw",
-            backgroundColor: ["green", "blue", "red"][index % 3],
+            height: "120vh",
+            width: "120vw",
+            // backgroundColor: ["green", "blue", "red"][index % 3],
           }} />
         </Waypoint>
       ))}
