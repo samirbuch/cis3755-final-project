@@ -22,6 +22,16 @@ export default function ImportExport() {
   const editorContext = useEditorContext();
 
   function exportData() {
+    if(editorContext.nodes.length === 0) {
+      notifications.show({
+        title: "No nodes to export",
+        message: "Please add nodes to the graph before exporting.",
+        color: "red",
+        position: "top-center"
+      });
+      return;
+    }
+
     const svgContainer = document.getElementById("graph");
     if (!svgContainer) {
       notifications.show({
