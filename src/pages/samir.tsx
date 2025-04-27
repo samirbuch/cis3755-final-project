@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react"
-import Event from "@/interfaces/Event";
-import { ClockLoader } from "react-spinners";
-import CenteredOnPage from "@/components/CenteredOnPage";
-import { Flex, Title, Text, Button } from "@mantine/core";
+import { Button, Card, Code, Flex, Switch, Text, Title } from "@mantine/core";
 import Link from "next/link";
-import { useEditorContext } from "@/contexts/EditorContext";
-import { ZodTimeline } from "@/interfaces/Timeline";
-import Graph from "@/components/editor/Graph";
-
+import { useEffect, useState } from "react";
+import { ClockLoader } from "react-spinners";
 import { Waypoint } from "react-waypoint";
+
+import Event from "@/interfaces/Event";
+import CenteredOnPage from "@/components/CenteredOnPage";
+import Draggable from "@/components/Draggable";
+import Graph from "@/components/editor/Graph";
+import { useEditorContext } from "@/contexts/EditorContext";
 import { NodeNoFixed } from "@/interfaces/Node";
+import { ZodTimeline } from "@/interfaces/Timeline";
 
 export default function Samir() {
   const [timeline, setTimeline] = useState<Event[] | null>(null);
@@ -19,10 +20,26 @@ export default function Samir() {
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const event = timeline ? timeline[currentEventIndex] : null;
 
+  // Override the default behavior of the graph; if there are any highlighted nodes
+  // in the graph, we want to show them, but only if the user has flipped the switch.
+  // We want this to default to whatever the graph is doing at its current index.
+  const [highlightEnabled, setHighlightEnabled] = useState(false);
+
   // I know it's weird to be using the editor context here, but this is (right now)
   // the only thing that controls the graph's state. We can refactor this later after
   // the project has been submitted and if we feel like it.
   const editorContext = useEditorContext();
+
+  const handleHighlightToggle = (checked: boolean) => {
+    setHighlightEnabled(checked);
+
+    editorContext.setNodes(prevNodes => {
+      return prevNodes.map(node => ({
+        ...node,
+        highlighted: checked ? node.highlighted : false,
+      }));
+    });
+  }
 
   useEffect(() => {
     if (!timeline) return;
@@ -36,6 +53,7 @@ export default function Samir() {
     editorContext.setEventTimestamp(newEvent.eventTime);
     editorContext.setEventTitle(newEvent.eventTitle);
     editorContext.setEventDescription(newEvent.eventDescription);
+    setHighlightEnabled(newEvent.nodes.some(node => node.highlighted));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEventIndex, timeline]);
@@ -151,7 +169,8 @@ export default function Samir() {
           <Flex direction={"column"} gap="sm" align={"center"}>
             <Title>Sorry!</Title>
             <Text>There was an error fetching the data.</Text>
-            <Text>Error text: {error}</Text>
+            <Text>Error text:</Text>
+            <Code block>{error}</Code>
 
             <Link href="/">
               <Button variant="transparent">
@@ -177,14 +196,23 @@ export default function Samir() {
         <Graph />
       </div>
 
-      <div style={{
-        position: "fixed"
-      }}>
-        <div style={{ height: "100vh" }}>
-          <Title>{event?.eventTitle}</Title>
+      <Draggable>
+        <Card maw={300}>
+          <Title order={3}>{event?.eventTitle}</Title>
           <Text>{event?.eventDescription}</Text>
-        </div>
-      </div>
+          {event?.nodes.some(node => node.highlighted) && (
+            <Switch
+              label="Show highlights"
+              checked={highlightEnabled}
+              onChange={e => {
+                console.log("Switch checked:", e.currentTarget.checked);
+                handleHighlightToggle(e.currentTarget.checked);
+              }}
+            />
+          )}
+        </Card>
+      </Draggable>
+
       {timeline.map((event, index) => (
         <Waypoint
           // debug
