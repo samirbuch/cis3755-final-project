@@ -5,7 +5,7 @@ import Head from "next/head";
 import { Button, Divider, Flex, Text, Title } from "@mantine/core";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/router";
-import { createScope, animate, type Scope, createTimeline, stagger } from "animejs";
+import { createScope, type Scope, createTimeline, stagger } from "animejs";
 
 import styles from "@/styles/Home.module.css";
 import CenteredOnPage from "@/components/CenteredOnPage";
@@ -72,7 +72,7 @@ export default function Home() {
             easing: "ease"
           }, stagger(200, { start: "+=50" }))
           .call(() => {
-            router.push(`/story?path=timeline-${to}.json`);
+            router.push(`/story/timeline-${to}.json`);
           }, "<");
 
       });

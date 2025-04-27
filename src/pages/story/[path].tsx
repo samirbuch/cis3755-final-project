@@ -78,6 +78,10 @@ export default function Timeline() {
     const fetchTimeline = async () => {
       const res = await fetch(`/storylines/${path}`);
       if (!res.ok) {
+        if(res.status === 404) {
+          throw new Error(`404: Storyline ${path} not found`);
+        }
+
         throw new Error("Failed to fetch data");
       }
 
