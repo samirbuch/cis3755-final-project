@@ -5,7 +5,7 @@ import "@/styles/globals.css";
 
 import Providers from '@/components/Providers';
 
-import { Flex, Text, Title } from "@mantine/core";
+import { Button, Flex, Text, Title } from "@mantine/core";
 import type { AppProps } from "next/app";
 import { useEffect, useState } from "react";
 import { ClockLoader } from "react-spinners";
@@ -16,6 +16,8 @@ export default function App({ Component, pageProps }: AppProps) {
   const [isClient, setIsClient] = useState(true);
   const [isWideEnough, setIsWideEnough] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [showMeAnyway, setShowMeAnyway] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -44,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
     )
   }
 
-  if (!isWideEnough) {
+  if (!isWideEnough && !showMeAnyway) {
     return (
       <Providers>
         <CenteredOnPage>
@@ -52,6 +54,10 @@ export default function App({ Component, pageProps }: AppProps) {
             <ClockLoader color="#FFF" size={50} />
             <Title>Sorry!</Title>
             <Text>This experience is best viewed on a wider screen.</Text>
+
+            <Button variant="transparent" onClick={() => setShowMeAnyway(true)}>
+              I don&apos;t care, show me anyway
+            </Button>
           </Flex>
         </CenteredOnPage>
       </Providers>
