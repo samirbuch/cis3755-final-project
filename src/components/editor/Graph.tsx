@@ -471,9 +471,28 @@ export default function Graph(props: GraphProps) {
     nodeGroups
       .on("mouseenter", function(event, d) {
         hoveredNodeRef.current = d.id;
+
+        // Fade out all other nodes
+        svgNodesRef.current?.transition()
+          .duration(200)
+          .attr("opacity", (node: Node) => getNodeOpacity(node));
+
+        // Fade out all other links
+        svgLinksRef.current?.transition()
+          .duration(200)
+          .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
       })
       .on("mouseleave", function() {
         hoveredNodeRef.current = null;
+
+        // Fade in all nodes
+        svgNodesRef.current?.transition()
+          .duration(200)
+          .attr("opacity", (node: Node) => getNodeOpacity(node));
+        // Fade in all links
+        svgLinksRef.current?.transition()
+          .duration(200)
+          .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
       })
       .call(d3.drag<SVGGElement, Node>()
         .on("start", function(event, d) {
