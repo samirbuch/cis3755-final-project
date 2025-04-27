@@ -26,7 +26,8 @@ export interface GraphProps {
 export function diffNodes(prevNodes: Node[], newNodes: Node[]) {
   const added = newNodes.filter(node => !prevNodes.some(prevNode => prevNode.id === node.id));
   const removed = prevNodes.filter(prevNode => !newNodes.some(node => node.id === prevNode.id));
-  return { added, removed };
+  const existing = newNodes.filter(node => prevNodes.some(prevNode => prevNode.id === node.id));
+  return { added, removed, existing };
 }
 
 export default function Graph(props: GraphProps) {
@@ -461,264 +462,229 @@ export default function Graph(props: GraphProps) {
     }
   }, [nodes, links]);
 
+  const addNodeInteractions = useCallback(() => {
+    if (!d3SvgRef.current) return;
+
+    const nodeGroups = d3SvgRef.current.select(".nodes").selectAll("g");
+
+    nodeGroups
+      .on("mouseenter", (event, d: Node) => {
+        hoveredNodeRef.current = d.id;
+      })
+      .on("mouseleave", () => {
+        hoveredNodeRef.current = null;
+      })
+      .call(d3.drag<SVGGElement, Node>()
+        .on("start", (event, d) => {
+          if (!event.active && simulationRef.current)
+            simulationRef.current.alphaTarget(0.3).restart();
+          d.fx = d.x;
+          d.fy = d.y;
+        })
+        .on("drag", (event, d) => {
+          d.fx = event.x;
+          d.fy = event.y;
+        })
+        .on("end", (event, d) => {
+          if (!event.active && simulationRef.current)
+            simulationRef.current.alphaTarget(0);
+          d.fx = null;
+          d.fy = null;
+        })
+      );
+  }, []);
+
   const createNodes = useCallback(() => {
     if (!d3SvgRef.current) return;
 
-    const { added, removed } = diffNodes(prevNodesRef.current, nodes);
-
-    // Create node groups containing both circle and text
-    svgNodeGroupsRef.current = d3SvgRef.current.append("g")
-      .attr("class", "nodes")
+    // Select all node groups and bind data
+    const nodeGroups = d3SvgRef.current.select(".nodes")
       .selectAll("g")
-      .data(nodes)
-      .enter()
-      .append("g");
+      .data(nodes, (d: Node) => d.id);
 
-    // Add text to each group
-    svgTextsRef.current = svgNodeGroupsRef.current.append("text")
+    // Handle exiting nodes (fade out and remove)
+    nodeGroups.exit()
+      .transition()
+      .duration(800)
+      .attr("opacity", 0)
+      .remove();
+
+    // Handle entering nodes (fade in)
+    const enteringNodes = nodeGroups.enter()
+      .append("g")
+      .attr("opacity", 0) // Start fully transparent
+      // .attr("transform", d => {
+      //   // If this is a brand new node, start near center
+      //   if (!d.x || !d.y) {
+      //     const centerX = svgContainerRef.current?.clientWidth || 500;
+      //     const centerY = svgContainerRef.current?.clientHeight || 300;
+      //     return `translate(${centerX / 2}, ${centerY / 2})`;
+      //   }
+      //   return `translate(${d.x}, ${d.y})`;
+      // });
+
+    enteringNodes.append("circle")
+      .attr("r", 10)
+      .attr("fill", d => d.color || "#FFFFFF");
+
+    enteringNodes.append("text")
       .attr("x", 15)
       .attr("y", 5)
       .attr("fill", "white")
       .text(d => d.name);
 
-    // Add circles to each group
-    svgNodesRef.current = svgNodeGroupsRef.current.append("circle")
-      .attr("r", 10)
-      .attr("fill", (d) => d.color || "#FFFFFF")
-      .attr("opacity", (d) => {
-        // If the node was just added, set its opacity to 0.
-        if (added.some(node => node.id === d.id)) {
-          return 0;
-        }
-        // If it has been here for a while, set its default opacity.
-        return getNodeOpacity(d);
-      })
-      .on("mouseenter", function (event, d) {
-        // Store hovered node ID
-        hoveredNodeRef.current = d.id;
+    // Fade in the new nodes
+    enteringNodes.transition()
+      .duration(800)
+      .attr("opacity", 1);
 
-        // Enlarge this node
-        d3.select(this)
-          .transition()
-          .duration(200)
-          .attr("r", 14);
-
-        // Update all node opacities based on hover state
-        if (svgNodesRef.current) {
-          svgNodesRef.current
-            .transition()
-            .duration(200)
-            .attr("opacity", node => getNodeOpacity(node));
-        }
-
-        // Update all text opacities
-        if (svgTextsRef.current) {
-          svgTextsRef.current
-            .transition()
-            .duration(200)
-            .attr("opacity", node => getNodeOpacity(node));
-        }
-
-        // Highlight connected links
-        if (svgLinksRef.current) {
-          svgLinksRef.current
-            .transition()
-            .duration(200)
-            .attr("stroke-width", link => {
-              return (link.source.id === d.id || link.target.id === d.id) ? 4 : 2;
-            })
-            .attr("stroke-opacity", link => getLinkOpacity(link));
-        }
-      })
-      .on("mouseleave", function () {
-        // Clear hovered node reference
-        hoveredNodeRef.current = null;
-
-        // Reset this node
-        d3.select(this)
-          .transition()
-          .duration(200)
-          .attr("r", 10);
-
-        // Reset opacities
-        if (svgNodesRef.current) {
-          svgNodesRef.current
-            .transition()
-            .duration(200)
-            .attr("opacity", d => getNodeOpacity(d));
-        }
-
-        // Reset text opacities
-        if (svgTextsRef.current) {
-          svgTextsRef.current
-            .transition()
-            .duration(200)
-            .attr("opacity", d => getNodeOpacity(d));
-        }
-
-        // Reset all links
-        if (svgLinksRef.current) {
-          svgLinksRef.current
-            .transition()
-            .duration(200)
-            .attr("stroke-width", 2)
-            .attr("stroke-opacity", link => getLinkOpacity(link));
-        }
-      })
-      // Add drag behavior to nodes
-      .call(d3.drag<SVGCircleElement, Node>()
-        .on("start", (event, d) => {
-          if (!event.active && simulationRef.current)
-            simulationRef.current.alphaTarget(0.3).restart();
-
-          d.fx = d.x;
-          d.fy = d.y;
-
-          updateCanvasAnimations();
-        })
-        .on("drag", (event, d) => {
-          d.fx = event.x;
-          d.fy = event.y;
-
-          // This prevents freezing by refreshing path points based on current positions
-          if (arcAnimations.current.length > 0) {
-            const nodeMap = new Map();
-            nodes.forEach(node => nodeMap.set(node.id, node));
-
-            arcAnimations.current.forEach(anim => {
-              const sourceNode = nodeMap.get(anim.sourceId);
-              const targetNode = nodeMap.get(anim.targetId);
-
-              if (sourceNode && targetNode) {
-                // Update path points during drag without resetting progress
-                anim.pathPoints = calculatePathPoints(
-                  { x: sourceNode.x, y: sourceNode.y },
-                  { x: targetNode.x, y: targetNode.y },
-                  100
-                );
-              }
-            });
-          }
-        })
-        .on("end", (event, d) => {
-          if (!event.active && simulationRef.current)
-            simulationRef.current.alphaTarget(0);
-
-          // Clear the fixed position after updating state
-          d.fx = null;
-          d.fy = null;
-
-          updateCanvasAnimations();
-        })
-      );
-
-    // Fade in new nodes
-    svgNodesRef.current
-      .filter((d: Node) => added.some(node => node.id === d.id))
+    // Update existing nodes
+    const existingNodes = nodeGroups
       .transition()
-      .duration(2000)
-      .attr("opacity", (d: Node) => getNodeOpacity(d))
+      .duration(500)
+      .attr("opacity", 1);
 
-    // Update the previous nodes reference
-    prevNodesRef.current = nodes;
-  }, [calculatePathPoints, getLinkOpacity, getNodeOpacity, nodes, updateCanvasAnimations]);
+    existingNodes.select("circle")
+      .attr("fill", d => d.color || "#FFFFFF");
+
+    existingNodes.select("text")
+      .text(d => d.name);
+
+    // Merge the entering nodes with the existing selection
+    const allNodes = nodeGroups.merge(enteringNodes);
+
+    // Add interaction handlers
+    addNodeInteractions();
+
+    // Store references to use during simulation updates
+    svgNodesRef.current = d3SvgRef.current.select(".nodes").selectAll("circle");
+    svgTextsRef.current = d3SvgRef.current.select(".nodes").selectAll("text");
+    svgNodeGroupsRef.current = d3SvgRef.current.select(".nodes").selectAll("g");
+
+    // Update the previous nodes reference for next comparison
+    prevNodesRef.current = [...nodes];
+  }, [nodes, getNodeOpacity, addNodeInteractions]);
 
   const createLinks = useCallback(() => {
     if (!d3SvgRef.current) return;
 
-    svgLinksRef.current = d3SvgRef.current.append("g")
-      .attr("class", "links")
+    // Clean up any existing links group
+    if (d3SvgRef.current.select(".links").empty()) {
+      d3SvgRef.current.append("g").attr("class", "links");
+    }
+
+    // Select all links and bind data
+    const linkElements = d3SvgRef.current.select(".links")
       .selectAll("line")
-      .data(links)
-      .enter()
+      .data(links, (d: Link) => `${d.source.id}-${d.target.id}`);
+
+    // Handle exiting links
+    linkElements.exit()
+      .transition()
+      .duration(800)
+      .attr("stroke-opacity", 0)
+      .remove();
+
+    // Handle entering links
+    const enteringLinks = linkElements.enter()
       .append("line")
       .attr("stroke", "white")
       .attr("stroke-width", 2)
-      .attr("data-source", d => d.source.id) // Add data attributes for easier selection
+      .attr("data-source", d => d.source.id)
       .attr("data-target", d => d.target.id)
-      .attr("stroke-opacity", link => getLinkOpacity(link)); // Set initial opacity
+      .attr("stroke-opacity", 0); // Start with 0 opacity
+
+    enteringLinks.transition()
+      .duration(800)
+      .attr("stroke-opacity", link => getLinkOpacity(link));
+
+    // Handle updating links
+    linkElements.transition()
+      .duration(500)
+      .attr("stroke-opacity", link => getLinkOpacity(link));
+
+    // Store reference to all links
+    svgLinksRef.current = d3SvgRef.current.select(".links").selectAll("line");
   }, [getLinkOpacity, links]);
 
   useEffect(() => {
     if (!svgContainerRef.current) return;
 
-    // Clear existing elements
-    d3.select(svgContainerRef.current).selectAll("*").remove();
+    // Initialize D3 SVG if not already done
+    if (!d3SvgRef.current) {
+      d3SvgRef.current = d3.select(svgContainerRef.current);
+    }
 
-    d3SvgRef.current = d3.select(svgContainerRef.current);
+    // Ensure we have groups for nodes and links
+    if (d3SvgRef.current.select(".nodes").empty()) {
+      d3SvgRef.current.append("g").attr("class", "nodes");
+    }
 
-    // Order of operations is important here.
-    // We want links to be on the bottom then nodes on top.
+    if (d3SvgRef.current.select(".links").empty()) {
+      d3SvgRef.current.append("g").attr("class", "links");
+    }
+
+    // Order is important: links first, then nodes on top
     createLinks();
     createNodes();
 
+    // Set up force simulation if we have nodes
     if (nodes.length > 0) {
-      // Use a force simulation to position the nodes
-      simulationRef.current = d3.forceSimulation(nodes)
-        .force("charge", d3.forceManyBody().strength(-30))
-        .force("collide", d3.forceCollide(40))
-        .force("center", d3.forceCenter(
-          svgContainerRef.current.clientWidth / 2,
-          svgContainerRef.current.clientHeight / 2
-        ))
-        .alphaDecay(0.05)
-        .on("tick", tick);
-
-      if (links.length > 0) {
-        simulationRef.current.force(
-          "link",
-          d3.forceLink(links)
-            .distance((d) => {
-              // Calculate total PPM in both directions with more dramatic weighting
-              // Since PPM and MPPM both range from 0-10, we can apply stronger weights
-              const totalPPM = (d.sourceToTargetPPM?.ppm || 0) * 1 +
-                (d.targetToSourcePPM?.ppm || 0) * 1 +
-                (d.sourceToTargetPPM?.mppm || 0) * 10 + // Much stronger weight for MPPM
-                (d.targetToSourcePPM?.mppm || 0) * 10;  // Much stronger weight for MPPM
-
-              // For no communication, use maximum distance
-              if (totalPPM === 0) return 500; // Increased max distance for no communication
-
-              // For low communication (total < 10), scale distance more dramatically
-              if (totalPPM < 10) {
-                return 300 - (totalPPM * 5); // Range from 300 down to 250
-              }
-
-              // For medium communication (10-40), scale more aggressively
-              if (totalPPM < 40) {
-                return 250 - ((totalPPM - 10) * 4); // Range from 250 down to 130
-              }
-
-              // For high communication (> 40), get very close
-              const minDistance = 30; // Minimum distance to prevent overlap
-              const scaleFactor = Math.pow(totalPPM, 1.2); // More aggressive power scaling
-
-              return Math.max(minDistance, 130 - (scaleFactor / 10));
-            })
-            .strength(1)
-        )
+      if (!simulationRef.current) {
+        // Initialize simulation
+        simulationRef.current = d3.forceSimulation(nodes)
+          .force("charge", d3.forceManyBody().strength(-30))
+          .force("collide", d3.forceCollide(40))
+          .force("center", d3.forceCenter(
+            svgContainerRef.current.clientWidth / 2,
+            svgContainerRef.current.clientHeight / 2
+          ))
+          .alphaDecay(0.05)
+          .on("tick", tick);
+      } else {
+        // Update existing simulation
+        simulationRef.current
+          .nodes(nodes)
+          .alpha(0.3) // Lower alpha for smoother transitions
+          .restart();
       }
 
-      // Set up animations after brief delay to ensure simulation has started positioning
-      setTimeout(() => updateCanvasAnimations(), 100);
+      // Configure link forces if we have links
+      if (links.length > 0) {
+        simulationRef.current.force("link", d3.forceLink(links)
+          .id((d: Node) => d.id)
+          .distance((d) => {
+            // Your existing distance calculation code...
+            const totalPPM = (d.sourceToTargetPPM?.ppm || 0) * 1 +
+              (d.targetToSourcePPM?.ppm || 0) * 1 +
+              (d.sourceToTargetPPM?.mppm || 0) * 10 +
+              (d.targetToSourcePPM?.mppm || 0) * 10;
 
-      // Update animations when simulation stabilizes
+            if (totalPPM === 0) return 500;
+            if (totalPPM < 10) return 300 - (totalPPM * 5);
+            if (totalPPM < 40) return 250 - ((totalPPM - 10) * 4);
+
+            const minDistance = 30;
+            const scaleFactor = Math.pow(totalPPM, 1.2);
+            return Math.max(minDistance, 130 - (scaleFactor / 10));
+          })
+          .strength(1)
+        );
+      }
+
+      // Set up animations
+      setTimeout(() => updateCanvasAnimations(), 100);
       simulationRef.current.on("end", updateCanvasAnimations);
     }
 
     // Cleanup
     return () => {
-      simulationRef.current?.restart();
-
       if (animationFrameId.current !== null) {
         cancelAnimationFrame(animationFrameId.current);
         animationFrameId.current = null;
       }
-
       arcAnimations.current = [];
-      // animationsRef.current.forEach(anim => anim.pause());
-      // animationsRef.current = [];
-    }
+    };
   }, [nodes, links, tick, createNodes, createLinks, updateCanvasAnimations]);
 
   useEffect(() => {
