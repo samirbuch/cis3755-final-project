@@ -115,7 +115,7 @@ export default function Legend() {
               <svg width="20" height="20" viewBox="0 0 20 20">
                 <line x1="0" y1="10" x2="20" y2="10" stroke="white" strokeWidth="2" />
               </svg>
-              <Text>Connection. The closer a connection, the more meaningful.</Text>
+              <Text>Connection. The shorter a connection, the more meaningful.</Text>
             </Flex>
           </Flex>
         </Container>
