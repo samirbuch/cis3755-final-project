@@ -525,7 +525,7 @@ export default function Graph(props: GraphProps) {
     // Handle exiting nodes (fade out and remove)
     nodeGroups.exit<Node>()
       .transition()
-      .duration(800)
+      .duration(200)
       .attr("opacity", 0)
       .remove();
   
@@ -577,7 +577,7 @@ export default function Graph(props: GraphProps) {
   
     // Update the previous nodes reference for next comparison
     prevNodesRef.current = [...nodes];
-  }, [nodes, addNodeInteractions]); // Remove getNodeOpacity from dependencies
+  }, [nodes, addNodeInteractions, getNodeOpacity]); // Remove getNodeOpacity from dependencies
 
   const createLinks = useCallback(() => {
     if (!d3SvgRef.current) return;
@@ -595,7 +595,7 @@ export default function Graph(props: GraphProps) {
     // Handle exiting links
     linkElements.exit<Link>()
       .transition()
-      .duration(800)
+      .duration(200)
       .attr("stroke-opacity", 0)
       .remove();
   
@@ -609,7 +609,7 @@ export default function Graph(props: GraphProps) {
       .attr("stroke-opacity", 0); // Start with 0 opacity
   
     enteringLinks.transition()
-      .duration(800)
+      .duration(200)
       .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
   
     // Handle updating links
