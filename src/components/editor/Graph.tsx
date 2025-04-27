@@ -547,13 +547,13 @@ export default function Graph(props: GraphProps) {
     // Fade in the new nodes
     enteringNodes.transition()
       .duration(800)
-      .attr("opacity", 1);
+      .attr("opacity", (d) => getNodeOpacity(d));
   
     // Update existing nodes
     const existingNodes = nodeGroups
       .transition()
       .duration(500)
-      .attr("opacity", 1);
+      .attr("opacity", (d) => getNodeOpacity(d));
   
     existingNodes.select("circle")
       .attr("fill", (d: Node) => d.color || "#FFFFFF");
