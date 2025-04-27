@@ -464,28 +464,29 @@ export default function Graph(props: GraphProps) {
 
   const addNodeInteractions = useCallback(() => {
     if (!d3SvgRef.current) return;
-
-    const nodeGroups = d3SvgRef.current.select(".nodes").selectAll("g");
-
+  
+    const nodeGroups = d3SvgRef.current.select(".nodes")
+      .selectAll<SVGGElement, Node>("g");
+  
     nodeGroups
-      .on("mouseenter", (event, d: Node) => {
+      .on("mouseenter", function(event, d) {
         hoveredNodeRef.current = d.id;
       })
-      .on("mouseleave", () => {
+      .on("mouseleave", function() {
         hoveredNodeRef.current = null;
       })
       .call(d3.drag<SVGGElement, Node>()
-        .on("start", (event, d) => {
+        .on("start", function(event, d) {
           if (!event.active && simulationRef.current)
             simulationRef.current.alphaTarget(0.3).restart();
           d.fx = d.x;
           d.fy = d.y;
         })
-        .on("drag", (event, d) => {
+        .on("drag", function(event, d) {
           d.fx = event.x;
           d.fy = event.y;
         })
-        .on("end", (event, d) => {
+        .on("end", function(event, d) {
           if (!event.active && simulationRef.current)
             simulationRef.current.alphaTarget(0);
           d.fx = null;
@@ -496,115 +497,110 @@ export default function Graph(props: GraphProps) {
 
   const createNodes = useCallback(() => {
     if (!d3SvgRef.current) return;
-
+  
     // Select all node groups and bind data
-    const nodeGroups = d3SvgRef.current.select(".nodes")
-      .selectAll("g")
-      .data(nodes, (d: Node) => d.id);
-
+    const nodeGroups = d3SvgRef.current.select<SVGGElement>(".nodes")
+      .selectAll<SVGGElement, Node>("g")
+      .data<Node>(nodes, (d: Node) => d.id);
+  
     // Handle exiting nodes (fade out and remove)
-    nodeGroups.exit()
+    nodeGroups.exit<Node>()
       .transition()
       .duration(800)
       .attr("opacity", 0)
       .remove();
-
+  
     // Handle entering nodes (fade in)
     const enteringNodes = nodeGroups.enter()
       .append("g")
-      .attr("opacity", 0) // Start fully transparent
-      // .attr("transform", d => {
-      //   // If this is a brand new node, start near center
-      //   if (!d.x || !d.y) {
-      //     const centerX = svgContainerRef.current?.clientWidth || 500;
-      //     const centerY = svgContainerRef.current?.clientHeight || 300;
-      //     return `translate(${centerX / 2}, ${centerY / 2})`;
-      //   }
-      //   return `translate(${d.x}, ${d.y})`;
-      // });
-
+      .attr("opacity", 0); // Start fully transparent
+  
     enteringNodes.append("circle")
       .attr("r", 10)
-      .attr("fill", d => d.color || "#FFFFFF");
-
+      .attr("fill", (d: Node) => d.color || "#FFFFFF");
+  
     enteringNodes.append("text")
       .attr("x", 15)
       .attr("y", 5)
       .attr("fill", "white")
-      .text(d => d.name);
-
+      .text((d: Node) => d.name);
+  
     // Fade in the new nodes
     enteringNodes.transition()
       .duration(800)
       .attr("opacity", 1);
-
+  
     // Update existing nodes
     const existingNodes = nodeGroups
       .transition()
       .duration(500)
       .attr("opacity", 1);
-
+  
     existingNodes.select("circle")
-      .attr("fill", d => d.color || "#FFFFFF");
-
+      .attr("fill", (d: Node) => d.color || "#FFFFFF");
+  
     existingNodes.select("text")
-      .text(d => d.name);
-
-    // Merge the entering nodes with the existing selection
-    const allNodes = nodeGroups.merge(enteringNodes);
-
+      .text((d: Node) => d.name);
+  
+    // Remove the merge line since we're not using allNodes
+    // const allNodes = nodeGroups.merge(enteringNodes);
+  
     // Add interaction handlers
     addNodeInteractions();
-
+  
     // Store references to use during simulation updates
-    svgNodesRef.current = d3SvgRef.current.select(".nodes").selectAll("circle");
-    svgTextsRef.current = d3SvgRef.current.select(".nodes").selectAll("text");
-    svgNodeGroupsRef.current = d3SvgRef.current.select(".nodes").selectAll("g");
-
+    svgNodesRef.current = d3SvgRef.current.select<SVGGElement>(".nodes")
+      .selectAll<SVGCircleElement, Node>("circle");
+    svgTextsRef.current = d3SvgRef.current.select<SVGGElement>(".nodes")
+      .selectAll<SVGTextElement, Node>("text");
+    svgNodeGroupsRef.current = d3SvgRef.current.select<SVGGElement>(".nodes")
+      .selectAll<SVGGElement, Node>("g");
+  
     // Update the previous nodes reference for next comparison
     prevNodesRef.current = [...nodes];
-  }, [nodes, getNodeOpacity, addNodeInteractions]);
+  }, [nodes, addNodeInteractions]); // Remove getNodeOpacity from dependencies
 
   const createLinks = useCallback(() => {
     if (!d3SvgRef.current) return;
-
+  
     // Clean up any existing links group
     if (d3SvgRef.current.select(".links").empty()) {
       d3SvgRef.current.append("g").attr("class", "links");
     }
-
+  
     // Select all links and bind data
-    const linkElements = d3SvgRef.current.select(".links")
-      .selectAll("line")
-      .data(links, (d: Link) => `${d.source.id}-${d.target.id}`);
-
+    const linkElements = d3SvgRef.current.select<SVGGElement>(".links")
+      .selectAll<SVGLineElement, Link>("line")
+      .data<Link>(links, (d: Link) => `${d.source.id}-${d.target.id}`);
+  
     // Handle exiting links
-    linkElements.exit()
+    linkElements.exit<Link>()
       .transition()
       .duration(800)
       .attr("stroke-opacity", 0)
       .remove();
-
+  
     // Handle entering links
     const enteringLinks = linkElements.enter()
       .append("line")
       .attr("stroke", "white")
       .attr("stroke-width", 2)
-      .attr("data-source", d => d.source.id)
-      .attr("data-target", d => d.target.id)
+      .attr("data-source", (d: Link) => d.source.id)
+      .attr("data-target", (d: Link) => d.target.id)
       .attr("stroke-opacity", 0); // Start with 0 opacity
-
+  
     enteringLinks.transition()
       .duration(800)
-      .attr("stroke-opacity", link => getLinkOpacity(link));
-
+      .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
+  
     // Handle updating links
     linkElements.transition()
       .duration(500)
-      .attr("stroke-opacity", link => getLinkOpacity(link));
-
+      .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
+  
     // Store reference to all links
-    svgLinksRef.current = d3SvgRef.current.select(".links").selectAll("line");
+    svgLinksRef.current = d3SvgRef.current.select<SVGGElement>(".links")
+      .selectAll<SVGLineElement, Link>("line");
   }, [getLinkOpacity, links]);
 
   useEffect(() => {
@@ -652,6 +648,7 @@ export default function Graph(props: GraphProps) {
       // Configure link forces if we have links
       if (links.length > 0) {
         simulationRef.current.force("link", d3.forceLink(links)
+          // @ts-expect-error // no idea why ts is complaining lol
           .id((d: Node) => d.id)
           .distance((d) => {
             // Your existing distance calculation code...
