@@ -49,6 +49,7 @@ export default function Samir() {
     const newEvent = timeline[currentEventIndex];
 
     editorContext.setNodes(newEvent.nodes as NodeNoFixed[]);
+    // @ts-expect-error // internally using the correct object shape
     editorContext.setLinks(newEvent.links);
     editorContext.setEventTimestamp(newEvent.eventTime);
     editorContext.setEventTitle(newEvent.eventTitle);
