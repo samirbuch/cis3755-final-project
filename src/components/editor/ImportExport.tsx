@@ -56,11 +56,13 @@ export default function ImportExport() {
       return value;
     }, 2);
 
+    const title = editorContext.eventTitle || new Date().toISOString();
+    
     const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = new Date().toISOString() + ".json";
+    a.download = `${title.replace(/\s+/g, "_")}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }
