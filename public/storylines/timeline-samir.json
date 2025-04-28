@@ -523,7 +523,7 @@
       "day": 5
     },
     "eventTitle": "The first one",
-    "eventDescription": "Samir severs communication with Jennifer after repeated battles, to save himself.",
+    "eventDescription": "After a long battle with mental health, Samir severs communication with Jennifer.",
     "nodes": [
       {
         "id": 1,
@@ -669,7 +669,7 @@
       },
       {
         "id": 8,
-        "name": "Faye",
+        "name": "Therapist",
         "x": 71.64701340391126,
         "y": 50.8985174689084,
         "highlighted": false,
