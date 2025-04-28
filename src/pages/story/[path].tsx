@@ -1,4 +1,4 @@
-import { Button, Card, Code, Flex, Switch, Text, Title } from "@mantine/core";
+import { Button, Code, Flex, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ClockLoader } from "react-spinners";
@@ -35,13 +35,24 @@ export default function Timeline() {
   // Override the default behavior of the graph; if there are any highlighted nodes
   // in the graph, we want to show them, but only if the user has flipped the switch.
   // We want this to default to whatever the graph is doing at its current index.
+  const [originalHighlightedIds, setOriginalHighlightedIds] = useState<number[]>([]);
   const handleHighlightToggle = (checked: boolean) => {
-    editorContext.setNodes(prevNodes => {
-      return prevNodes.map(node => ({
-        ...node,
-        highlighted: checked ? node.highlighted : false,
-      }));
-    });
+    if (!checked) {
+      // turn _all_ highlights off
+      editorContext.nodes.forEach(node => {
+        editorContext.updateNode(node.id, {
+          highlighted: false,
+        });
+      });
+    } else {
+      // restore exactly the original set of highlights
+      editorContext.nodes.forEach(node => {
+        const isOriginal = originalHighlightedIds.includes(node.id);
+        editorContext.updateNode(node.id, {
+          highlighted: isOriginal,
+        });
+      });
+    }
   }
 
   useEffect(() => {
@@ -57,6 +68,11 @@ export default function Timeline() {
     editorContext.setEventTimestamp(newEvent.eventTime);
     editorContext.setEventTitle(newEvent.eventTitle);
     editorContext.setEventDescription(newEvent.eventDescription);
+
+    const ids = newEvent.nodes
+      .filter(n => n.highlighted)
+      .map(n => n.id);
+    setOriginalHighlightedIds(ids);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEventIndex, timeline]);
@@ -246,7 +262,7 @@ export default function Timeline() {
             title={event.eventTitle}
             description={event.eventDescription}
             date={{ year: event.eventTime.year, month: event.eventTime.month, day: event.eventTime.day }}
-            // showSwitch={event.nodes.some(node => node.highlighted)}
+            showSwitch={originalHighlightedIds.length > 0}
             switchDefaultChecked={event.nodes.some(node => node.highlighted)}
             onSwitchChange={handleHighlightToggle}
           />
