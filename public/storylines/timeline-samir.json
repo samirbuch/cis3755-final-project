@@ -178,9 +178,9 @@
   },
   {
     "eventTime": {
-      "year": 2007,
-      "month": 1,
-      "day": 15
+      "year": 2003,
+      "month": 9,
+      "day": 9
     },
     "eventTitle": "Nara was born",
     "eventDescription": "On January 15th, 2007, Nara Buch was brought into this world by Akhil and Jennifer Buch.",
@@ -189,41 +189,49 @@
         "id": 1,
         "name": "Samir",
         "highlighted": false,
-        "x": 41.17269502050414,
-        "y": 46.0254965825121,
-        "color": "#85d92b"
+        "x": 40.99087746062571,
+        "y": 39.95706333642295,
+        "color": "#88de2c"
       },
       {
         "id": 2,
         "name": "Akhil",
         "highlighted": false,
-        "x": 48.21692755328251,
-        "y": 51.58274222280303,
-        "color": "#FFFFFF"
+        "x": 47.344258223586436,
+        "y": 50.398838031952785,
+        "color": "#fc0000"
       },
       {
         "id": 3,
         "name": "Jennifer",
         "highlighted": false,
-        "x": 48.745241665485864,
-        "y": 60.9197515019655,
-        "color": "#FFFFFF"
-      },
-      {
-        "id": 4,
-        "name": "Nara",
-        "highlighted": true,
-        "x": 60.34207475081913,
-        "y": 52.68746107125396,
-        "color": "#FFFFFF"
+        "x": 42.21049848442032,
+        "y": 58.263357939862715,
+        "color": "#f78234"
       },
       {
         "id": 5,
         "name": "Arun",
         "highlighted": false,
-        "x": 51.523036547132776,
-        "y": 38.78459024678924,
-        "color": "#FFFFFF"
+        "x": 71.85140494585536,
+        "y": 39.70466922044595,
+        "color": "#ad04bd"
+      },
+      {
+        "id": 6,
+        "name": "Detta",
+        "highlighted": false,
+        "x": 63.97648990673942,
+        "y": 58.388533400721144,
+        "color": "#1bcef2"
+      },
+      {
+        "id": 7,
+        "name": "Nara",
+        "x": 33.62692131585908,
+        "y": 53.286687171325106,
+        "highlighted": true,
+        "color": "#6395ee"
       }
     ],
     "links": [
@@ -250,7 +258,7 @@
         },
         "targetToSourcePPM": {
           "ppm": 10,
-          "mppm": 1
+          "mppm": 3
         }
       },
       {
@@ -267,34 +275,183 @@
         }
       },
       {
-        "id": 3,
-        "source": 4,
-        "target": 1,
-        "sourceToTargetPPM": {
-          "ppm": 4,
-          "mppm": 1
-        },
-        "targetToSourcePPM": {
-          "ppm": 0,
-          "mppm": 0
-        }
-      },
-      {
         "id": 4,
-        "source": 4,
-        "target": 2,
+        "source": 5,
+        "target": 6,
         "sourceToTargetPPM": {
-          "ppm": 1,
+          "ppm": 6,
           "mppm": 1
         },
         "targetToSourcePPM": {
-          "ppm": 10,
+          "ppm": 5,
           "mppm": 1
         }
       },
       {
         "id": 5,
-        "source": 4,
+        "source": 5,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 8,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 6,
+        "source": 6,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 7,
+        "source": 1,
+        "target": 5,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 2,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 9,
+          "mppm": 2
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 9,
+          "mppm": 2
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 9,
+        "source": 3,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 10,
+        "source": 2,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 7
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 11,
+        "source": 1,
+        "target": 6,
+        "sourceToTargetPPM": {
+          "ppm": 4,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 3,
+          "mppm": 0
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2011,
+      "month": 3,
+      "day": 1
+    },
+    "eventTitle": "Divorce",
+    "eventDescription": "After near-constant battling, Jennifer & Akhil divorced. Samir & Nara went between them, split custody.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Samir",
+        "highlighted": false,
+        "x": 56.05477277550707,
+        "y": 46.44389494114622,
+        "color": "#88de2c"
+      },
+      {
+        "id": 2,
+        "name": "Akhil",
+        "highlighted": false,
+        "x": 40.31639913250325,
+        "y": 36.445958991868395,
+        "color": "#fc0000"
+      },
+      {
+        "id": 3,
+        "name": "Jennifer",
+        "highlighted": false,
+        "x": 60.63146308671522,
+        "y": 60.21658584571716,
+        "color": "#f78234"
+      },
+      {
+        "id": 7,
+        "name": "Nara",
+        "x": 42.997354948794694,
+        "y": 56.893560757996596,
+        "highlighted": false,
+        "color": "#6395ee"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 1,
+        "source": 1,
         "target": 3,
         "sourceToTargetPPM": {
           "ppm": 2,
@@ -302,28 +459,651 @@
         },
         "targetToSourcePPM": {
           "ppm": 10,
+          "mppm": 3
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 9,
+        "source": 3,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 10,
+        "source": 2,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2016,
+      "month": 4,
+      "day": 5
+    },
+    "eventTitle": "The first one",
+    "eventDescription": "Samir severs communication with Jennifer after repeated battles, to save himself.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Samir",
+        "highlighted": false,
+        "x": 56.45086987048087,
+        "y": 41.63547035791425,
+        "color": "#88de2c"
+      },
+      {
+        "id": 2,
+        "name": "Akhil",
+        "highlighted": false,
+        "x": 39.44293019539668,
+        "y": 35.21779626918643,
+        "color": "#fc0000"
+      },
+      {
+        "id": 3,
+        "name": "Jennifer",
+        "highlighted": false,
+        "x": 58.88512098748237,
+        "y": 68.40551873062026,
+        "color": "#f78234"
+      },
+      {
+        "id": 7,
+        "name": "Nara",
+        "x": 45.221049073283226,
+        "y": 54.741214783948266,
+        "highlighted": false,
+        "color": "#6395ee"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 9,
+        "source": 3,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 10,
+        "source": 2,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2016,
+      "month": 11,
+      "day": 10
+    },
+    "eventTitle": "Reconciliation",
+    "eventDescription": "Samir & Jennifer reestablish a relationship, with a joint therapist.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Samir",
+        "highlighted": false,
+        "x": 51.084056337535955,
+        "y": 44.74404985135651,
+        "color": "#88de2c"
+      },
+      {
+        "id": 2,
+        "name": "Akhil",
+        "highlighted": false,
+        "x": 35.39835543462865,
+        "y": 34.62392494488583,
+        "color": "#fc0000"
+      },
+      {
+        "id": 3,
+        "name": "Jennifer",
+        "highlighted": false,
+        "x": 53.896746437430046,
+        "y": 64.65426045370035,
+        "color": "#f78234"
+      },
+      {
+        "id": 7,
+        "name": "Nara",
+        "x": 37.97207655636654,
+        "y": 55.08047654097139,
+        "highlighted": false,
+        "color": "#6395ee"
+      },
+      {
+        "id": 8,
+        "name": "Faye",
+        "x": 71.64701340391126,
+        "y": 50.8985174689084,
+        "highlighted": false,
+        "color": "#FFFFFF"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 9,
+        "source": 3,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 10,
+        "source": 2,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 5,
+        "source": 1,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 3,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
           "mppm": 1
         }
       },
       {
         "id": 6,
-        "source": 5,
-        "target": 2,
+        "source": 1,
+        "target": 8,
         "sourceToTargetPPM": {
-          "ppm": 10,
+          "ppm": 1,
           "mppm": 1
         },
         "targetToSourcePPM": {
-          "ppm": 10,
+          "ppm": 1,
           "mppm": 1
         }
       },
       {
         "id": 7,
-        "source": 4,
-        "target": 5,
+        "source": 3,
+        "target": 8,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 1
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2018,
+      "month": 3,
+      "day": 14
+    },
+    "eventTitle": "Business as usual",
+    "eventDescription": "Enough time passes, Samir & Jennifer's relationship stabilizes.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Samir",
+        "highlighted": false,
+        "x": 56.41656914396583,
+        "y": 45.061321758956716,
+        "color": "#88de2c"
+      },
+      {
+        "id": 2,
+        "name": "Akhil",
+        "highlighted": false,
+        "x": 40.68665567074657,
+        "y": 35.04415707713657,
+        "color": "#fc0000"
+      },
+      {
+        "id": 3,
+        "name": "Jennifer",
+        "highlighted": false,
+        "x": 59.54637758924972,
+        "y": 64.40389123140207,
+        "color": "#f78234"
+      },
+      {
+        "id": 7,
+        "name": "Nara",
+        "x": 43.350338325974036,
+        "y": 55.49063849807986,
+        "highlighted": false,
+        "color": "#6395ee"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 1,
+        "target": 2,
         "sourceToTargetPPM": {
           "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 9,
+        "source": 3,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 10,
+        "source": 2,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 5,
+        "source": 1,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 7,
+          "mppm": 1
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2021,
+      "month": 12,
+      "day": 28
+    },
+    "eventTitle": "The second time",
+    "eventDescription": "Samir severs the relationship with his mother. This time, for good.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Samir",
+        "highlighted": false,
+        "x": 56.566455233136416,
+        "y": 43.31168852548713,
+        "color": "#88de2c"
+      },
+      {
+        "id": 2,
+        "name": "Akhil",
+        "highlighted": false,
+        "x": 40.55553791680205,
+        "y": 33.95690400702577,
+        "color": "#fc0000"
+      },
+      {
+        "id": 3,
+        "name": "Jennifer",
+        "highlighted": false,
+        "x": 55.25430850168822,
+        "y": 70.4014780545156,
+        "color": "#f78234"
+      },
+      {
+        "id": 7,
+        "name": "Nara",
+        "x": 47.623680645588315,
+        "y": 52.32991446434856,
+        "highlighted": false,
+        "color": "#6395ee"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 9,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 9,
+        "source": 3,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 4,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 10,
+        "source": 2,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 7,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2023,
+      "month": 5,
+      "day": 12
+    },
+    "eventTitle": "Nara follows suit",
+    "eventDescription": "Nara severs her relationship after having the same issues as Samir.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Samir",
+        "highlighted": false,
+        "x": 56.6747518274889,
+        "y": 41.125916370426054,
+        "color": "#88de2c"
+      },
+      {
+        "id": 2,
+        "name": "Akhil",
+        "highlighted": false,
+        "x": 40.91986460905916,
+        "y": 32.25161387532343,
+        "color": "#fc0000"
+      },
+      {
+        "id": 3,
+        "name": "Jennifer",
+        "highlighted": false,
+        "x": 53.09599892340376,
+        "y": 76.81380452430699,
+        "color": "#f78234"
+      },
+      {
+        "id": 7,
+        "name": "Nara",
+        "x": 49.30940140810353,
+        "y": 49.80867951062432,
+        "highlighted": false,
+        "color": "#6395ee"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 6,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 8,
+        "source": 1,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 10,
+        "source": 2,
+        "target": 7,
+        "sourceToTargetPPM": {
+          "ppm": 7,
           "mppm": 1
         },
         "targetToSourcePPM": {
