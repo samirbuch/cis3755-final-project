@@ -48,7 +48,8 @@ export default function Graph(props: GraphProps) {
 
   const simulationRef = useRef<d3.Simulation<Node, Link> | null>(null);
 
-  const hoveredNodeRef = useRef<number | null>(null);
+  // const hoveredNodeRef = useRef<number | null>(null);
+  const [hoveredId, setHoveredId] = useState<number | null>(null);
 
   // State to track nodes with transition effects
   const prevNodesRef = useRef<Node[]>([]);
@@ -75,7 +76,7 @@ export default function Graph(props: GraphProps) {
 
   // Create helper functions to determine opacity
   const getNodeOpacity = useCallback((node: Node): number => {
-    const hoveredId = hoveredNodeRef.current;
+    // const hoveredId = hoveredNodeRef.current;
     const hasHighlighted = nodes.some(n => n.highlighted);
 
     // Case 1: A node is being hovered
@@ -88,11 +89,11 @@ export default function Graph(props: GraphProps) {
     }
     // Case 3: Default state - all nodes fully visible
     return 1;
-  }, [nodes]);
+  }, [hoveredId, nodes]);
 
   // Helper function for link opacity
   const getLinkOpacity = useCallback((link: Link): number => {
-    const hoveredId = hoveredNodeRef.current;
+    // const hoveredId = hoveredNodeRef.current;
     const hasHighlighted = nodes.some(n => n.highlighted);
 
     // Case 1: A node is being hovered
@@ -108,7 +109,7 @@ export default function Graph(props: GraphProps) {
     }
     // Case 3: Default state - all links visible
     return 0.7;
-  }, [nodes]);
+  }, [hoveredId, nodes]);
 
   // Canvas draw function - called every frame
   const drawCanvas = useCallback(() => {
@@ -153,7 +154,7 @@ export default function Graph(props: GraphProps) {
     });
 
     // Get current hover/highlight state
-    const hoveredId = hoveredNodeRef.current;
+    // const hoveredId = hoveredNodeRef.current;
     const hasHighlighted = nodes.some(node => node.highlighted);
 
     // Draw and update each animation
@@ -283,7 +284,7 @@ export default function Graph(props: GraphProps) {
 
     // Request next animation frame
     animationFrameId.current = requestAnimationFrame(drawCanvas);
-  }, [calculatePathPoints, fps, nodes, props.showFPS]);
+  }, [calculatePathPoints, fps, hoveredId, nodes, props.showFPS]);
 
   const updateCanvasAnimations = useCallback(() => {
     if (!svgContainerRef.current) return;
@@ -470,29 +471,10 @@ export default function Graph(props: GraphProps) {
 
     nodeGroups
       .on("mouseenter", function (event, d) {
-        hoveredNodeRef.current = d.id;
-
-        // Fade out all other nodes
-        svgNodesRef.current?.transition()
-          .duration(200)
-          .attr("opacity", (node: Node) => getNodeOpacity(node));
-
-        // Fade out all other links
-        svgLinksRef.current?.transition()
-          .duration(200)
-          .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
+        setHoveredId(d.id);
       })
       .on("mouseleave", function () {
-        hoveredNodeRef.current = null;
-
-        // Fade in all nodes
-        svgNodesRef.current?.transition()
-          .duration(200)
-          .attr("opacity", (node: Node) => getNodeOpacity(node));
-        // Fade in all links
-        svgLinksRef.current?.transition()
-          .duration(200)
-          .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
+        setHoveredId(null);
       })
       .call(d3.drag<SVGGElement, Node>()
         .on("start", function (event, d) {
@@ -512,7 +494,7 @@ export default function Graph(props: GraphProps) {
           d.fy = null;
         })
       );
-  }, [getLinkOpacity, getNodeOpacity]);
+  }, []);
 
   const createNodes = useCallback(() => {
     if (!d3SvgRef.current) return;
@@ -732,6 +714,39 @@ export default function Graph(props: GraphProps) {
       clearInterval(heartbeat);
     };
   }, [drawCanvas]);
+
+  useEffect(() => {
+    if (!svgNodesRef.current || !svgLinksRef.current) return;
+    const hasHighlighted = nodes.some(n => n.highlighted);
+
+    // apply node opacities
+    svgNodesRef.current
+      .attr("opacity", (d: Node) => {
+        if (hoveredId !== null) {
+          return d.id === hoveredId ? 1 : 0.3;
+        }
+        if (hasHighlighted) {
+          return d.highlighted ? 1 : 0.3;
+        }
+        return 1;
+      });
+
+    // apply link opacities
+    svgLinksRef.current
+      .attr("stroke-opacity", (l: Link) => {
+        if (hoveredId !== null) {
+          return (l.source.id === hoveredId || l.target.id === hoveredId)
+            ? 0.8
+            : 0.2;
+        }
+        if (hasHighlighted) {
+          const srcH = nodes.find(n => n.id === l.source.id)?.highlighted;
+          const tgtH = nodes.find(n => n.id === l.target.id)?.highlighted;
+          return (srcH || tgtH) ? 0.8 : 0.2;
+        }
+        return 0.7;
+      });
+  }, [nodes, links, hoveredId]);
 
   return (
     <div style={{
