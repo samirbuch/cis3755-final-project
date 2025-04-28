@@ -53,6 +53,7 @@ export default function Graph(props: GraphProps) {
 
   // State to track nodes with transition effects
   const prevNodesRef = useRef<Node[]>([]);
+  const prevSimNodesRef = useRef<Node[]>([]);
 
   // Add these at the top with other state
   const [fps, setFps] = useState<number>(0);
@@ -628,7 +629,7 @@ export default function Graph(props: GraphProps) {
     // Set up force simulation if we have nodes
     if (nodes.length > 0) {
       if (!simulationRef.current) {
-        // Initialize simulation
+        // first time: build the simulation
         simulationRef.current = d3.forceSimulation(nodes)
           .force("charge", d3.forceManyBody().strength(-30))
           .force("collide", d3.forceCollide(40))
@@ -638,12 +639,19 @@ export default function Graph(props: GraphProps) {
           ))
           .alphaDecay(0.05)
           .on("tick", tick);
+
+        // remember for next diff
+        prevSimNodesRef.current = nodes.slice();
       } else {
-        // Update existing simulation
-        simulationRef.current
-          .nodes(nodes)
-          .alpha(0.3) // Lower alpha for smoother transitions
-          .restart();
+        // only restart if nodes were added/removed
+        const { added, removed } = diffNodes(prevSimNodesRef.current, nodes);
+        if (added.length > 0 || removed.length > 0) {
+          simulationRef.current
+            .nodes(nodes)
+            .alpha(0.3)
+            .restart();
+          prevSimNodesRef.current = nodes.slice();
+        }
       }
 
       // Configure link forces if we have links
