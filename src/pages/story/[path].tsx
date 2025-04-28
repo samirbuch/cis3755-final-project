@@ -244,22 +244,24 @@ export default function Timeline() {
         <Graph />
       </div>
 
-      <Draggable>
-        <Card maw={350} withBorder>
-          <Title order={3}>{event?.eventTitle}</Title>
-          <Text>{event?.eventDescription}</Text>
-          {event?.nodes.some(node => node.highlighted) && (
-            <Switch
-              label="Show highlights"
-              checked={highlightEnabled}
-              onChange={e => {
-                console.log("Switch checked:", e.currentTarget.checked);
-                handleHighlightToggle(e.currentTarget.checked);
-              }}
-            />
-          )}
-        </Card>
-      </Draggable>
+      {event?.eventTitle && event?.eventDescription && (
+        <Draggable>
+          <Card maw={350} withBorder>
+            <Title order={3}>{event.eventTitle}</Title>
+            <Text>{event.eventDescription}</Text>
+            {event?.nodes.some(node => node.highlighted) && (
+              <Switch
+                label="Show highlights"
+                checked={highlightEnabled}
+                onChange={e => {
+                  console.log("Switch checked:", e.currentTarget.checked);
+                  handleHighlightToggle(e.currentTarget.checked);
+                }}
+              />
+            )}
+          </Card>
+        </Draggable>
+      )}
 
       {timeline.map((event, index) => (
         <Waypoint
