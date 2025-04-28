@@ -14,6 +14,7 @@ import { ZodTimeline } from "@/interfaces/Timeline";
 import { wait } from "@/util/misc";
 import Legend from '@/components/Legend';
 import { useRouter } from "next/router";
+import InfoCard from "@/components/InfoCard";
 
 export default function Timeline() {
   const router = useRouter();
@@ -26,19 +27,15 @@ export default function Timeline() {
   const [currentEventIndex, setCurrentEventIndex] = useState(0);
   const event = timeline ? timeline[currentEventIndex] : null;
 
-  // Override the default behavior of the graph; if there are any highlighted nodes
-  // in the graph, we want to show them, but only if the user has flipped the switch.
-  // We want this to default to whatever the graph is doing at its current index.
-  const [highlightEnabled, setHighlightEnabled] = useState(false);
-
   // I know it's weird to be using the editor context here, but this is (right now)
   // the only thing that controls the graph's state. We can refactor this later after
   // the project has been submitted and if we feel like it.
   const editorContext = useEditorContext();
 
+  // Override the default behavior of the graph; if there are any highlighted nodes
+  // in the graph, we want to show them, but only if the user has flipped the switch.
+  // We want this to default to whatever the graph is doing at its current index.
   const handleHighlightToggle = (checked: boolean) => {
-    setHighlightEnabled(checked);
-
     editorContext.setNodes(prevNodes => {
       return prevNodes.map(node => ({
         ...node,
@@ -60,7 +57,6 @@ export default function Timeline() {
     editorContext.setEventTimestamp(newEvent.eventTime);
     editorContext.setEventTitle(newEvent.eventTitle);
     editorContext.setEventDescription(newEvent.eventDescription);
-    setHighlightEnabled(newEvent.nodes.some(node => node.highlighted));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEventIndex, timeline]);
@@ -246,20 +242,14 @@ export default function Timeline() {
 
       {event?.eventTitle && event?.eventDescription && (
         <Draggable>
-          <Card maw={350} withBorder>
-            <Title order={3}>{event.eventTitle}</Title>
-            <Text>{event.eventDescription}</Text>
-            {event?.nodes.some(node => node.highlighted) && (
-              <Switch
-                label="Show highlights"
-                checked={highlightEnabled}
-                onChange={e => {
-                  console.log("Switch checked:", e.currentTarget.checked);
-                  handleHighlightToggle(e.currentTarget.checked);
-                }}
-              />
-            )}
-          </Card>
+          <InfoCard
+            title={event.eventTitle}
+            description={event.eventDescription}
+            date={{ year: event.eventTime.year, month: event.eventTime.month, day: event.eventTime.day }}
+            // showSwitch={event.nodes.some(node => node.highlighted)}
+            switchDefaultChecked={event.nodes.some(node => node.highlighted)}
+            onSwitchChange={handleHighlightToggle}
+          />
         </Draggable>
       )}
 
@@ -267,9 +257,9 @@ export default function Timeline() {
         <Waypoint
           // debug
           key={index}
-          onEnter={({ currentPosition, previousPosition }) => {
-            console.log("Current position:", currentPosition);
-            console.log("Previous position:", previousPosition);
+          onEnter={({ }) => {
+            // console.log("Current position:", currentPosition);
+            // console.log("Previous position:", previousPosition);
             setCurrentEventIndex(index);
           }}
         >

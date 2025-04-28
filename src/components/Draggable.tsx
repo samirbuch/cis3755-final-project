@@ -52,7 +52,7 @@ export default function Draggable(props: DraggableProps) {
         left: position.x,
         top: position.y,
         cursor: "grab",
-        zIndex: 1000,
+        zIndex: 100,
       }}
     >
       {props.children}
