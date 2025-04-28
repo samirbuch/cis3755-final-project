@@ -464,12 +464,12 @@ export default function Graph(props: GraphProps) {
 
   const addNodeInteractions = useCallback(() => {
     if (!d3SvgRef.current) return;
-  
+
     const nodeGroups = d3SvgRef.current.select(".nodes")
       .selectAll<SVGGElement, Node>("g");
-  
+
     nodeGroups
-      .on("mouseenter", function(event, d) {
+      .on("mouseenter", function (event, d) {
         hoveredNodeRef.current = d.id;
 
         // Fade out all other nodes
@@ -482,7 +482,7 @@ export default function Graph(props: GraphProps) {
           .duration(200)
           .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
       })
-      .on("mouseleave", function() {
+      .on("mouseleave", function () {
         hoveredNodeRef.current = null;
 
         // Fade in all nodes
@@ -495,17 +495,17 @@ export default function Graph(props: GraphProps) {
           .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
       })
       .call(d3.drag<SVGGElement, Node>()
-        .on("start", function(event, d) {
+        .on("start", function (event, d) {
           if (!event.active && simulationRef.current)
             simulationRef.current.alphaTarget(0.3).restart();
           d.fx = d.x;
           d.fy = d.y;
         })
-        .on("drag", function(event, d) {
+        .on("drag", function (event, d) {
           d.fx = event.x;
           d.fy = event.y;
         })
-        .on("end", function(event, d) {
+        .on("end", function (event, d) {
           if (!event.active && simulationRef.current)
             simulationRef.current.alphaTarget(0);
           d.fx = null;
@@ -516,57 +516,57 @@ export default function Graph(props: GraphProps) {
 
   const createNodes = useCallback(() => {
     if (!d3SvgRef.current) return;
-  
+
     // Select all node groups and bind data
     const nodeGroups = d3SvgRef.current.select<SVGGElement>(".nodes")
       .selectAll<SVGGElement, Node>("g")
       .data<Node>(nodes, (d: Node) => d.id);
-  
+
     // Handle exiting nodes (fade out and remove)
     nodeGroups.exit<Node>()
       .transition()
       .duration(200)
       .attr("opacity", 0)
       .remove();
-  
+
     // Handle entering nodes (fade in)
     const enteringNodes = nodeGroups.enter()
       .append("g")
       .attr("opacity", 0); // Start fully transparent
-  
+
     enteringNodes.append("circle")
       .attr("r", 10)
       .attr("fill", (d: Node) => d.color || "#FFFFFF");
-  
+
     enteringNodes.append("text")
       .attr("x", 15)
       .attr("y", 5)
       .attr("fill", "white")
       .text((d: Node) => d.name);
-  
+
     // Fade in the new nodes
     enteringNodes.transition()
       .duration(800)
       .attr("opacity", (d) => getNodeOpacity(d));
-  
+
     // Update existing nodes
     const existingNodes = nodeGroups
       .transition()
       .duration(500)
       .attr("opacity", (d) => getNodeOpacity(d));
-  
+
     existingNodes.select("circle")
       .attr("fill", (d: Node) => d.color || "#FFFFFF");
-  
+
     existingNodes.select("text")
       .text((d: Node) => d.name);
-  
+
     // Remove the merge line since we're not using allNodes
     // const allNodes = nodeGroups.merge(enteringNodes);
-  
+
     // Add interaction handlers
     addNodeInteractions();
-  
+
     // Store references to use during simulation updates
     svgNodesRef.current = d3SvgRef.current.select<SVGGElement>(".nodes")
       .selectAll<SVGCircleElement, Node>("circle");
@@ -574,31 +574,31 @@ export default function Graph(props: GraphProps) {
       .selectAll<SVGTextElement, Node>("text");
     svgNodeGroupsRef.current = d3SvgRef.current.select<SVGGElement>(".nodes")
       .selectAll<SVGGElement, Node>("g");
-  
+
     // Update the previous nodes reference for next comparison
     prevNodesRef.current = [...nodes];
   }, [nodes, addNodeInteractions, getNodeOpacity]); // Remove getNodeOpacity from dependencies
 
   const createLinks = useCallback(() => {
     if (!d3SvgRef.current) return;
-  
+
     // Clean up any existing links group
     if (d3SvgRef.current.select(".links").empty()) {
       d3SvgRef.current.append("g").attr("class", "links");
     }
-  
+
     // Select all links and bind data
     const linkElements = d3SvgRef.current.select<SVGGElement>(".links")
       .selectAll<SVGLineElement, Link>("line")
       .data<Link>(links, (d: Link) => `${d.source.id}-${d.target.id}`);
-  
+
     // Handle exiting links
     linkElements.exit<Link>()
       .transition()
       .duration(200)
       .attr("stroke-opacity", 0)
       .remove();
-  
+
     // Handle entering links
     const enteringLinks = linkElements.enter()
       .append("line")
@@ -607,16 +607,16 @@ export default function Graph(props: GraphProps) {
       .attr("data-source", (d: Link) => d.source.id)
       .attr("data-target", (d: Link) => d.target.id)
       .attr("stroke-opacity", 0); // Start with 0 opacity
-  
+
     enteringLinks.transition()
       .duration(200)
       .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
-  
+
     // Handle updating links
     linkElements.transition()
       .duration(500)
       .attr("stroke-opacity", (link: Link) => getLinkOpacity(link));
-  
+
     // Store reference to all links
     svgLinksRef.current = d3SvgRef.current.select<SVGGElement>(".links")
       .selectAll<SVGLineElement, Link>("line");
@@ -661,7 +661,6 @@ export default function Graph(props: GraphProps) {
         simulationRef.current
           .nodes(nodes)
           .alpha(0.3) // Lower alpha for smoother transitions
-          .restart();
       }
 
       // Configure link forces if we have links
@@ -703,6 +702,50 @@ export default function Graph(props: GraphProps) {
     };
   }, [nodes, links, tick, createNodes, createLinks, updateCanvasAnimations]);
 
+  useEffect(() => {
+    if (!simulationRef.current) return;
+
+    const width = svgContainerRef.current?.clientWidth || 800;
+    const height = svgContainerRef.current?.clientHeight || 600;
+
+    // Make sure all nodes have x, y, vx, vy
+    const initializedNodes = nodes.map(node => ({
+      ...node,
+      x: node.x ?? width / 2 + (Math.random() - 0.5) * 100,
+      y: node.y ?? height / 2 + (Math.random() - 0.5) * 100,
+      vx: node.vx ?? 0,
+      vy: node.vy ?? 0,
+      fx: node.fx ?? null,
+      fy: node.fy ?? null,
+    }));
+
+    simulationRef.current.stop();
+
+    simulationRef.current = d3.forceSimulation(initializedNodes)
+      .force("charge", d3.forceManyBody().strength(-30))
+      .force("collide", d3.forceCollide(40))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("link", d3.forceLink(links)
+        .id((d: any) => d.id)
+        .distance(d => {
+          const totalPPM = (d.sourceToTargetPPM?.ppm || 0) * 1 +
+            (d.targetToSourcePPM?.ppm || 0) * 1 +
+            (d.sourceToTargetPPM?.mppm || 0) * 10 +
+            (d.targetToSourcePPM?.mppm || 0) * 10;
+          if (totalPPM === 0) return 500;
+          if (totalPPM < 10) return 300 - (totalPPM * 5);
+          if (totalPPM < 40) return 250 - ((totalPPM - 10) * 4);
+          const minDistance = 30;
+          const scaleFactor = Math.pow(totalPPM, 1.2);
+          return Math.max(minDistance, 130 - (scaleFactor / 10));
+        })
+        .strength(1)
+      )
+      .alpha(1)
+      .on("tick", tick);
+  }, [nodes, links, tick]);
+
+  // Draw canvas update
   useEffect(() => {
     // Start animation frame loop that runs independently of other state changes
     if (animationFrameId.current === null) {
