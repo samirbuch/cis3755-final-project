@@ -644,14 +644,12 @@ export default function Graph(props: GraphProps) {
         prevSimNodesRef.current = nodes.slice();
       } else {
         // only restart if nodes were added/removed
-        const { added, removed } = diffNodes(prevSimNodesRef.current, nodes);
-        if (added.length > 0 || removed.length > 0) {
-          simulationRef.current
-            .nodes(nodes)
-            .alpha(0.3)
-            .restart();
-          prevSimNodesRef.current = nodes.slice();
-        }
+        // const { added, removed } = diffNodes(prevSimNodesRef.current, nodes);
+        simulationRef.current
+          .nodes(nodes)
+          .alpha(0.3)
+          .restart();
+        prevSimNodesRef.current = nodes.slice();
       }
 
       // Configure link forces if we have links
