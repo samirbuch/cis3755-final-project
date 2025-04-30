@@ -276,12 +276,13 @@ export default function Timeline() {
           onEnter={({ }) => {
             // console.log("Current position:", currentPosition);
             // console.log("Previous position:", previousPosition);
+            console.log(new Date(), "Waypoint entered:", index);
             setCurrentEventIndex(index);
           }}
         >
           <div style={{
             height: "120vh",
-            width: "120vw",
+            width: "100vw",
             // backgroundColor: ["green", "blue", "red"][index % 3],
           }} />
         </Waypoint>

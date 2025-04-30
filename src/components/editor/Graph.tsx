@@ -56,9 +56,9 @@ export default function Graph(props: GraphProps) {
   const prevSimNodesRef = useRef<Node[]>([]);
 
   // Add these at the top with other state
-  const [fps, setFps] = useState<number>(0);
+  // const [fps, setFps] = useState<number>(0);
   const frameCountRef = useRef<number>(0);
-  const lastFpsUpdateTimeRef = useRef<number>(0);
+  // const lastFpsUpdateTimeRef = useRef<number>(0);
 
   // Function to calculate points along a path
   const calculatePathPoints = useCallback((source: { x: number, y: number }, target: { x: number, y: number }, pointCount = 100) => {
@@ -121,19 +121,19 @@ export default function Graph(props: GraphProps) {
     if (!ctx) return;
 
     // Calculate FPS
-    const now = performance.now();
+    // const now = performance.now();
     frameCountRef.current++;
 
     // Update FPS every 500ms for stability
-    if (now - lastFpsUpdateTimeRef.current > 500) {
-      const elapsed = now - lastFpsUpdateTimeRef.current;
-      const currentFps = Math.round((frameCountRef.current / elapsed) * 1000);
-      setFps(currentFps);
+    // if (now - lastFpsUpdateTimeRef.current > 500) {
+    //   const elapsed = now - lastFpsUpdateTimeRef.current;
+    //   const currentFps = Math.round((frameCountRef.current / elapsed) * 1000);
+    //   setFps(currentFps);
 
-      // Reset counters
-      lastFpsUpdateTimeRef.current = now;
-      frameCountRef.current = 0;
-    }
+    //   // Reset counters
+    //   lastFpsUpdateTimeRef.current = now;
+    //   frameCountRef.current = 0;
+    // }
 
     // Match canvas size to display size
     const rect = canvas.getBoundingClientRect();
@@ -272,20 +272,20 @@ export default function Graph(props: GraphProps) {
     });
 
     // Draw FPS counter if enabled
-    if (props.showFPS) {
-      ctx.save();
-      ctx.fillStyle = 'white';
-      ctx.font = '16px monospace';
-      ctx.textAlign = 'right';
-      ctx.shadowColor = 'black';
-      ctx.shadowBlur = 3;
-      ctx.fillText(`${fps} FPS`, canvas.width - 20, 30);
-      ctx.restore();
-    }
+    // if (props.showFPS) {
+    //   ctx.save();
+    //   ctx.fillStyle = 'white';
+    //   ctx.font = '16px monospace';
+    //   ctx.textAlign = 'right';
+    //   ctx.shadowColor = 'black';
+    //   ctx.shadowBlur = 3;
+    //   ctx.fillText(`${fps} FPS`, canvas.width - 20, 30);
+    //   ctx.restore();
+    // }
 
     // Request next animation frame
     animationFrameId.current = requestAnimationFrame(drawCanvas);
-  }, [calculatePathPoints, fps, hoveredId, nodes, props.showFPS]);
+  }, [calculatePathPoints, hoveredId, nodes]);
 
   const updateCanvasAnimations = useCallback(() => {
     if (!svgContainerRef.current) return;
