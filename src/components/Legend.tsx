@@ -93,29 +93,38 @@ export default function Legend() {
       <Card>
         <Container mx="xs">
           <Title order={3}>Legend</Title>
-          <Flex direction="row" gap="sm" align="center">
-            <Flex align="center">
+          <Flex direction="row" gap="xl" align="center">
+            <Flex align="center" gap="xs">
               <svg width="20" height="20" viewBox="0 0 20 20">
                 <circle cx="10" cy="10" r="7" fill="white" />
               </svg>
               <Text>Person</Text>
             </Flex>
 
-            <Flex gap={3}>
+            <Flex gap={"xs"} align="center" direction="row">
               <canvas width={20} height={20} ref={arcRef} style={{ transform: "translateY(3px)" }} />
-              <Text>Communication</Text>
+              <Flex direction="column" gap={0}>
+                <Text>Communication</Text>
+                <Text size="sm" c="dimmed">e.g. sending a video</Text>
+              </Flex>
             </Flex>
 
-            <Flex gap={3}>
+            <Flex gap={"xs"} align="center">
               <canvas width={20} height={20} ref={arcRefMeaningful} style={{ transform: "translateY(3px)" }} />
-              <Text>Meaningful Communication</Text>
+              <Flex direction="column" gap={0}>
+                <Text>Meaningful Communication</Text>
+                <Text size="sm" c="dimmed">e.g. having a dinner together</Text>
+              </Flex>
             </Flex>
 
-            <Flex gap={3}>
+            <Flex gap={"xs"} align={"center"}>
               <svg width="20" height="20" viewBox="0 0 20 20">
                 <line x1="0" y1="10" x2="20" y2="10" stroke="white" strokeWidth="2" />
               </svg>
-              <Text>Connection. The shorter a connection, the more meaningful.</Text>
+              <Flex direction="column" gap={0}>
+                <Text>Connection</Text>
+                <Text size="sm" c="dimmed">The shorter, the more meaningful</Text>
+              </Flex>
             </Flex>
           </Flex>
         </Container>
