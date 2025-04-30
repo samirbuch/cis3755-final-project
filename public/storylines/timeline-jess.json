@@ -1,0 +1,2085 @@
+[
+  {
+    "eventTime": {
+      "year": 2000,
+      "month": 1,
+      "day": 2
+    },
+    "eventTitle": "Jess is born",
+    "eventDescription": "On January 2nd, 2000, Jessica was born to her parents, Jerry and Wenyong.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": false,
+        "x": 52.10575700403594,
+        "y": 57.38014507940852,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": false,
+        "x": 43.797348304196134,
+        "y": 49.19513234797183,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": false,
+        "x": 54.17010113393484,
+        "y": 43.424722572619665,
+        "color": "#fa89c7"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 2,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 4
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 4
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2002,
+      "month": 1,
+      "day": 28
+    },
+    "eventTitle": "Joy is born",
+    "eventDescription": "My younger sister is born.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": false,
+        "x": 44.891996958622066,
+        "y": 54.685118603905416,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": false,
+        "x": 55.084995371527576,
+        "y": 46.037277457395454,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": false,
+        "x": 39.68804688274339,
+        "y": 42.32301151242953,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": false,
+        "x": 60.48105282509086,
+        "y": 56.87321553280793,
+        "color": "#ffe72e"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 2,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 4
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 4
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 1
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2007,
+      "month": 12,
+      "day": 1
+    },
+    "eventTitle": "Grandparents move in",
+    "eventDescription": "When I was 7, my grandparents moved from Shanghai, China, to Philadelphia to live with us.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": false,
+        "x": 40.859463702953164,
+        "y": 36.159174381218044,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": false,
+        "x": 54.15420770606121,
+        "y": 40.85876935789997,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": false,
+        "x": 48.60110507828566,
+        "y": 28.249969465778058,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": false,
+        "x": 45.1698696040934,
+        "y": 49.77114111453883,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 32.664728830877664,
+        "y": 43.07837180948718,
+        "color": "#ff8400"
+      },
+      {
+        "id": 6,
+        "name": "外公",
+        "highlighted": false,
+        "x": 29.24481231699293,
+        "y": 33.79982132805593,
+        "color": "#c76a00"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 2,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 4
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 4
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 8,
+        "source": 5,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 9,
+        "source": 6,
+        "target": 5,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 10,
+        "source": 6,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 11,
+        "source": 6,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 2,
+          "mppm": 2
+        }
+      },
+      {
+        "id": 12,
+        "source": 6,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 2,
+          "mppm": 2
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2010,
+      "month": 12,
+      "day": 1
+    },
+    "eventTitle": "My grandparents move out.",
+    "eventDescription": "When I was 10, my grandparents left our house in Philadelphia to move in with my aunt and uncle in Lexington, Massachusetts. Doing this caused my sister and I to become a lot more distant from them, since we would only see them a few times a year. You can see how little time we spend with them in how far away they are from us on the graph.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": true,
+        "x": 51.64975589946915,
+        "y": 49.5785837892168,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": true,
+        "x": 33.646234369379634,
+        "y": 54.55066749492293,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 29.25326400137594,
+        "y": 68.06473251214626,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": true,
+        "x": 20.306831120261986,
+        "y": 48.79704425555481,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 80.55530754621401,
+        "y": 34.898118727297295,
+        "color": "#ff8400"
+      },
+      {
+        "id": 6,
+        "name": "外公",
+        "highlighted": false,
+        "x": 84.80770500580691,
+        "y": 43.988870357098556,
+        "color": "#c76a00"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 2,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 4
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 4
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 8,
+        "source": 5,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 9,
+        "source": 6,
+        "target": 5,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 10,
+        "source": 6,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 11,
+        "source": 6,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 12,
+        "source": 6,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2018,
+      "month": 8,
+      "day": 21
+    },
+    "eventTitle": "I move out for college.",
+    "eventDescription": "I move to Pittsburgh to start college. Being so far from home means I spent a lot less time with my family. This was the first time I really understood how different it was to live with my family than alone, in a foreign city, far, far, away from home. It was a hard transition.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": false,
+        "x": 51.84769959112292,
+        "y": 47.86793314529847,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": false,
+        "x": 37.94001106029134,
+        "y": 61.41319737342076,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 33.24329698991766,
+        "y": 34.2649249684265,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": false,
+        "x": 31.872963605048714,
+        "y": 55.451780603947654,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 72.91949812995472,
+        "y": 45.506810174992204,
+        "color": "#ff8400"
+      },
+      {
+        "id": 6,
+        "name": "外公",
+        "highlighted": false,
+        "x": 72.1761086506769,
+        "y": 55.62211030870334,
+        "color": "#c76a00"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 2,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 2,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 2,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 4,
+          "mppm": 4
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 8,
+        "source": 5,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 9,
+        "source": 6,
+        "target": 5,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 10,
+        "source": 6,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 11,
+        "source": 6,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 12,
+        "source": 6,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2020,
+      "month": 1,
+      "day": 28
+    },
+    "eventTitle": "COVID Pandemic begins.",
+    "eventDescription": "I moved home after the pandemic started. School closed, and everyone was stuck at home. This put a lot of strain on my parents relationship, since they were having a lot of problems with their marriage. My sister and I got closer, since we were able to bond over always trying to act as moderators for our parents. My sister's relationships with our grandparents continuted to attenuate until eventually she didn't speak to them at all. My time at college had made me miss my parents, so I was excited to come home.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": true,
+        "x": 56.478456160040466,
+        "y": 44.41261769606999,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": true,
+        "x": 21.47970844735302,
+        "y": 54.323555585498205,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 36.77175215415271,
+        "y": 40.540766776676406,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": true,
+        "x": 40.20195276998112,
+        "y": 49.580395498964144,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 73.69395907942389,
+        "y": 50.800343526016675,
+        "color": "#ff8400"
+      },
+      {
+        "id": 6,
+        "name": "外公",
+        "highlighted": false,
+        "x": 71.37417172008081,
+        "y": 60.46836721789796,
+        "color": "#c76a00"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 2,
+        "source": 1,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 4,
+          "mppm": 4
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 4,
+          "mppm": 8
+        },
+        "targetToSourcePPM": {
+          "ppm": 4,
+          "mppm": 8
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 9,
+        "source": 6,
+        "target": 5,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 10,
+        "source": 6,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 1
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2021,
+      "month": 8,
+      "day": 24
+    },
+    "eventTitle": "Joy moves out to Boston for college.",
+    "eventDescription": "My dad and I took my sister to Boston to help her move in. ...",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": true,
+        "x": 56.83461353339906,
+        "y": 63.92521976319294,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": true,
+        "x": 37.03466686665517,
+        "y": 57.7852844769725,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 45.99810258074184,
+        "y": 55.83951111390206,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": false,
+        "x": 44.96555357262038,
+        "y": 37.82253716312417,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 60.88825895429625,
+        "y": 48.185110208165135,
+        "color": "#ff8400"
+      },
+      {
+        "id": 6,
+        "name": "外公",
+        "highlighted": false,
+        "x": 58.12004564223686,
+        "y": 36.56984342519182,
+        "color": "#c76a00"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 3
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 3,
+          "mppm": 7
+        },
+        "targetToSourcePPM": {
+          "ppm": 3,
+          "mppm": 7
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 4,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 4,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 2
+        },
+        "targetToSourcePPM": {
+          "ppm": 8,
+          "mppm": 2
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 3,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 3,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 10,
+        "source": 6,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 8,
+        "source": 5,
+        "target": 6,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2022,
+      "month": 8,
+      "day": 23
+    },
+    "eventTitle": "I transfer to Temple University.",
+    "eventDescription": "Being home during the pandemic had made me realize how much I wanted to be home, so I transferred to Temple so I would be able to see my parents more.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": true,
+        "x": 50.96193007351283,
+        "y": 61.41761335220178,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": true,
+        "x": 42.191152298430566,
+        "y": 58.8771875848509,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 45.07370490308067,
+        "y": 49.42198927165721,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": false,
+        "x": 37.907869798479624,
+        "y": 35.653050651558296,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 60.92165410718924,
+        "y": 58.51911470357892,
+        "color": "#ff8400"
+      },
+      {
+        "id": 6,
+        "name": "外公",
+        "highlighted": false,
+        "x": 63.08600388588971,
+        "y": 36.23815252942841,
+        "color": "#c76a00"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 6
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 6
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 8
+        },
+        "targetToSourcePPM": {
+          "ppm": 6,
+          "mppm": 8
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 4,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 4,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 2
+        },
+        "targetToSourcePPM": {
+          "ppm": 8,
+          "mppm": 2
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 3,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 3,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 10,
+        "source": 6,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 8,
+        "source": 5,
+        "target": 6,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2022,
+      "month": 10,
+      "day": 26
+    },
+    "eventTitle": "My grandfather dies.",
+    "eventDescription": "When my grandfather died, my grandma was distraught. It was really hard for her. In the years prior, my grandfather had developed pretty severe dementia. He was usually incoherent when I'd go to visit, and it was hard for me to connect with him. Still, we all felt his loss. It brought me closer to my grandma. We began talking more frequently over the phone and I would visit her more.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": true,
+        "x": 55.80434756385163,
+        "y": 58.95555759945589,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": true,
+        "x": 46.37608398552742,
+        "y": 58.19702484576491,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 48.99252116744959,
+        "y": 48.19578629681397,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": false,
+        "x": 40.015447413340006,
+        "y": 36.28111607409142,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 58.930106004755565,
+        "y": 48.47634920568525,
+        "color": "#ff8400"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 6
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 6
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 8
+        },
+        "targetToSourcePPM": {
+          "ppm": 6,
+          "mppm": 8
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 4,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 4,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 2
+        },
+        "targetToSourcePPM": {
+          "ppm": 8,
+          "mppm": 2
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 7
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 7
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 3,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 3,
+          "mppm": 5
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2023,
+      "month": 1,
+      "day": 1
+    },
+    "eventTitle": "My mom moves to Boston to live with my auntie and grandma.",
+    "eventDescription": "My mom and dad had long since stopped talking to each other, even though they still lived together. My mom decided to move to Boston to stay with my Grandma.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": false,
+        "x": 64.28546736778358,
+        "y": 59.92455596485782,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": true,
+        "x": 43.63993550508517,
+        "y": 56.59957740170983,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 41.89886114788567,
+        "y": 46.66963139791241,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": false,
+        "x": 45.77395018934759,
+        "y": 32.77925593219139,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 54.52034967575864,
+        "y": 54.1328787578207,
+        "color": "#ff8400"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 8
+        },
+        "targetToSourcePPM": {
+          "ppm": 6,
+          "mppm": 8
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 2
+        },
+        "targetToSourcePPM": {
+          "ppm": 8,
+          "mppm": 2
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 3,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 3,
+          "mppm": 5
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2023,
+      "month": 12,
+      "day": 22
+    },
+    "eventTitle": "My dad is hospitalized.",
+    "eventDescription": "My dad had been doing badly for a few years, but he'd started having more serious problems in the months leading up to the 22nd. ",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": false,
+        "x": 67.86114557222523,
+        "y": 43.45152281854942,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": true,
+        "x": 35.74212845039613,
+        "y": 47.05629903713177,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 43.312753063901475,
+        "y": 49.12540335364059,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": false,
+        "x": 46.06857008059315,
+        "y": 64.5672362560449,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 57.13412933788587,
+        "y": 45.90513240562768,
+        "color": "#ff8400"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 6,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 2,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 3,
+        "source": 4,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 1
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 1
+        }
+      },
+      {
+        "id": 4,
+        "source": 4,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 1,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 1,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 2
+        },
+        "targetToSourcePPM": {
+          "ppm": 8,
+          "mppm": 2
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 3,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 3,
+          "mppm": 5
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2024,
+      "month": 1,
+      "day": 1
+    },
+    "eventTitle": "My mom moves home with me. My dad gets moved to a memory care facility.",
+    "eventDescription": "My dad's dementia had gotten bad enough that he needed additional support. My mom came home to help me with my dad's transition out of the hospital.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": true,
+        "x": 65.33432716096763,
+        "y": 40.141589578540966,
+        "color": "#ff0000"
+      },
+      {
+        "id": 2,
+        "name": "Dad",
+        "highlighted": true,
+        "x": 36.303111045156086,
+        "y": 46.72648906067642,
+        "color": "#0077ff"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 45.517671150917074,
+        "y": 51.689448587973764,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": false,
+        "x": 46.075742064593335,
+        "y": 66.58885593622892,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 56.88772941377336,
+        "y": 44.959596622239005,
+        "color": "#ff8400"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 5,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 5,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 1,
+        "source": 3,
+        "target": 2,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 5
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 2
+        },
+        "targetToSourcePPM": {
+          "ppm": 8,
+          "mppm": 2
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 3,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 3,
+          "mppm": 5
+        }
+      }
+    ]
+  },
+  {
+    "eventTime": {
+      "year": 2024,
+      "month": 4,
+      "day": 12
+    },
+    "eventTitle": "My dad dies.",
+    "eventDescription": "Joy came home to see him off.",
+    "nodes": [
+      {
+        "id": 1,
+        "name": "Mom",
+        "highlighted": true,
+        "x": 61.82569177768325,
+        "y": 39.36968084720375,
+        "color": "#ff0000"
+      },
+      {
+        "id": 3,
+        "name": "Jess",
+        "highlighted": true,
+        "x": 42.275366219565576,
+        "y": 50.73604534794585,
+        "color": "#fa89c7"
+      },
+      {
+        "id": 4,
+        "name": "Joy",
+        "highlighted": true,
+        "x": 42.53798307385218,
+        "y": 65.7533579175505,
+        "color": "#ffe72e"
+      },
+      {
+        "id": 5,
+        "name": "外婆",
+        "highlighted": false,
+        "x": 53.455764245163294,
+        "y": 44.22559481938521,
+        "color": "#ff8400"
+      }
+    ],
+    "links": [
+      {
+        "id": 0,
+        "source": 3,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 0,
+          "mppm": 0
+        },
+        "targetToSourcePPM": {
+          "ppm": 0,
+          "mppm": 0
+        }
+      },
+      {
+        "id": 5,
+        "source": 3,
+        "target": 4,
+        "sourceToTargetPPM": {
+          "ppm": 8,
+          "mppm": 2
+        },
+        "targetToSourcePPM": {
+          "ppm": 8,
+          "mppm": 2
+        }
+      },
+      {
+        "id": 6,
+        "source": 5,
+        "target": 1,
+        "sourceToTargetPPM": {
+          "ppm": 10,
+          "mppm": 10
+        },
+        "targetToSourcePPM": {
+          "ppm": 10,
+          "mppm": 10
+        }
+      },
+      {
+        "id": 7,
+        "source": 5,
+        "target": 3,
+        "sourceToTargetPPM": {
+          "ppm": 3,
+          "mppm": 5
+        },
+        "targetToSourcePPM": {
+          "ppm": 3,
+          "mppm": 5
+        }
+      }
+    ]
+  }
+]
