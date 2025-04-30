@@ -130,39 +130,27 @@ export default function Timeline() {
 
         const fixedTimeline = data.map((event: Event) => {
           const fixedNodes = (event.nodes as Event["nodes"]).map((node) => {
-            if ("x" in node && "y" in node) {
-              // We can safely assume we have a current exported node version.
-              console.log("New version!");
+            // We can safely assume we have a current exported node version.
+            console.log("New version!");
 
-              return {
-                ...node,
-                ...nodeCoordMap.has(node.id) ? {
-                  x: (nodeCoordMap.get(node.id)!.x / 100) * width, // Convert percentage to coordinate
-                  y: (nodeCoordMap.get(node.id)!.y / 100) * height, // ^^
-                } : (() => {
-                  nodeCoordMap.set(node.id, { x: node.x, y: node.y });
-                  return {
-                    x: (node.x / 100) * width, // Convert percentage to coordinate
-                    y: (node.y / 100) * height, // ^^
-                  };
-                })(),
-                color: nodeColorMap.has(node.id)
-                  ? nodeColorMap.get(node.id)
-                  : (() => {
-                    nodeColorMap.set(node.id, node.color);
-                    return node.color;
-                  })() // iife's are cool :3
-              };
-            }
-
-            // Else, we need to assume we have a previous exported node version,
-            // and set some sensible default values.
-            console.log("Old version!");
             return {
               ...node,
-              x: (Math.random() * width) * width, // Convert percentage to coordinate or default
-              y: (Math.random() * height) / 2, // Convert percentage to coordinate or default
-              color: "#FFFFFF", // pure white
+              ...nodeCoordMap.has(node.id) ? {
+                x: (nodeCoordMap.get(node.id)!.x / 100) * width, // Convert percentage to coordinate
+                y: (nodeCoordMap.get(node.id)!.y / 100) * height, // ^^
+              } : (() => {
+                nodeCoordMap.set(node.id, { x: node.x, y: node.y });
+                return {
+                  x: (node.x / 100) * width, // Convert percentage to coordinate
+                  y: (node.y / 100) * height, // ^^
+                };
+              })(),
+              color: nodeColorMap.has(node.id)
+                ? nodeColorMap.get(node.id)
+                : (() => {
+                  nodeColorMap.set(node.id, node.color);
+                  return node.color;
+                })() // iife's are cool :3
             };
           });
 
