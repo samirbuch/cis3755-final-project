@@ -1,4 +1,4 @@
-import { Button, Code, Flex, Text, Title } from "@mantine/core";
+import { Button, Code, Divider, Flex, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ClockLoader } from "react-spinners";
@@ -202,11 +202,19 @@ export default function Timeline() {
           <Title mt={"lg"}>No path specified</Title>
           <Text>You&apos;re missing a <Code>/story/&gt;path.json&lt;</Code> parameter.</Text>
 
-          <Link href="/" style={{ marginTop: "1rem" }}>
-            <Button variant="transparent">
-              Try going home
-            </Button>
-          </Link>
+          <Flex direction="row" gap="sm" mt="lg">
+            <Link href="/">
+              <Button variant="transparent">
+                Try going home
+              </Button>
+            </Link>
+            <Divider orientation="vertical" />
+            <Link href="/editor">
+              <Button variant="Outline">
+                Try making your own...
+              </Button>
+            </Link>
+          </Flex>
         </Flex>
       </CenteredOnPage>
     )
@@ -230,11 +238,19 @@ export default function Timeline() {
             <Text>There was an error fetching the story.</Text>
             <Code block>{error}</Code>
 
-            <Link href="/">
-              <Button variant="transparent">
-                Try going back
-              </Button>
-            </Link>
+            <Flex direction="row" gap="sm" mt="lg">
+              <Link href="/">
+                <Button variant="transparent">
+                  Try going home
+                </Button>
+              </Link>
+              <Divider orientation="vertical" />
+              <Link href="/editor">
+                <Button variant="transparent">
+                  Try making your own...
+                </Button>
+              </Link>
+            </Flex>
           </Flex>
         </CenteredOnPage>
       </CenteredOnPage>
