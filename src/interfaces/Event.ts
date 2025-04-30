@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { ZodLinkSourceTargetID } from "./Link";
-import { ZodNodeNoFixed } from "./Node";
+import { ZodNodeNoFixed, OldZodNode } from "./Node";
 
 export const ZodEvent = z.object({
   eventTime: z.object({
@@ -10,7 +10,7 @@ export const ZodEvent = z.object({
   }),
   eventTitle: z.string().nullable(),
   eventDescription: z.string().nullable(),
-  nodes: z.array(ZodNodeNoFixed),
+  nodes: z.array(z.union([ZodNodeNoFixed, OldZodNode])),
   links: z.array(ZodLinkSourceTargetID),
 });
 type ZodDataT = z.infer<typeof ZodEvent>;
