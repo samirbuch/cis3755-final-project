@@ -249,7 +249,7 @@ export default function Graph(props: GraphProps) {
 
       // Set glow effect
       if (anim.glow === 'bloom') {
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = 30;
         ctx.shadowColor = anim.color;
       } else {
         ctx.shadowBlur = 5;
@@ -258,7 +258,7 @@ export default function Graph(props: GraphProps) {
 
       // Draw arc shape
       ctx.beginPath();
-      const radius = 8 * anim.scale;
+      const radius = 5 * anim.scale;
       ctx.arc(0, 0, radius, 0, Math.PI); // Outer arc
       ctx.arc(0, 0, radius * 0.6, Math.PI, 0, true); // Inner arc
       ctx.closePath();
@@ -421,7 +421,7 @@ export default function Graph(props: GraphProps) {
               scale,
               reverse,
               startTime: performance.now() - (i * (interval / count)),
-              duration: 2000,
+              duration: 3000,
               glow
             });
           }
