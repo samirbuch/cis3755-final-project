@@ -200,7 +200,7 @@ export default function Timeline() {
         <Flex direction={"column"} align="center">
           <ClockLoader color="#FFF" size={50} />
           <Title mt={"lg"}>No path specified</Title>
-          <Text>You&apos;re missing a <Code>?path=</Code> parameter.</Text>
+          <Text>You&apos;re missing a <Code>/story/&gt;path.json&lt;</Code> parameter.</Text>
 
           <Link href="/" style={{ marginTop: "1rem" }}>
             <Button variant="transparent">
