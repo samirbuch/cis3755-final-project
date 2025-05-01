@@ -1,0 +1,84 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Bell MT, serif;
+  background: #171717;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+.section {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  opacity: 1;
+  transform: translateY(50px);
+  padding: 2rem;
+  text-align: center;
+  z-index: 12;
+}
+
+.sticky-section {
+  height: 500vh;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: center;
+  font-size: 1.5rem;
+  opacity: 1;
+  transform: translateY(50px);
+  padding: 2rem;
+  text-align: center;
+  z-index: 2;
+}
+
+h3 {
+  margin: 3rem;
+}
+
+.section p {
+  margin: 3rem;
+  display: block;
+}
+
+.section img {
+  width: 300px;
+  margin-top: 1rem;
+  display: block;
+}
+
+.section figcaption {
+  font-size: 1.1rem;
+}
+
+.sticky-element {
+  position: sticky;
+  top: 0%;
+  /* background: #222; */
+  /* padding: 1rem; */
+  z-index: 10;
+}
+
+.text-box {
+  background-color: #9300c5;
+  color: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  /* Size of the svg graph minus a good margin amount */
+  width: calc(500px - 8rem);
+  /* margin: 0 auto; */ /* This aligns center of the page */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  z-index: 12;
+}
+
+.flex-right {
+  align-self: flex-end;
+}

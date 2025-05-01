@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vertical Scrollytelling</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.7.0/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/noframework.waypoints.js"></script>
+    <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://unpkg.com/gsap@3/dist/ScrollTrigger.min.js"></script>
+</head>
+
+<body>
+    <div class="content">
+        <section class="section">
+            <h3>Each storyline shows something that may be somewhat obvious:</h3>
+
+            <section class="text-box">
+                The more time you spend with someone you love, the more meaningful your relationship with them will be.
+            </section>
+            <img src="close-relationship.png" />
+            <figcaption>a close relationship</figcaption>
+            <img src="distant-relationship.png" />
+            <figcaption>a distant relationship</figcaption>
+        </section>
+        <section class="section">
+            <p>
+                We've shown you our own lives through this paradigm. Now we raise the question to you.
+            </p>
+
+            <section class="text-box">
+                How much time do you spend with your loved ones? Are you happy with that?
+            </section>
+            <p>
+                It's easy to say you'll go home for Thanksgiving next year, or that you'll reschedule dinner with your
+                dad, even though more often than not, you'll get busy and forget, going to do the other tasks that have
+                deadlines or career repercussions, until he asks again.
+            </p>
+        </section>
+
+        <section class="sticky-section">
+            <h3>
+                You might remember this graph. It shows the average lifespan of a person, in weeks.
+            </h3>
+            <div class="sticky-element">
+                <svg id="canvas" width="500" height="500"></svg>
+            </div>
+            <div style="height: 10rem;">
+            </div>
+            <section class="text-box">
+                Each box is 1 week. There are 52 boxes in each row representing the weeks in a year.
+            </section>
+            <section class="text-box flex-right">
+                The average person in the US lives to be about 77 years old. This graph has 77 rows, one for each year.
+            </section>
+            <div style="height: 50rem;">
+                <!-- rem / em -->
+                <!-- rem = root (body) font size -->
+                <!-- em = closest parent font size, which if undefined, goes to the next parent, etc. until it finds a font size. -->
+                <!-- (most people use rem for consistency) -->
+                <!-- https://open.spotify.com/track/31AOj9sFz2gM0O3hMARRBx?si=f75302f1fb72497d -->
+            </div>
+            <section class="text-box" id="most-of-us">
+                Most of us in this class are in our 20s, so that means we've got about <b>57 years of time left.</b>
+            </section>
+            <div style="height: 70rem;">
+            </div>
+            <section class="text-box flex-right" id="sleep">
+                For the most part, we are able to spend this time how we like, but not all of it. Some of how we spend
+                our time is predetermined, like how long we sleep. On average, a human being spends about a third of
+                their life asleep. If we subtract this time, we have about <b>38 years left</b>.
+            </section>
+            <div style="height: 50rem;">
+            </div>
+            <section class="text-box" id="work">
+                Now let's assume that you are in school or work for 8 hours a day until you're 60 years old. That means
+                you'll spend a little over 13 years working total, leaving you with <b>25 years left</b>.
+            </section>
+            <div style="height: 70rem;">
+            </div>
+            <section class="text-box flex-right" id="teeth">
+                In addition to this, most people in the US take a 16 minute shower every day, brush their teeth for about a minute a day, and about 12 minutes using the toilet, (assuming no scrolling happens during those times). This totals to 29 minutes a day. This accumulates to a little less than a year, leaving you with <b>24 years left</b>.
+                <!-- samir, ac georg, is an outlier and should not be counted. samir spends 186 minutes per day, on average, playing animal crossing gamecube. -->
+            </section> 
+            <div id="reflection" style="height: 50rem;">
+            </div>         
+        </section>
+        <section class="section">
+            <h3>
+                So.
+            </h3>
+            <p>
+                We know we haven't covered everything that people need to do to live. Things like exercising, grocery shopping, cooking, and laundry are largely inescapable parts of our lives too, but the point's probably pretty clear. We're looking at about 24 years of the remaining 57 years we have. This is the time we can spend however we want. 
+            </p>
+            <img src="24years.png" />
+            <p>
+                Here it is.
+            </p>
+            <p>
+                There's so much you can do with these boxes... and yet they're inevitably exchanged for things that aren't super valueable. We're all too aware of the time we've spent bedrotting and doom scrolling. Some of us might even have apps on our phone telling us <i>exactly</i> how much time... But there's a decent chance you didn't really enjoy that time.
+            </p>
+            <p>
+                We suggest that there are two possible ways to maximize the value of your time: either by spending it doing something that makes you happy, or by spending it doing something to make someone else happy.
+            </p>
+            
+        </section>
+        <div style="height: 50rem;">
+        </div>
+        <section class="section">
+            Thank you!
+        </section>
+    </div>
+
+    <script src="script.js" module></script>
+</body>
+
+</html>
