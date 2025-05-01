@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ClockLoader } from "react-spinners";
 import { Waypoint } from "react-waypoint";
+import { IconArrowRight } from "@tabler/icons-react";
 
 import Event from "@/interfaces/Event";
 import CenteredOnPage from "@/components/CenteredOnPage";
@@ -303,6 +304,18 @@ export default function Timeline() {
           }} />
         </Waypoint>
       ))}
+
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "2rem" }}>
+        <Link href="https://ytilepilogue.netlify.app/">
+          <Button
+            variant="transparent"
+            rightSection={<IconArrowRight />}
+            style={{ zIndex: 101 }}
+          >
+            Why does this matter?
+          </Button>
+        </Link>
+      </div>
     </div>
   );
 }
