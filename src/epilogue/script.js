@@ -7,6 +7,7 @@ function ScrollTrigger(n, offset, onScrollDown, onScrollUp) {
   return new Waypoint({
     element: el,
     handler: function (direction) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       direction == 'down' ? onScrollDown() : onScrollUp();
     },
     //start 75% from the top of the div
